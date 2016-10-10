@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#01a4e8</color>
+    <color name="colorPrimaryDark">#0292ce</color>
+    <color name="colorAccent">#01a4e8</color>
+    <color name="white">#FFFFFF</color>
+    <color name="sky_blue">#3498db</color>
+    <color name="orange_transparent">#10FC9A44</color>
+
+    <color name="transparent_blue">#303498db</color>
+
+    <color name="black_overlay">#66000000</color>
+    <color name="light_grey">#DBDBDB</color>>
+    <color name="grey_light">#ccccb3</color>>
+    <color name="alert_primaryColor">#f24f40</color>>
+    <color name="alert_primaryColorDark">#f03928</color>>
+    <color name="alert_colorAccent">#ff1a1a</color>>
+
+
+    <color name="text_gray_nav">#676E6E</color>
+    <color name="menu_ash_color">#8b8b8b</color>
+    <color name="orange">#FF7F00</color>
+    <color name="green">#04ba33</color>
+    <color name="grey_btn_select">#E8E8E8</color>
+    <color name="snackbar_background">#FFFFFF</color>
+    <color name="black">#090202</color>
+    <color name="transparent_orange">#60ED6C3D</color>
+    <color name="red">#FF0000</color>
+    <color name="light_ash1">#e5e5e5</color>
+
+    <color name="pale_rose">#E04583</color>
+    <color name="blue">#2A79E0</color>
+
+    <color name="purple">#9C4AE0</color>
+    <color name="majenta">#CB45E0</color>
+    <color name="light_green">#C2E02A</color>
+    <color name="yellow">#E0AC2A</color>
+    <color name="pale_red">#E0454D</color>
+
+    <color name="transparent_red">#60FF0000</color>
+
+    <color name="select">#403498db</color>
+    <color name="colorPrimaryTextDark">#0281b6</color>
+    <color name="ivery">#fcfce0</color>
+
+    <color name="a1">#FF7079</color>
+    <color name="a2">#FF9979</color>
+    <color name="a3">#FFC879</color>
+    <color name="a4">#A17EBC</color>
+    <color name="a5">#BC7AAB</color>
+    <color name="a6">#B9BC7A</color>
+    <color name="a7">#998FBC</color>
+    <color name="a8">#C6A2D6</color>
+    <color name="a9">#A2D6D1</color>
+    <color name="a10">#843333</color>
+    <color name="a11">#EA5B5B</color>
+    <color name="a12">#8AC4EA</color>
+    <color name="a13">#EA8AE4</color>
+    <color name="a14">#EA8A98</color>
+    <color name="a15">#EAEA8A</color>
+    <color name="a16">#9FEA8A</color>
+    <color name="a17">#628774</color>
+    <color name="a18">#628774</color>
+    <color name="a19">#7587A0</color>
+    <color name="a20">#1F406D</color>
+</resources>

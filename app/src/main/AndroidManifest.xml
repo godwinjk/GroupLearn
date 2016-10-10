@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.grouplearn.project">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <application
+        android:name=".app.MyApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/grouplearn_icon_256"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme1">
+        <activity
+            android:name=".app.uiManagement.SplashScreenActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:noHistory="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
+            android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.uiManagement.userManagement.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.groupManagement.GroupListActivity"
+            android:label="@string/title_activity_group_list"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".app.uiManagement.userManagement.SignupActivity"
+            android:label="@string/title_activity_signup"
+            android:noHistory="true"
+            android:theme="@style/AppTheme1" />
+        <activity android:name=".app.uiManagement.BaseActivity" />
+        <activity
+            android:name=".app.uiManagement.groupManagement.GroupChatActivity"
+            android:label="@string/title_activity_group_chat"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".app.uiManagement.groupManagement.AddGroupActivity"
+            android:label="@string/title_activity_add_group"
+            android:theme="@style/AppTheme1" />
+
+        <provider
+            android:name=".app.databaseManagament.DatabaseProvider"
+            android:authorities="com.grouplearn.project.app.GroupLearn.DataBaseProvider"
+            android:exported="true" />
+
+        <activity
+            android:name=".app.uiManagement.StatusActivity"
+            android:label="@string/title_activity_status"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.contactManagement.ContactListActivity"
+            android:label="@string/title_activity_contact_list"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.userManagement.UserProfileActivity"
+            android:label="@string/title_activity_user_profile"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.serachManagement.SearchAllActivity"
+            android:label="@string/title_activity_search_all"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.groupManagement.GroupInfoActivity"
+            android:label="@string/title_activity_group_info"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.settingsManagement.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.settingsManagement.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:theme="@style/AppTheme1"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".app.uiManagement.groupManagement.RequestAcceptingActivity"
+            android:label="@string/title_activity_request_acceptiong"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.settingsManagement.PrivacySettingsActivity"
+            android:label="@string/title_activity_privacy_settings"
+            android:theme="@style/AppTheme1" />
+
+        <service android:name=".cloud.message.FcmMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service android:name=".cloud.message.FcmInstantIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name="it.moondroid.chatbot.MainActivity"
+            android:label="@string/app_name" >
+
+        </activity>
+
+
+    </application>
+
+</manifest>

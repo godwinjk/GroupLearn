@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/group1"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_status"
+            android:checked="false"
+            android:icon="@drawable/ic_menu_smile"
+            android:title="Status" />
+    </group>
+    <group
+        android:id="@+id/group2"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_contacts"
+            android:checked="false"
+            android:icon="@drawable/ic_menu_contacts"
+            android:title="Contacts" />
+        <item
+            android:id="@+id/nav_request"
+            android:checked="false"
+            android:icon="@drawable/invitation_32"
+            android:title="Invitations" />
+    </group>
+    <group
+        android:id="@+id/group3"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_settings"
+            android:checked="false"
+            android:icon="@drawable/ic_menu_settings"
+            android:title="Settings" />
+        <item
+            android:id="@+id/nav_about"
+            android:checked="false"
+            android:icon="@drawable/ic_menu_about"
+            android:title="About" />
+        <item
+            android:id="@+id/nav_signout"
+            android:checked="false"
+            android:icon="@drawable/ic_menu_logout"
+            android:title="Sign Out" />
+    </group>
+</menu>

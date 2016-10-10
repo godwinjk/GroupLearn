@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "834135602618",
+    "firebase_url": "https://group-learn.firebaseio.com",
+    "project_id": "group-learn",
+    "storage_bucket": "group-learn.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:834135602618:android:a2feabfb786d47c1",
+        "android_client_info": {
+          "package_name": "com.grouplearn.project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "834135602618-6cblffeb81p4upik9g9ssaojlf2hbcqs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIcelqfzkEchR-zf8yHW3aIDfgIRkLLLE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
