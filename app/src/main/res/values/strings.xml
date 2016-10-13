@@ -111,4 +111,6 @@
     <string name="title.custom_url">Enter custom Url</string>
     <string name="btn.title.cancel">Cancel</string>
     <string name="btn.title.Okay">Okay</string>
+    <string name="title_activity_subscribed_group_request_list">SubscribedGroupRequestListActivity
+    </string>
 </resources>

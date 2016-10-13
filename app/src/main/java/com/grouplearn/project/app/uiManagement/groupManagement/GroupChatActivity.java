@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -17,8 +19,10 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
+import android.view.animation.ScaleAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -40,18 +44,20 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 import it.moondroid.chatbot.BrainService;
 import it.moondroid.chatbot.Constants;
 
 
-public class GroupChatActivity extends BaseActivity {
+public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnInitListener {
 
     private static final String TAG = "GroupChatActivity";
     String groupUniqueId;
     Toolbar toolbar;
     ImageView ivSent;
+    ImageView ivInputType;
     EditText etChatBox;
     Context mContext;
     GroupModel mGroupModel;
@@ -59,10 +65,15 @@ public class GroupChatActivity extends BaseActivity {
     ChatRecyclerAdapter mChatRecyclerAdapter;
     RecyclerView rvChatList;
     ChatDbHelper mDbHelper;
+
     boolean isGodwinBot = false;
+    boolean isTtsEnabled = false;
     long myUserId;
 
+    TextToSpeech textToSpeech;
     private ArrayList<MessageModel> godwinBotConversation = new ArrayList<>();
+    private boolean isZoomAnimation = true;
+    SpeechRecognizer recognizer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,13 +134,35 @@ public class GroupChatActivity extends BaseActivity {
 
         etChatBox = (EditText) findViewById(R.id.et_chat_box);
         ivSent = (ImageView) findViewById(R.id.iv_sent);
+        ivInputType = (ImageView) findViewById(R.id.iv_input_type);
 
         rvChatList.scrollToPosition(mChatRecyclerAdapter.getItemCount() - 1);
+
         setSentButtonType(1);
+        ivInputType.setTag(true);
+        if (isGodwinBot) {
+            ivInputType.setVisibility(View.GONE);
+        }
+
+        textToSpeech = new TextToSpeech(mContext, this);
     }
 
     @Override
     public void registerListeners() {
+        ivInputType.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if ((boolean) ivInputType.getTag()) {
+                    ivInputType.setImageResource(R.drawable.happy_32);
+                    ivInputType.setTag(false);
+                    hideSoftKeyboard();
+                } else {
+                    openSoftKeyBoard();
+                    ivInputType.setImageResource(R.drawable.key_board_32);
+                    ivInputType.setTag(true);
+                }
+            }
+        });
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -200,7 +233,7 @@ public class GroupChatActivity extends BaseActivity {
     }
 
     private void speechRecognizer() {
-        SpeechRecognizer recognizer = SpeechRecognizer.createSpeechRecognizer(mContext);
+        recognizer = SpeechRecognizer.createSpeechRecognizer(mContext);
 
         final StringBuilder builder = new StringBuilder();
         recognizer.setRecognitionListener(new RecognitionListener() {
@@ -216,7 +249,9 @@ public class GroupChatActivity extends BaseActivity {
 
             @Override
             public void onRmsChanged(float rmsdB) {
-                Log.e(TAG, "onRmsChanged");
+                float value = (float) (10 * Math.pow(10, ((double) rmsdB / (double) 10)));
+                Log.e(TAG, "onRmsChanged \t" + rmsdB + " value \t" + value);
+//                zoomAnimation(rmsdB);
             }
 
             @Override
@@ -238,14 +273,16 @@ public class GroupChatActivity extends BaseActivity {
             @Override
             public void onResults(Bundle results) {
                 Log.e(TAG, "onResults" + results.toString());
-                ArrayList<String> texts = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-//                for (String word : texts) {
-                builder.append(texts.get(0) + "\t");
-//                }
+                final ArrayList<String> texts = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+
+//                builder.append(texts.get(0) + "\t");
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        etChatBox.setText(builder.toString());
+                        String finalText = texts.get(0);
+                        etChatBox.setText(finalText);
+                        processResult(finalText);
                     }
                 });
             }
@@ -254,9 +291,11 @@ public class GroupChatActivity extends BaseActivity {
             public void onPartialResults(Bundle partialResults) {
                 Log.e(TAG, "onPartialResults");
                 ArrayList<String> texts = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-                for (String word : texts) {
-                    builder.append(word + "\t");
-                }
+//                for (String word : texts) {
+//                    builder.append(word + "\t");
+//                }
+                builder.append(texts.get(0) + " ");
+                etChatBox.setText(texts.get(0));
                 Log.e(TAG, "onPartialResults" + builder.toString());
             }
 
@@ -272,12 +311,30 @@ public class GroupChatActivity extends BaseActivity {
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1000);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 3000);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak Now");
 
         recognizer.startListening(recognizerIntent);
 //        startActivity(recognizerIntent);
         Log.e(TAG, "START LISTNEING");
+//        DisplayInfo.showToast(mContext, "Say 'SEND' or 'CANCEL/DISMISS' at last to send or dismiss message");
         DisplayInfo.showToast(mContext, "Say something loud");
+    }
+
+    private void processResult(String message) {
+        if (message != null) {
+            String[] words = message.split(" ");
+            if (words != null && words.length > 1) {
+//                if (words[words.length - 1].equals("send") || words[words.length - 1].equals("sent")) {
+                ivSent.performClick();
+//                } else if (words[words.length - 1].equals("cancel") || words[words.length - 1].equals("dismiss")) {
+                etChatBox.setText("");
+                etChatBox.setEnabled(true);
+//                }
+
+            }
+        }
     }
 
     public String getErrorText(int errorCode) {
@@ -362,7 +419,7 @@ public class GroupChatActivity extends BaseActivity {
                 switch (status) {
                     case Constants.STATUS_BRAIN_LOADING:
                         if (isGodwinBot) {
-                            DisplayInfo.showToast(mContext, "Godwin is  loading");
+                            DisplayInfo.showToast(mContext, "Aimi is  loading");
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -376,13 +433,13 @@ public class GroupChatActivity extends BaseActivity {
 
                     case Constants.STATUS_BRAIN_LOADED:
                         if (isGodwinBot) {
-                            DisplayInfo.showToast(mContext, "Godwin is ready");
+                            DisplayInfo.showToast(mContext, "Aimi is ready");
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     etChatBox.setEnabled(true);
                                     etChatBox.setText("");
-                                    etChatBox.setHint("Ask to Godwin");
+                                    etChatBox.setHint("Ask to Aimi");
                                     ivSent.setEnabled(true);
                                 }
                             });
@@ -399,6 +456,7 @@ public class GroupChatActivity extends BaseActivity {
                 model.setSenderName("Aimi");
                 godwinBotConversation.add(model);
                 mChatRecyclerAdapter.setMessageModels(godwinBotConversation);
+                speakOut(answer);
             }
 
             if (intent.getAction().equalsIgnoreCase(Constants.BROADCAST_ACTION_LOGGER)) {
@@ -410,6 +468,13 @@ public class GroupChatActivity extends BaseActivity {
             }
         }
     };
+
+    private void speakOut(String message) {
+        if (isTtsEnabled && message != null) {
+            textToSpeech.setSpeechRate(.8f);
+            textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
 
     private void addChatToDb(String message) {
         etChatBox.setText("");
@@ -450,24 +515,74 @@ public class GroupChatActivity extends BaseActivity {
 
     private void rotateAnimation() {
         RotateAnimation animation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, .5f, Animation.RELATIVE_TO_SELF, .5f);
-        animation.setInterpolator(new OvershootInterpolator());
-        animation.setDuration(200);
+        animation.setInterpolator(new DecelerateInterpolator());
+        animation.setDuration(500);
         ivSent.startAnimation(animation);
+    }
+
+    private void zoomAnimation(float rms) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                isZoomAnimation = true;
+            }
+        }, 200);
+        if (isZoomAnimation) {
+            ScaleAnimation scaleAnimation = new ScaleAnimation(.5f, rms / 10, .5f, rms / 10, Animation.RELATIVE_TO_SELF, .5f, Animation.RELATIVE_TO_SELF, .5f);
+            scaleAnimation.setInterpolator(new OvershootInterpolator());
+            scaleAnimation.setDuration(200);
+            ivSent.startAnimation(scaleAnimation);
+            isZoomAnimation = false;
+        }
     }
 
     private void setSentButtonType(int tag) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+
             if (tag == 1) {
                 ivSent.setTag(2);
                 ivSent.setImageResource(R.drawable.mic_128);
+
             } else {
                 ivSent.setTag(1);
                 ivSent.setImageResource(R.drawable.sent);
             }
-
+            if (ivSent.getTag() != null && (Integer) ivSent.getTag() == tag) {
+                rotateAnimation();
+            }
         } else {
             ivSent.setTag(1);
             ivSent.setImageResource(R.drawable.sent);
         }
     }
+
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+
+            int result = textToSpeech.setLanguage(Locale.US);
+            if (result == TextToSpeech.LANG_NOT_SUPPORTED || result == TextToSpeech.LANG_MISSING_DATA) {
+                Log.e(TAG, "LANGIAGE NOT SUPPORTED ");
+                isTtsEnabled = false;
+            } else {
+                Log.e(TAG, "SUCCESS SUCCESS");
+                isTtsEnabled = true;
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
+        if (recognizer != null) {
+            recognizer.stopListening();
+            recognizer.cancel();
+            recognizer.destroy();
+        }
+        super.onDestroy();
+    }
+
 }

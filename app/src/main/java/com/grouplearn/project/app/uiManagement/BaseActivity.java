@@ -82,6 +82,14 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    public void openSoftKeyBoard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.toggleSoftInputFromWindow(view.getWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+        }
+    }
+
     public void showNoInternetConnectionAlert(Context context) {
         GeneralAlert.showAlert(context, "Warning !!!", "No internet connection. Please connect to any network and proceed.");
     }

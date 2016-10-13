@@ -33,7 +33,7 @@ import java.util.ArrayList;
  */
 public class CloudMessageHelper {
     Context mContext;
-    final int LIMIT = 1000;
+    final int LIMIT = 100;
 
     public CloudMessageHelper(@NonNull Context mContext) {
         this.mContext = mContext;
@@ -44,7 +44,7 @@ public class CloudMessageHelper {
         String token = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN);
         request.setToken(token);
         request.setGroupId(groupId);
-        request.setLimit(100);
+        request.setLimit(LIMIT);
         long serverSyncTime = new ServerSyncTimes(mContext).getLastUpdatedTime(ServerSyncTimes.MESSAGE_GET);
         request.setStartTime(serverSyncTime);
 
