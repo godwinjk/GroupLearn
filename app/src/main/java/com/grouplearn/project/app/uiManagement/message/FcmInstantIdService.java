@@ -1,4 +1,4 @@
-package com.grouplearn.project.cloud.message;
+package com.grouplearn.project.app.uiManagement.message;
 
 import android.os.Build;
 import android.provider.Settings;

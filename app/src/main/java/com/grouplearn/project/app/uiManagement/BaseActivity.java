@@ -14,6 +14,12 @@ import com.grouplearn.project.utilities.GeneralAlert;
 
 public abstract class BaseActivity extends AppCompatActivity {
     Toolbar mToolbar;
+    public static final int APP_ACTIVE = 0;
+    public static final int APP_NOT_ACTIVE = 0;
+    public static final int APP_PAUSED = 1;
+    public static final int APP_DESTROYED = 2;
+
+    public static int appState = APP_NOT_ACTIVE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +71,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        appState = APP_PAUSED;
+        appState = APP_NOT_ACTIVE;
         hideSoftKeyboard();
     }
 
@@ -72,6 +80,18 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         hideSoftKeyboard();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        appState = APP_ACTIVE;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        appState = APP_DESTROYED;
     }
 
     public void hideSoftKeyboard() {

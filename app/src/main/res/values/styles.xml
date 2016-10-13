@@ -45,4 +45,5 @@
     <style name="ToolbarStyle" parent="@style/ThemeOverlay.AppCompat.ActionBar">
         <item name="colorAccent">@color/white</item>
     </style>
+
 </resources>

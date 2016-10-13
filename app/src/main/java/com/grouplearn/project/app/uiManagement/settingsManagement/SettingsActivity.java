@@ -14,6 +14,8 @@ import com.grouplearn.project.app.uiManagement.userManagement.UserProfileActivit
 public class SettingsActivity extends BaseActivity implements View.OnClickListener {
     Context mContext;
     TextView tvUserSettings;
+    TextView tvNotificationSettings;
+    TextView tvChatSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +31,15 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     @Override
     public void initializeWidgets() {
         tvUserSettings = (TextView) findViewById(R.id.tv_user_settings);
+        tvNotificationSettings = (TextView) findViewById(R.id.tv_notification_settings);
+        tvChatSettings = (TextView) findViewById(R.id.tv_chat_settings);
     }
 
     @Override
     public void registerListeners() {
         tvUserSettings.setOnClickListener(this);
+        tvNotificationSettings.setOnClickListener(this);
+        tvChatSettings.setOnClickListener(this);
     }
 
     @Override
@@ -41,6 +47,12 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         switch (v.getId()) {
             case R.id.tv_user_settings:
                 startActivity(new Intent(mContext, UserProfileActivity.class));
+                break;
+            case R.id.tv_notification_settings:
+                startActivity(new Intent(mContext, NotificationSettingsActivity.class));
+                break;
+            case R.id.tv_chat_settings:
+                startActivity(new Intent(mContext, ChatSettings.class));
                 break;
         }
     }

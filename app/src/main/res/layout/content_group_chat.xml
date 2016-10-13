@@ -53,12 +53,11 @@
                     android:layout_height="wrap_content"
                     android:background="@null"
                     android:hint="Say something..."
-                    android:imeOptions="actionDone"
-                    android:inputType="textCapSentences"
+                    android:imeOptions="actionSend"
+                    android:inputType="textCapSentences|textMultiLine"
                     android:maxLines="5"
                     android:padding="10dp" />
             </LinearLayout>
-
 
         </android.support.v7.widget.CardView>
 

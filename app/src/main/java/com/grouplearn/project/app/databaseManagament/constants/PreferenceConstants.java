@@ -19,4 +19,14 @@ public class PreferenceConstants {
 
     public static final String USER_STATUS = "USER_STATUS";
     public static final String DP_PATH = "DP_PATH";
+
+    public static final String IS_SHOW_NOTIFICATION = "IS_SHOW_NOTIFICATION";
+    public static final String IS_SHOW_CONTENT_IN_NOTIFICATION = "IS_SHOW_CONTENT_IN_NOTIFICATION";
+    public static final String IS_SHOW_IN_APP_NOTIFICATION = "IS_SHOW_IN_APP_NOTIFICATION";
+    public static final String IS_NOTIFICATION_SOUND = "IS_NOTIFICATION_SOUND";
+
+    public static final String IS_SPEAK_ENABLED = "IS_SPEAK_ENABLED";
+    public static final String IS_ENTER_KEY_SEND_MESSAGE = "IS_ENTER_KEY_SEND_MESSAGE";
+
+
 }

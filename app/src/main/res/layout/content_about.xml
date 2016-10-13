@@ -7,6 +7,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.grouplearn.project.app.uiManagement.settingsManagement.AboutActivity"
     tools:showIn="@layout/activity_about">
+
     <EditText
         android:id="@+id/et_fcm_token"
         android:layout_width="wrap_content"
@@ -34,11 +35,10 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/textView"
         android:layout_marginEnd="47dp"
-        android:layout_marginTop="26dp"
+        android:layout_marginTop="20dp"
         android:foregroundGravity="right"
         android:gravity="center"
-        android:text="Version 1.0.0"
-        android:textColor="@color/colorPrimary" />
+        android:text="Version 1.0.0" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -48,23 +48,22 @@
         android:orientation="vertical"
         android:padding="5dp">
 
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_marginBottom="5dp"
             android:gravity="center"
-            android:text="Powered By"
+            android:text="By"
             android:textColor="@color/colorPrimary"
             android:textSize="12dp"
-            android:textStyle="italic" />
+            android:textStyle="italic|bold" />
 
         <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_gravity="center"
-            android:src="@drawable/group_128" />
+            android:src="@drawable/grouplearn_icon_128" />
 
         <TextView
             android:layout_width="match_parent"

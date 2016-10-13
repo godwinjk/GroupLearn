@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -23,6 +24,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
 import android.view.animation.ScaleAnimation;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -34,6 +36,7 @@ import com.grouplearn.project.app.uiManagement.adapter.ChatRecyclerAdapter;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
+import com.grouplearn.project.app.uiManagement.notification.NotificationManager;
 import com.grouplearn.project.models.GroupModel;
 import com.grouplearn.project.models.MessageModel;
 import com.grouplearn.project.utilities.ChatUtilities;
@@ -65,6 +68,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
     ChatRecyclerAdapter mChatRecyclerAdapter;
     RecyclerView rvChatList;
     ChatDbHelper mDbHelper;
+    AppSharedPreference mPref;
 
     boolean isGodwinBot = false;
     boolean isTtsEnabled = false;
@@ -81,6 +85,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
         setContentView(R.layout.activity_group_chat);
         Intent intent = getIntent();
         mContext = this;
+        mPref = new AppSharedPreference(mContext);
 
         groupUniqueId = intent.getStringExtra("groupCloudId");
 
@@ -100,6 +105,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
     @Override
     protected void onResume() {
         super.onResume();
+        NotificationManager.getInstance().cancelNotification();
         updateChatList();
 
         MessageInteractor.getInstance().getAllMessages(Long.parseLong(groupUniqueId));
@@ -145,6 +151,16 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
         }
 
         textToSpeech = new TextToSpeech(mContext, this);
+
+        if (mPref.getBooleanPrefValue(PreferenceConstants.IS_ENTER_KEY_SEND_MESSAGE)) {
+            etChatBox.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+            etChatBox.setMaxLines(1);
+            etChatBox.setImeOptions(EditorInfo.IME_ACTION_SEND);
+        } else {
+            etChatBox.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+            etChatBox.setMaxLines(5);
+            etChatBox.setImeOptions(EditorInfo.IME_ACTION_NONE);
+        }
     }
 
     @Override
@@ -178,7 +194,6 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
                 if ((Integer) ivSent.getTag() == 2) {
                     speechRecognizer();
                 } else {
-                    hideSoftKeyboard();
                     String message = etChatBox.getText().toString();
                     message = message.trim();
                     if (!TextUtils.isEmpty(message)) {
@@ -198,14 +213,17 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
 
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    hideSoftKeyboard();
-                    String message = etChatBox.getText().toString();
-                    message = message.trim();
-                    if (!TextUtils.isEmpty(message)) {
-                        addChatToDb(message);
+                    if (mPref.getBooleanPrefValue(PreferenceConstants.IS_ENTER_KEY_SEND_MESSAGE)) {
                         hideSoftKeyboard();
+                        String message = etChatBox.getText().toString();
+                        message = message.trim();
+                        if (!TextUtils.isEmpty(message)) {
+                            addChatToDb(message);
+                            hideSoftKeyboard();
+                        }
+                        return true;
                     }
-                    return true;
+                    return false;
                 }
                 return false;
             }
@@ -456,7 +474,8 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
                 model.setSenderName("Aimi");
                 godwinBotConversation.add(model);
                 mChatRecyclerAdapter.setMessageModels(godwinBotConversation);
-                speakOut(answer);
+                if (mPref.getBooleanPrefValue(PreferenceConstants.IS_SPEAK_ENABLED))
+                    speakOut(answer);
             }
 
             if (intent.getAction().equalsIgnoreCase(Constants.BROADCAST_ACTION_LOGGER)) {
@@ -479,7 +498,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
     private void addChatToDb(String message) {
         etChatBox.setText("");
 
-        AppSharedPreference mPref = new AppSharedPreference(mContext);
+
         String userName = mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME);
         MessageModel model = new MessageModel();
         model.setMessageBody(message);

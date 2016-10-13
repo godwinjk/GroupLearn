@@ -182,6 +182,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     mPref.setStringPrefValue(PreferenceConstants.USER_STATUS, userStatus);
                     mPref.setBooleanPrefValue(PreferenceConstants.USER_PRIVACY_STATUS, userPrivacy);
 
+                    mPref.setBooleanPrefValue(PreferenceConstants.IS_SHOW_CONTENT_IN_NOTIFICATION, true);
+                    mPref.setBooleanPrefValue(PreferenceConstants.IS_SHOW_NOTIFICATION, true);
+                    mPref.setBooleanPrefValue(PreferenceConstants.IS_NOTIFICATION_SOUND, true);
+                    mPref.setBooleanPrefValue(PreferenceConstants.IS_SHOW_IN_APP_NOTIFICATION, true);
+
+                    mPref.setBooleanPrefValue(PreferenceConstants.IS_ENTER_KEY_SEND_MESSAGE, true);
+                    mPref.setBooleanPrefValue(PreferenceConstants.IS_SPEAK_ENABLED, false);
 
                     startActivity(new Intent(mContext, GroupListActivity.class));
                     finish();
