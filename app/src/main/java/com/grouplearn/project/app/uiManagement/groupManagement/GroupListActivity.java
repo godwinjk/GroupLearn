@@ -33,6 +33,7 @@ import com.grouplearn.project.app.uiManagement.StatusActivity;
 import com.grouplearn.project.app.uiManagement.adapter.GroupListAdapter;
 import com.grouplearn.project.app.uiManagement.contactManagement.ContactListActivity;
 import com.grouplearn.project.app.uiManagement.controllers.NavigationMenuController;
+import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
 import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
@@ -317,6 +318,8 @@ public class GroupListActivity extends BaseActivity implements NavigationView.On
             startActivity(new Intent(mContext, SettingsActivity.class));
         } else if (id == R.id.nav_request) {
             startActivity(new Intent(mContext, RequestAcceptingActivity.class));
+        } else if (id == R.id.nav_invitations) {
+            startActivity(new Intent(mContext, InvitationActivity.class));
         } else if (id == R.id.nav_signout) {
             new SignOutInteractor(mContext).doSignOut(new SignOutListener() {
                 @Override
@@ -354,9 +357,14 @@ public class GroupListActivity extends BaseActivity implements NavigationView.On
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(1, 1, 1, "Mark as read");
-        menu.add(1, 2, 1, "Group info");
-        menu.add(1, 3, 1, "Exit group");
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        int position = info.position;
+        GroupModel model = mGroupListAdapter.getGroupListData().get(position);
+        if (!model.getGroupUniqueId().equals("-11223344")) {
+            menu.add(1, 1, 1, "Mark as read");
+            menu.add(1, 2, 1, "Group info");
+//            menu.add(1, 3, 1, "Exit group");
+        }
     }
 
     @Override
@@ -366,6 +374,9 @@ public class GroupListActivity extends BaseActivity implements NavigationView.On
         int position = info.position;
         switch (item.getItemId()) {
             case 1:
+                new ChatDbHelper(mContext).updateAllRead(Long.parseLong(mGroupListAdapter.getGroupListData().get(position).getGroupUniqueId()));
+                GroupListInteractor interactor = GroupListInteractor.getInstance(mContext);
+                interactor.getSubscribedGroupsFromDatabase(GroupListActivity.this);
                 break;
             case 2:
                 Intent i = new Intent(mContext, GroupInfoActivity.class);

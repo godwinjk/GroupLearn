@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 
+import com.grouplearn.project.app.uiManagement.databaseHelper.ContactDbHelper;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.models.ContactModel;
 import com.grouplearn.project.utilities.Log;
@@ -26,6 +27,7 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
     Context mContext;
     ArrayList<ContactModel> contactList = new ArrayList<>();
     ContactViewInterface contactViewInterface;
+
 
 
     public ContactReadTask(Context mContext) {
@@ -70,6 +72,7 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
 
                     pCur.close();
                     contactList.add(contactModel);
+                    new ContactDbHelper(mContext).addContact(contactModel);
                     sort(contactList);
                     count++;
                     if (contactViewInterface != null && count % 10 == 0) {

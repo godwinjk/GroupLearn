@@ -15,6 +15,7 @@ public class RequestModel extends BaseModel implements Parcelable {
     String groupIconId;
     String requestStatus;
     int action;
+    private String definition;
 
     public String getUserName() {
         return userName;
@@ -127,4 +128,12 @@ public class RequestModel extends BaseModel implements Parcelable {
             return new RequestModel[size];
         }
     };
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
+
+    public String getDefinition() {
+        return definition;
+    }
 }

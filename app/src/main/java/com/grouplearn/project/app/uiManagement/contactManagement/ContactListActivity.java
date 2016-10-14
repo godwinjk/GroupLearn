@@ -10,10 +10,13 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SmsManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,10 +29,23 @@ import android.widget.TextView;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.adapter.ContactListAdapter;
+import com.grouplearn.project.app.uiManagement.databaseHelper.ContactDbHelper;
+import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
+import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
+import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
+import com.grouplearn.project.cloud.CloudConnectRequest;
+import com.grouplearn.project.cloud.CloudConnectResponse;
+import com.grouplearn.project.cloud.CloudError;
+import com.grouplearn.project.cloud.CloudResponseCallback;
+import com.grouplearn.project.cloud.groupManagement.inviteGroup.CloudGroupInvitationResponse;
 import com.grouplearn.project.models.ContactModel;
+import com.grouplearn.project.models.GroupModel;
+import com.grouplearn.project.models.RequestModel;
+import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
+import com.grouplearn.project.utilities.views.DisplayInfo;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -42,6 +58,8 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
     Context mContext;
     ContactListAdapter mAdapter;
     private String TAG = "ContactListActivity";
+    ContactDbHelper mDbHelper;
+    GroupModel groupModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,23 +67,25 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
         setContentView(R.layout.activity_contact_list);
         Toolbar toolbar = setupToolbar("Contacts", true);
         mContext = this;
+        String groupUniqueId = getIntent().getStringExtra("groupCloudId");
+        groupModel = new GroupDbHelper(mContext).getGroupInfo(groupUniqueId);
 
         initializeWidgets();
         registerListeners();
 //        getCountryData();
+        getContactsFromDb();
     }
 
     @Override
     public void initializeWidgets() {
+        mDbHelper = new ContactDbHelper(mContext);
+
         lvContacts = (ListView) findViewById(R.id.lv_contacts);
 
         mAdapter = new ContactListAdapter(mContext);
         lvContacts.setAdapter(mAdapter);
         tvNoContacts = (TextView) findViewById(R.id.tv_no_contacts);
 
-        ContactReadTask readTask = new ContactReadTask(this);
-        readTask.setContactViewInterface(this);
-        readTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
@@ -84,6 +104,72 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
                 }
             }
         });
+        mAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
+            @Override
+            public void onItemClicked(int position, Object model, View v) {
+                ContactModel contactModel = (ContactModel) model;
+                if (v instanceof TextView) {
+                    if (groupModel != null) {
+                        RequestModel requestModel = new RequestModel();
+
+                        requestModel.setUserId(contactModel.getContactUniqueId());
+                        requestModel.setGroupIconId(groupModel.getGroupIconId());
+                        requestModel.setGroupId(groupModel.getGroupUniqueId());
+                        requestModel.setGroupName(groupModel.getGroupName());
+
+                        callGroupInvite(requestModel);
+                    } else {
+                        sendSms(contactModel.getContactNumber());
+                    }
+                } else if (v instanceof ImageView) {
+                    openContact(contactModel.getContactId());
+                }
+            }
+
+            @Override
+            public void onItemLongClicked(int position, Object model, View v) {
+
+            }
+        });
+    }
+
+    private void callGroupInvite(RequestModel model) {
+        CloudResponseCallback callback = new CloudResponseCallback() {
+            @Override
+            public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
+                DisplayInfo.dismissLoader(mContext);
+                CloudGroupInvitationResponse response = (CloudGroupInvitationResponse) cloudResponse;
+                if (response.getInvitationCount() > 0) {
+                    for (RequestModel requestModel : response.getRequestModels()) {
+                        DisplayInfo.showToast(mContext, "Invitation sent successfully");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
+                DisplayInfo.dismissLoader(mContext);
+                DisplayInfo.showToast(mContext, "Invitation sent failed");
+            }
+        };
+        if (AppUtility.checkInternetConnection()) {
+            DisplayInfo.showLoader(mContext, "Please wait");
+            GroupListInteractor.getInstance(mContext).inviteToGroup(model, callback);
+        } else {
+            DisplayInfo.showToast(mContext, "Please check your internet connection");
+        }
+
+
+    }
+
+    private void getContactsFromDb() {
+        ArrayList<ContactModel> contactModels = mDbHelper.getContacts();
+        if (contactModels != null && contactModels.size() > 0) {
+            updateDataInList(contactModels);
+        }
+        ContactReadTask readTask = new ContactReadTask(this);
+        readTask.setContactViewInterface(this);
+        readTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
@@ -152,6 +238,24 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
 
     private ArrayList<String> mCountries = new ArrayList<String>();
 
+    private void openContact(String contactId) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contactId));
+        intent.setData(uri);
+        startActivity(intent);
+    }
+
+    private void sendSms(String phoneNumber) {
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phoneNumber, null, "Install GroupLearn App to learn new things in new way https://goo.gl/nXaY6l", null, null);
+            DisplayInfo.showToast(mContext, "Invitation sent successfully.");
+        } catch (Exception ex) {
+            Log.e(TAG, "FAILED TO SEND MESSAGE, FAILED TO SEND MESSAGE");
+            ex.printStackTrace();
+        }
+    }
+
     public void getCountryData() {
         Locale[] locales = Locale.getAvailableLocales();
         for (Locale locale : locales) {
@@ -168,10 +272,10 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share:
-                String shareBody = "Install GroupLearn App.";
+                String shareBody = "Install GroupLearn App to learn new things in new way https://goo.gl/nXaY6l";
                 Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
-                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "GroupLearn App");
                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share using"));
                 break;

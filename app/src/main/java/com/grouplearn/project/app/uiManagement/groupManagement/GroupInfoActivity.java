@@ -7,6 +7,8 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,6 +18,7 @@ import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.adapter.ProfileRecyclerAdapter;
+import com.grouplearn.project.app.uiManagement.contactManagement.ContactListActivity;
 import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
@@ -28,6 +31,7 @@ import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.groupManagement.getGroupSubscribersList.GetGroupSubscribersResponse;
 import com.grouplearn.project.cloud.userManagement.status.CloudStatusRequest;
 import com.grouplearn.project.models.GroupModel;
+import com.grouplearn.project.models.RequestModel;
 import com.grouplearn.project.models.UserModel;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -97,6 +101,30 @@ public class GroupInfoActivity extends BaseActivity {
 
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_group_info, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_invite:
+                invite();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void invite() {
+        Intent intent = new Intent(mContext, ContactListActivity.class);
+
+        intent.putExtra("groupCloudId", mModel.getGroupUniqueId());
+
+        startActivity(intent);
     }
 
     @Override

@@ -79,4 +79,8 @@ public class GroupListAdapter extends BaseAdapter {
     public void setGroupListData(ArrayList<GroupModel> listData) {
         this.mGroupList = listData;
     }
+
+    public ArrayList<GroupModel> getGroupListData() {
+        return this.mGroupList;
+    }
 }

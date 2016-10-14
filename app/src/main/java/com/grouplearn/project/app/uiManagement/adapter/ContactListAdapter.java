@@ -1,15 +1,11 @@
 package com.grouplearn.project.app.uiManagement.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
-import android.net.Uri;
-import android.provider.ContactsContract;
-import android.telephony.SmsManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +17,8 @@ import android.widget.TextView;
 
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.ContactItemHolder;
+import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.models.ContactModel;
-import com.grouplearn.project.utilities.Log;
 
 import java.util.ArrayList;
 
@@ -37,6 +33,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
     ArrayList<ContactModel> filterContacts = new ArrayList<>();
     SearchFilter searchFilter;
     String filterText;
+    OnRecyclerItemClickListener onRecyclerItemClickListener;
 
     public ContactListAdapter(Context mContext) {
         this.mContext = mContext;
@@ -66,7 +63,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         ContactItemHolder holder;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.layout_contact_item, null);
@@ -93,33 +90,24 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
         holder.tvInvite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendSms(model.getContactNumber());
+                if (onRecyclerItemClickListener != null) {
+                    onRecyclerItemClickListener.onItemClicked(position, model, v);
+                }
             }
         });
         holder.ivIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (model.getContactId() != null) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(model.getContactId()));
-                    intent.setData(uri);
-                    mContext.startActivity(intent);
+                    if (onRecyclerItemClickListener != null) {
+                        onRecyclerItemClickListener.onItemClicked(position, model, v);
+                    }
                 }
             }
         });
         return convertView;
     }
 
-    private void sendSms(String phoneNumber) {
-        try {
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNumber, null, "Install New GroupLearn", null, null);
-
-        } catch (Exception ex) {
-            Log.e(TAG, "FAILED TO SEND MESSAGE, FAILED TO SEND MESSAGE");
-            ex.printStackTrace();
-        }
-    }
 
     @Override
     public Filter getFilter() {
@@ -171,5 +159,13 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
         position = Math.abs(position);
         int[] colorSchema = new int[]{R.color.pale_rose, R.color.blue, R.color.green, R.color.purple, R.color.majenta, R.color.light_green, R.color.yellow, R.color.pale_red};
         return context.getResources().getColor((colorSchema[position % colorSchema.length]));
+    }
+
+    public OnRecyclerItemClickListener getOnRecyclerItemClickListener() {
+        return onRecyclerItemClickListener;
+    }
+
+    public void setOnRecyclerItemClickListener(OnRecyclerItemClickListener onRecyclerItemClickListener) {
+        this.onRecyclerItemClickListener = onRecyclerItemClickListener;
     }
 }

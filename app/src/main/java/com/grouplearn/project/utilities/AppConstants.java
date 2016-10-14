@@ -14,4 +14,9 @@ public class AppConstants {
     public static final int GROUP_VISIBLE_TO_SUBSCRIBERS = 107;
 
     public static final String KEY_QUICK_REPLY_TEXT = "quick_reply";
+
+    public static final String INTENT_KEY_INVITATION = "INTENT_KEY_INVITATION";
+    public static final String INTENT_KEY_REQUEST_MODEL = "INTENT_KEY_REQUEST_MODEL";
+
+
 }

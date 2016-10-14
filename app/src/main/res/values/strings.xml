@@ -114,4 +114,5 @@
     <string name="title_activity_subscribed_group_request_list">SubscribedGroupRequestListActivity
     </string>
     <string name="title_activity_chat_settings">ChatSettings</string>
+    <string name="title_activity_invitation">InvitationActivity</string>
 </resources>

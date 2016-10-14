@@ -12,6 +12,7 @@ public class TableContacts {
     public static final String TABLE_NAME = "CONTACTS_DETAILS";
 
     public static final String CONTACT_ID = "CONTACT_ID";
+    public static final String CONTACT_CLOUD_ID = "CONTACT_CLOUD_ID";
     public static final String CONTACT_NAME = "CONTACT_NAME";
     public static final String CREATED_TIME = "CREATED_TIME";
 

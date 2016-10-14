@@ -14,8 +14,10 @@ import com.grouplearn.project.app.databaseManagament.tables.TableServerSyncDetai
  */
 public class ServerSyncTimes {
 
-    public static final int LOGIN_TIME = 3000;
+    public static final int LOGIN_TIME = 1000;
     public static final int MESSAGE_GET = 3000;
+    public static final int GET_ALL_INVITATION = 3001;
+    public static final int GET_ALL_REQUESTS = 3002;
 
     ContentResolver mContentResolver;
     Context mContext;

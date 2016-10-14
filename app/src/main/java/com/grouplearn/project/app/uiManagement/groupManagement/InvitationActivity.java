@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
-import com.grouplearn.project.app.uiManagement.adapter.RequestRecyclerAdapter;
+import com.grouplearn.project.app.uiManagement.adapter.InvitationRecyclerAdapter;
 import com.grouplearn.project.app.uiManagement.cloudHelper.CloudGroupManagement;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
@@ -21,37 +21,35 @@ import com.grouplearn.project.utilities.errorManagement.AppError;
 
 import java.util.ArrayList;
 
-public class RequestAcceptingActivity extends BaseActivity implements GroupRequestCallback {
+public class InvitationActivity extends BaseActivity implements GroupRequestCallback {
+    InvitationRecyclerAdapter mRecyclerAdapter;
+    RecyclerView rvInvitationList;
     Context mContext;
-    RequestRecyclerAdapter mRecyclerAdapter;
-    RecyclerView rvRequestView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_request_acceptiong);
-        Toolbar toolbar = setupToolbar("Requests", true);
+        setContentView(R.layout.activity_invitation);
+        Toolbar toolbar = setupToolbar("Invitations", true);
         mContext = this;
 
         initializeWidgets();
         registerListeners();
-
-
     }
 
     @Override
     public void initializeWidgets() {
-        rvRequestView = (RecyclerView) findViewById(R.id.rv_request_list);
-        rvRequestView.setLayoutManager(new StaggeredGridLayoutManager(1, 1));
+        rvInvitationList = (RecyclerView) findViewById(R.id.rv_invitation_list);
+        rvInvitationList.setLayoutManager(new StaggeredGridLayoutManager(1, 1));
 
-        mRecyclerAdapter = new RequestRecyclerAdapter();
-        rvRequestView.setAdapter(mRecyclerAdapter);
+        mRecyclerAdapter = new InvitationRecyclerAdapter(mContext);
+        rvInvitationList.setAdapter(mRecyclerAdapter);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getRequests();
+        GroupListInteractor.getInstance(mContext).getGroupInvitations(this);
     }
 
     @Override
@@ -76,11 +74,6 @@ public class RequestAcceptingActivity extends BaseActivity implements GroupReque
         });
     }
 
-    private void getRequests() {
-        GroupListInteractor interactor = GroupListInteractor.getInstance(mContext);
-        interactor.getGroupRequests(this);
-    }
-
     private void updateData(final RequestModel requestModel) {
         CloudOperationCallback callback = new CloudOperationCallback() {
             @Override
@@ -88,7 +81,7 @@ public class RequestAcceptingActivity extends BaseActivity implements GroupReque
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mRecyclerAdapter.getRequestModels().remove(requestModel);
+                        mRecyclerAdapter.getInvitationList().remove(requestModel);
                         mRecyclerAdapter.notifyDataSetChanged();
                     }
                 });
@@ -99,13 +92,13 @@ public class RequestAcceptingActivity extends BaseActivity implements GroupReque
 
             }
         };
-        new CloudGroupManagement(mContext).updateSubscribeGroups(requestModel, callback);
+        new CloudGroupManagement(mContext).updateInvitations(requestModel, callback);
     }
 
     @Override
     public void onGroupRequestFetchSuccess(ArrayList<RequestModel> requestModels) {
-        if (requestModels != null) {
-            mRecyclerAdapter.setRequestModels(requestModels);
+        if (requestModels != null && requestModels.size() > 0) {
+            mRecyclerAdapter.setInvitationList(requestModels);
         }
     }
 

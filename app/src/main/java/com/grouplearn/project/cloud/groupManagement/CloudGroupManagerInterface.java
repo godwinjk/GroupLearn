@@ -8,8 +8,11 @@ import com.grouplearn.project.cloud.groupManagement.exitGroup.CloudExitGroupRequ
 import com.grouplearn.project.cloud.groupManagement.getGroupRequest.CloudGetSubscribeRequest;
 import com.grouplearn.project.cloud.groupManagement.getGroupSubscribersList.GetGroupSubscribersRequest;
 import com.grouplearn.project.cloud.groupManagement.getGroups.CloudGetGroupsRequest;
+import com.grouplearn.project.cloud.groupManagement.getInvitations.CloudGetGroupInvitationRequest;
 import com.grouplearn.project.cloud.groupManagement.getSubscribedGroups.CloudGetSubscribedGroupsRequest;
+import com.grouplearn.project.cloud.groupManagement.inviteGroup.CloudGroupInvitationRequest;
 import com.grouplearn.project.cloud.groupManagement.updateGroupRequest.CloudUpdateSubscribeGroupRequest;
+import com.grouplearn.project.cloud.groupManagement.updateInvitation.CloudUpdateGroupInvitationRequest;
 
 /**
  * Created by Godwin Joseph on 18-05-2016 23:25 for Group Learn application.
@@ -30,6 +33,12 @@ public interface CloudGroupManagerInterface {
     public void getAllGroups(CloudGetGroupsRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
 
     public void getAllSubscribers(GetGroupSubscribersRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
+
+    public void getAllInvitations(CloudGetGroupInvitationRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
+
+    public void inviteToGroup(CloudGroupInvitationRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
+
+    public void updateInvitation(CloudUpdateGroupInvitationRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
 
     public void deleteGroup(CloudContactDeleteRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
 

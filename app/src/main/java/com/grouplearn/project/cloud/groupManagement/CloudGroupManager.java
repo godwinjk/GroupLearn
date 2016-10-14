@@ -21,10 +21,16 @@ import com.grouplearn.project.cloud.groupManagement.getGroupSubscribersList.GetG
 import com.grouplearn.project.cloud.groupManagement.getGroupSubscribersList.GetGroupSubscribersResponse;
 import com.grouplearn.project.cloud.groupManagement.getGroups.CloudGetGroupsRequest;
 import com.grouplearn.project.cloud.groupManagement.getGroups.CloudGetGroupsResponse;
+import com.grouplearn.project.cloud.groupManagement.getInvitations.CloudGetGroupInvitationRequest;
+import com.grouplearn.project.cloud.groupManagement.getInvitations.CloudGetGroupInvitationsResponse;
 import com.grouplearn.project.cloud.groupManagement.getSubscribedGroups.CloudGetSubscribedGroupsRequest;
 import com.grouplearn.project.cloud.groupManagement.getSubscribedGroups.CloudGetSubscribedGroupsResponse;
+import com.grouplearn.project.cloud.groupManagement.inviteGroup.CloudGroupInvitationRequest;
+import com.grouplearn.project.cloud.groupManagement.inviteGroup.CloudGroupInvitationResponse;
 import com.grouplearn.project.cloud.groupManagement.updateGroupRequest.CloudUpdateSubscribeGroupRequest;
 import com.grouplearn.project.cloud.groupManagement.updateGroupRequest.CloudUpdateSubscribeGroupResponse;
+import com.grouplearn.project.cloud.groupManagement.updateInvitation.CloudUpdateGroupInvitationRequest;
+import com.grouplearn.project.cloud.groupManagement.updateInvitation.CloudUpdateGroupInvitationResponse;
 import com.grouplearn.project.cloud.networkManagement.CloudAPICallback;
 import com.grouplearn.project.cloud.networkManagement.CloudHttpMethod;
 import com.grouplearn.project.models.GroupModel;
@@ -719,7 +725,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
         };
         CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
         httpMethod.setRequestType(CloudHttpMethod.GET_METHOD);
-        httpMethod.setUrl(mBaseurl + "group-subscribe-users/"+cloudRequest.getGroupId()+"?start="+cloudRequest.getStartTime()+"&limit="+cloudRequest.getLimit());
+        httpMethod.setUrl(mBaseurl + "group-subscribe-users/" + cloudRequest.getGroupId() + "?start=" + cloudRequest.getStartTime() + "&limit=" + cloudRequest.getLimit());
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("token", cloudRequest.getToken());
@@ -727,6 +733,265 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
         hashMap.put("limit", "" + cloudRequest.getLimit());
 
         httpMethod.setHeaderMap(hashMap);
+        httpMethod.execute();
+    }
+
+    @Override
+    public void getAllInvitations(final CloudGetGroupInvitationRequest cloudRequest, final CloudResponseCallback responseCallback) {
+        if (cloudRequest == null || responseCallback == null)
+            throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
+        CloudAPICallback listener = new CloudAPICallback() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                CloudGetGroupInvitationsResponse response = new CloudGetGroupInvitationsResponse();
+                if (jsonObject != null) {
+                    jsonObject = jsonObject.optJSONObject(RESPONSE);
+                    if (jsonObject != null) {
+                        JSONObject statusObject = jsonObject.optJSONObject(STATUS);
+                        JSONObject dataObject = jsonObject.optJSONObject(DATA);
+                        if (statusObject != null) {
+                            response = (CloudGetGroupInvitationsResponse) getUpdatedResponse(statusObject, response);
+                            if (dataObject != null) {
+                                int invitationCount = dataObject.optInt("invitationGroupRequestCount", 0);
+                                JSONArray dataArray = dataObject.optJSONArray("invitationGroupDetails");
+                                response.setInvitationCount(invitationCount);
+
+                                ArrayList<RequestModel> groupModelArrayList = new ArrayList<>();
+                                for (int i = 0; dataArray != null && invitationCount > 0 && i < dataArray.length(); i++) {
+                                    JSONObject modelObject = dataArray.optJSONObject(i);
+                                    RequestModel groupModel = new RequestModel();
+//                                groupModel.setCreatedTime(modelObject.optString("createdTime"));
+//                                groupModel.setUpdatedTime(modelObject.optString("updatedTime"));
+                                    groupModel.setGroupId(modelObject.optString("invitedGroupId"));
+                                    groupModel.setGroupName(modelObject.optString("invitedGroupName"));
+                                    groupModel.setGroupIconId(modelObject.optString("invitedGroupIconId"));
+                                    groupModel.setUserId(modelObject.optString("invitedUserId"));
+                                    groupModel.setUserName(modelObject.optString("invitedGroupUserName"));
+                                    groupModel.setDefinition(modelObject.optString("definition"));
+
+                                    groupModelArrayList.add(groupModel);
+                                }
+                                response.setRequestModels(groupModelArrayList);
+                                if (responseCallback != null) {
+                                    responseCallback.onSuccess(cloudRequest, response);
+                                }
+                            } else {
+                                if (responseCallback != null) {
+                                    responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_DATA_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_DATA_FROM_CLOUD));
+                                }
+                            }
+                        } else {
+                            if (responseCallback != null) {
+                                responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                            }
+                        }
+
+                    } else {
+                        if (responseCallback != null) {
+                            responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                        }
+                    }
+                } else {
+                    if (responseCallback != null) {
+                        responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(CloudError cloudError) {
+                if (responseCallback != null) {
+                    responseCallback.onFailure(cloudRequest, cloudError);
+                }
+            }
+        };
+        CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
+        httpMethod.setRequestType(CloudHttpMethod.GET_METHOD);
+        httpMethod.setUrl(mBaseurl + "groupinvite/1?start=" + cloudRequest.getStartTime() + "&limit=" + cloudRequest.getLimit());
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("token", cloudRequest.getToken());
+        hashMap.put("start", "" + cloudRequest.getStartTime());
+        hashMap.put("limit", "" + cloudRequest.getLimit());
+
+        httpMethod.setHeaderMap(hashMap);
+        httpMethod.execute();
+    }
+
+    @Override
+    public void inviteToGroup(final CloudGroupInvitationRequest cloudRequest, final CloudResponseCallback responseCallback) {
+        if (cloudRequest == null || responseCallback == null)
+            throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
+        CloudAPICallback listener = new CloudAPICallback() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                CloudGroupInvitationResponse response = new CloudGroupInvitationResponse();
+                if (jsonObject != null) {
+                    jsonObject = jsonObject.optJSONObject(RESPONSE);
+                    if (jsonObject != null) {
+                        JSONObject statusObject = jsonObject.optJSONObject(STATUS);
+                        if (statusObject != null) {
+                            response = (CloudGroupInvitationResponse) getUpdatedResponse(statusObject, response);
+                            JSONArray dataArray = jsonObject.optJSONArray(DATA);
+                            if (dataArray != null) {
+                                ArrayList<RequestModel> groupModelArrayList = new ArrayList<>();
+                                for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
+                                    JSONObject modelObject = dataArray.optJSONObject(i);
+                                    RequestModel groupModel = new RequestModel();
+                                    groupModel.setStatus(modelObject.optInt("status"));
+                                    groupModel.setMessage(modelObject.optString("message"));
+
+                                    groupModel.setGroupId(modelObject.optString("groupId"));
+                                    groupModel.setGroupIconId(modelObject.optString("groupIconId"));
+                                    groupModel.setGroupName(modelObject.optString("groupName"));
+                                    groupModel.setUserId(modelObject.optString("inviteUserId"));
+
+                                    groupModelArrayList.add(groupModel);
+                                }
+                                response.setRequestModels(groupModelArrayList);
+                                if (responseCallback != null) {
+                                    responseCallback.onSuccess(cloudRequest, response);
+                                }
+                            } else {
+                                if (responseCallback != null) {
+                                    responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_DATA_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_DATA_FROM_CLOUD));
+                                }
+                            }
+                        } else {
+                            if (responseCallback != null) {
+                                responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                            }
+                        }
+                    } else {
+                        if (responseCallback != null) {
+                            responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                        }
+                    }
+                } else {
+                    if (responseCallback != null) {
+                        responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(CloudError cloudError) {
+                if (responseCallback != null) {
+                    responseCallback.onFailure(cloudRequest, cloudError);
+                }
+            }
+        };
+        CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
+        httpMethod.setRequestType(CloudHttpMethod.PUT_METHOD);
+        httpMethod.setUrl(mBaseurl + "groupinvite");
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("token", cloudRequest.getToken());
+
+        httpMethod.setHeaderMap(hashMap);
+        JSONArray entity = new JSONArray();
+        for (RequestModel model : cloudRequest.getRequestModels()) {
+            JSONObject modelObject = new JSONObject();
+            try {
+                modelObject.put("groupId", model.getGroupId());
+                modelObject.put("groupName", model.getGroupName());
+                modelObject.put("groupIconId", model.getGroupIconId());
+                modelObject.put("inviteUserId", model.getUserId());
+
+                entity.put(modelObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        httpMethod.setEntityString(entity.toString());
+        httpMethod.execute();
+    }
+
+    @Override
+    public void updateInvitation(final CloudUpdateGroupInvitationRequest cloudRequest, final CloudResponseCallback responseCallback) {
+        if (cloudRequest == null || responseCallback == null)
+            throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
+        CloudAPICallback listener = new CloudAPICallback() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                CloudUpdateGroupInvitationResponse response = new CloudUpdateGroupInvitationResponse();
+                if (jsonObject != null) {
+                    jsonObject = jsonObject.optJSONObject(RESPONSE);
+                    if (jsonObject != null) {
+                        JSONObject statusObject = jsonObject.optJSONObject(STATUS);
+                        if (statusObject != null) {
+                            response = (CloudUpdateGroupInvitationResponse) getUpdatedResponse(statusObject, response);
+                            JSONArray dataArray = jsonObject.optJSONArray(DATA);
+                            if (dataArray != null) {
+                                ArrayList<RequestModel> groupModelArrayList = new ArrayList<>();
+                                for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
+                                    JSONObject modelObject = dataArray.optJSONObject(i);
+                                    RequestModel groupModel = new RequestModel();
+                                    groupModel.setStatus(modelObject.optInt("status"));
+                                    groupModel.setMessage(modelObject.optString("message"));
+                                    groupModel.setGroupId(modelObject.optString("invitedGroupId"));
+                                    groupModel.setGroupName(modelObject.optString("invitedGroupName"));
+                                    groupModel.setUserId(modelObject.optString("invitedUserId"));
+                                    groupModel.setAction(modelObject.optInt("action"));
+
+                                    groupModelArrayList.add(groupModel);
+                                }
+                                response.setRequestModels(groupModelArrayList);
+                                if (responseCallback != null) {
+                                    responseCallback.onSuccess(cloudRequest, response);
+                                }
+                            } else {
+                                if (responseCallback != null) {
+                                    responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_DATA_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_DATA_FROM_CLOUD));
+                                }
+                            }
+                        } else {
+                            if (responseCallback != null) {
+                                responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                            }
+                        }
+                    } else {
+                        if (responseCallback != null) {
+                            responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                        }
+                    }
+                } else {
+                    if (responseCallback != null) {
+                        responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(CloudError cloudError) {
+                if (responseCallback != null) {
+                    responseCallback.onFailure(cloudRequest, cloudError);
+                }
+            }
+        };
+        CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
+        httpMethod.setRequestType(CloudHttpMethod.PUT_METHOD);
+        httpMethod.setUrl(mBaseurl + "groupinvite/1");
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("token", cloudRequest.getToken());
+
+        httpMethod.setHeaderMap(hashMap);
+        JSONArray entity = new JSONArray();
+        for (RequestModel model : cloudRequest.getRequestModels()) {
+            JSONObject modelObject = new JSONObject();
+            try {
+                modelObject.put("invitedGroupId", model.getGroupId());
+                modelObject.put("invitedGroupName", model.getGroupName());
+                modelObject.put("invitedUserId", model.getUserId());
+                modelObject.put("action", model.getAction());
+
+                entity.put(modelObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        httpMethod.setEntityString(entity.toString());
         httpMethod.execute();
     }
 

@@ -22,6 +22,12 @@ public class ContactDbHelper {
         this.mContentResolver = mContext.getContentResolver();
     }
 
+    public void addContact(ArrayList<ContactModel> models) {
+        for (ContactModel model : models) {
+            addContact(model);
+        }
+    }
+
     public void addContact(ContactModel model) {
         ContentValues cv = getContentValuesForContacts(model);
         String where = TableContacts.CONTACT_NUMBER + " = '" + model.getContactNumber() + "'";
@@ -45,7 +51,8 @@ public class ContactDbHelper {
 
     private ContentValues getContentValuesForContacts(ContactModel model) {
         ContentValues cv = new ContentValues();
-        cv.put(TableContacts.CONTACT_ID, model.getContactUniqueId());
+        cv.put(TableContacts.CONTACT_ID, model.getContactId());
+        cv.put(TableContacts.CONTACT_CLOUD_ID, model.getContactUniqueId());
         cv.put(TableContacts.CONTACT_ICON_ID, model.getContactIconId());
         cv.put(TableContacts.CONTACT_NAME, model.getContactName());
         cv.put(TableContacts.CONTACT_STATUS, model.getContactStatus());
@@ -58,12 +65,18 @@ public class ContactDbHelper {
         if (cursor != null) {
             ContactModel model = new ContactModel();
             model.setContactIconId(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_ICON_ID)));
-            model.setContactUniqueId(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_ID)));
+            model.setContactId(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_ID)));
+            model.setContactUniqueId(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_CLOUD_ID)));
             model.setContactName(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_NAME)));
             model.setContactStatus(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_STATUS)));
+            model.setStatus(cursor.getInt(cursor.getColumnIndex(TableContacts.CONTACT_FOUND)));
             model.setStatus(cursor.getInt(cursor.getColumnIndex(TableContacts.CONTACT_FOUND)));
             return model;
         }
         return null;
+    }
+
+    public void updateInvitationDetails(String groupId) {
+
     }
 }

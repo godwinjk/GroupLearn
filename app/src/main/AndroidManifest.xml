@@ -126,6 +126,10 @@
         <activity
             android:name=".app.uiManagement.settingsManagement.ChatSettings"
             android:label="@string/title_activity_chat_settings"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.groupManagement.InvitationActivity"
+            android:label="@string/title_activity_invitation"
             android:theme="@style/AppTheme1"></activity>
     </application>
 

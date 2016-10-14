@@ -3,9 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="300dp"
     android:id="@+id/ll_nav_header"
-    android:background="@color/colorPrimaryDark"
+    android:background="@drawable/nav_drawer_back"
     android:gravity="bottom"
     android:orientation="vertical"
+
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
 

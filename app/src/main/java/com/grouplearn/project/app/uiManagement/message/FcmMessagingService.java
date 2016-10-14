@@ -79,6 +79,8 @@ public class FcmMessagingService extends FirebaseMessagingService {
                     NotificationManager.getInstance().showNotification(notificationType, "You have a new group request");
                 } else if (notificationType == 2) {
                     NotificationManager.getInstance().showNotification(notificationType, "You have added to new group");
+                } else if (notificationType == 5) {
+                    NotificationManager.getInstance().showNotification(notificationType, "You have a new invitation");
                 }
             }
         } catch (JSONException e) {
