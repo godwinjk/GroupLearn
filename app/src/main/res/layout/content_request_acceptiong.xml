@@ -8,9 +8,23 @@
     tools:context=".app.uiManagement.groupManagement.RequestAcceptingActivity"
     tools:showIn="@layout/activity_request_acceptiong">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_request_list"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/srl_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_request_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"></android.support.v7.widget.RecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <TextView
+        android:id="@+id/tv_no_items"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"></android.support.v7.widget.RecyclerView>
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="No new requests" />
 </RelativeLayout>

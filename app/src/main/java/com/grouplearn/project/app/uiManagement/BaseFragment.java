@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager;
  */
 public abstract class BaseFragment extends Fragment {
     protected abstract void initializeWidgets(View v);
+
     protected abstract void registerListeners();
 
     @Override
@@ -25,6 +26,8 @@ public abstract class BaseFragment extends Fragment {
     }
 
     public void hideSoftKeyboard() {
+        if (getActivity() == null)
+            return;
         View view = getActivity().getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);

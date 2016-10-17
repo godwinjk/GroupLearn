@@ -2,6 +2,7 @@ package com.grouplearn.project.app.uiManagement.groupManagement;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +26,8 @@ public class RequestAcceptingActivity extends BaseActivity implements GroupReque
     Context mContext;
     RequestRecyclerAdapter mRecyclerAdapter;
     RecyclerView rvRequestView;
+    SwipeRefreshLayout srlRecycler;
+    TextView tvNoItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,18 +47,32 @@ public class RequestAcceptingActivity extends BaseActivity implements GroupReque
         rvRequestView = (RecyclerView) findViewById(R.id.rv_request_list);
         rvRequestView.setLayoutManager(new StaggeredGridLayoutManager(1, 1));
 
+        srlRecycler = (SwipeRefreshLayout) findViewById(R.id.srl_recycler);
+        tvNoItems = (TextView) findViewById(R.id.tv_no_items);
+
         mRecyclerAdapter = new RequestRecyclerAdapter();
         rvRequestView.setAdapter(mRecyclerAdapter);
+
+        int[] colorSchema = new int[]{R.color.pale_rose, R.color.blue, R.color.green, R.color.purple, R.color.majenta, R.color.light_green, R.color.yellow, R.color.pale_red};
+        srlRecycler.setColorSchemeColors(colorSchema);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         getRequests();
+        srlRecycler.setRefreshing(true);
     }
 
     @Override
     public void registerListeners() {
+        srlRecycler.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getRequests();
+
+            }
+        });
         mRecyclerAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
             public void onItemClicked(int position, Object model, View v) {
@@ -104,13 +121,19 @@ public class RequestAcceptingActivity extends BaseActivity implements GroupReque
 
     @Override
     public void onGroupRequestFetchSuccess(ArrayList<RequestModel> requestModels) {
+        srlRecycler.setRefreshing(false);
         if (requestModels != null) {
             mRecyclerAdapter.setRequestModels(requestModels);
+        }
+        if (mRecyclerAdapter.getRequestModels().size() > 0) {
+            tvNoItems.setVisibility(View.GONE);
+        } else {
+            tvNoItems.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void onGroupRequestFetchFailed(AppError error) {
-
+        srlRecycler.setRefreshing(false);
     }
 }

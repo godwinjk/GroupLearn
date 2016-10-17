@@ -42,7 +42,8 @@ public class ContactListInteractor {
                     for (ContactModel model : response.getContactModels()) {
                         dbHelper.addContact(model);
                     }
-                    getAllContacts(contactViewInterface);
+                    contactViewInterface.onGetAllContacts(response.getContactModels());
+//                    getAllContacts(contactViewInterface);
                 } else
                     contactViewInterface.onGetContactsFailed(new AppError(ErrorHandler.NO_ITEMS, ErrorHandler.ErrorMessage.NO_ITEMS));
             }

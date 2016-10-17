@@ -34,9 +34,11 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
     SearchFilter searchFilter;
     String filterText;
     OnRecyclerItemClickListener onRecyclerItemClickListener;
+    int type = 0;
 
-    public ContactListAdapter(Context mContext) {
+    public ContactListAdapter(Context mContext, int type) {
         this.mContext = mContext;
+        this.type = type;
         this.inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         searchFilter = new SearchFilter();
     }
@@ -78,6 +80,14 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
 
         final ContactModel model = (ContactModel) getItem(position);
 
+        if (model.getStatus() == 1) {
+            holder.tvInvite.setVisibility(View.INVISIBLE);
+        } else {
+            holder.tvInvite.setVisibility(View.VISIBLE);
+        }
+        if (type == 1) {
+            holder.tvInvite.setVisibility(View.VISIBLE);
+        }
         holder.tvContactName.setText(model.getContactName());
         holder.tvContactNumber.setText(model.getContactNumber());
         holder.ivIcon.setBackground(getBackgroundDrawable(mContext, position));

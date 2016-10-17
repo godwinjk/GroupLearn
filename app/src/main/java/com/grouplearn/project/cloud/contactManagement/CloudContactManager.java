@@ -54,9 +54,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                         JSONArray dataArray = jsonObject.optJSONArray(DATA);
                         if (statusObject != null) {
                             response = getUpdatedResponse(statusObject, response);
-                            if (responseCallback != null) {
-                                responseCallback.onFailure(cloudRequest, new CloudError(response.getResponseStatus(), response.getResponseMessage()));
-                            }
+
                         } else {
                             if (responseCallback != null) {
                                 responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
@@ -68,12 +66,13 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                                 JSONObject modelObject = dataArray.optJSONObject(i);
                                 ContactModel contactModel = new ContactModel();
 
-                                contactModel.setContactName(modelObject.optString("contactName"));
+                                contactModel.setContactNumber(modelObject.optString("contactName"));
                                 contactModel.setContactUniqueId(modelObject.optString("contactUserId"));
                                 contactModel.setContactIconId(modelObject.optString("contactIconId"));
                                 contactModel.setPrivacy(modelObject.optInt("privacy"));
                                 contactModel.setContactStatus(modelObject.optString("userStatus"));
                                 contactModel.setStatus(modelObject.optInt("status"));
+                                contactModel.setMessage(modelObject.optString("message"));
 
                                 contactModelArrayList.add(contactModel);
                             }

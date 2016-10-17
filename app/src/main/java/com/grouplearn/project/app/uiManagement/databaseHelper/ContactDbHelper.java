@@ -13,11 +13,12 @@ import java.util.ArrayList;
 /**
  * Created by Godwin Joseph on 07-06-2016 21:48 for Group Learn application.
  */
-public class ContactDbHelper {
+public class ContactDbHelper extends DataBaseHelper {
     Context mContext;
     ContentResolver mContentResolver;
 
     public ContactDbHelper(Context mContext) {
+        super(mContext);
         this.mContext = mContext;
         this.mContentResolver = mContext.getContentResolver();
     }
@@ -30,22 +31,31 @@ public class ContactDbHelper {
 
     public void addContact(ContactModel model) {
         ContentValues cv = getContentValuesForContacts(model);
-        String where = TableContacts.CONTACT_NUMBER + " = '" + model.getContactNumber() + "'";
-        int count = mContentResolver.update(TableContacts.CONTENT_URI, cv, where, null);
+        int count = updateContact(model);
         if (count <= 0)
             mContentResolver.insert(TableContacts.CONTENT_URI, cv);
     }
 
+    public int updateContact(ContactModel model) {
+        ContentValues cv = new ContentValues();
+        String where = TableContacts.CONTACT_NUMBER + " = '" + model.getContactNumber() + "'";
+        cv.put(TableContacts.CONTACT_FOUND, model.getStatus());
+        cv.put(TableContacts.CONTACT_CLOUD_ID, model.getContactUniqueId());
+        return mContentResolver.update(TableContacts.CONTENT_URI, cv, where, null);
+    }
+
     public ArrayList<ContactModel> getContacts() {
-        Cursor cursor = mContentResolver.query(TableContacts.CONTENT_URI, null, null, null, null);
+        String sort = TableContacts.CONTACT_FOUND + " ASC";
+        Cursor cursor = mContentResolver.query(TableContacts.CONTENT_URI, null, null, null, sort);
         ArrayList<ContactModel> contactModels = new ArrayList<>();
-        if (cursor != null) {
+        if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
                 ContactModel contactModel = getContactFromCursor(cursor);
                 contactModels.add(contactModel);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return contactModels;
     }
 
@@ -69,14 +79,31 @@ public class ContactDbHelper {
             model.setContactUniqueId(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_CLOUD_ID)));
             model.setContactName(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_NAME)));
             model.setContactStatus(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_STATUS)));
-            model.setStatus(cursor.getInt(cursor.getColumnIndex(TableContacts.CONTACT_FOUND)));
+            model.setContactNumber(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_NUMBER)));
             model.setStatus(cursor.getInt(cursor.getColumnIndex(TableContacts.CONTACT_FOUND)));
             return model;
         }
         return null;
     }
 
-    public void updateInvitationDetails(String groupId) {
+    public long isContactFound(String contactNumber) {
+        String where = TableContacts.CONTACT_NUMBER + "'" + contactNumber + "'";
+        return getNumberOfRowsInDatabase(TableContacts.TABLE_NAME, where);
+    }
 
+    public ArrayList<ContactModel> getContactsInCloud() {
+        String where = TableContacts.CONTACT_FOUND + "=1";
+        String sort = TableContacts.CONTACT_FOUND + " ASC";
+        Cursor cursor = mContentResolver.query(TableContacts.CONTENT_URI, null, where, null, sort);
+        ArrayList<ContactModel> contactModels = new ArrayList<>();
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                ContactModel contactModel = getContactFromCursor(cursor);
+                contactModels.add(contactModel);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return contactModels;
     }
 }

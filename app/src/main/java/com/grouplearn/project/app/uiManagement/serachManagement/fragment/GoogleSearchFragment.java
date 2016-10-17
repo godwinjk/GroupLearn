@@ -101,6 +101,7 @@ public class GoogleSearchFragment extends BaseFragment {
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
+                                            mSearchResults.clear();
                                             DisplayInfo.dismissLoader(getActivity());
 
                                             for (GoogleSearchResult result : googleSearchResults) {

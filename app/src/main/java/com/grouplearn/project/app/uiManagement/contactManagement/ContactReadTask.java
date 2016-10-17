@@ -29,7 +29,6 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
     ContactViewInterface contactViewInterface;
 
 
-
     public ContactReadTask(Context mContext) {
         this.mContext = mContext;
     }
@@ -83,6 +82,7 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
                 }
             }
             cur.close();
+            contactViewInterface.onGetContactsFinished(contactList);
         }
         return contactList;
     }

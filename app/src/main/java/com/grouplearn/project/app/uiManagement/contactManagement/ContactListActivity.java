@@ -31,6 +31,7 @@ import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.adapter.ContactListAdapter;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ContactDbHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
+import com.grouplearn.project.app.uiManagement.interactor.ContactListInteractor;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
@@ -50,6 +51,7 @@ import com.grouplearn.project.utilities.views.DisplayInfo;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Locale;
 
 public class ContactListActivity extends BaseActivity implements ContactViewInterface {
@@ -81,8 +83,10 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
         mDbHelper = new ContactDbHelper(mContext);
 
         lvContacts = (ListView) findViewById(R.id.lv_contacts);
-
-        mAdapter = new ContactListAdapter(mContext);
+        int type = 0;
+        if (groupModel != null)
+            type = 1;
+        mAdapter = new ContactListAdapter(mContext, type);
         lvContacts.setAdapter(mAdapter);
         tvNoContacts = (TextView) findViewById(R.id.tv_no_contacts);
 
@@ -116,6 +120,7 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
                         requestModel.setGroupIconId(groupModel.getGroupIconId());
                         requestModel.setGroupId(groupModel.getGroupUniqueId());
                         requestModel.setGroupName(groupModel.getGroupName());
+                        requestModel.setUserId(contactModel.getContactUniqueId());
 
                         callGroupInvite(requestModel);
                     } else {
@@ -158,18 +163,21 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
         } else {
             DisplayInfo.showToast(mContext, "Please check your internet connection");
         }
-
-
     }
 
     private void getContactsFromDb() {
-        ArrayList<ContactModel> contactModels = mDbHelper.getContacts();
-        if (contactModels != null && contactModels.size() > 0) {
+        if (groupModel != null) {
+            ArrayList<ContactModel> contactModels = new ContactDbHelper(mContext).getContactsInCloud();
             updateDataInList(contactModels);
+        } else {
+            ArrayList<ContactModel> contactModels = mDbHelper.getContacts();
+            if (contactModels != null && contactModels.size() > 0) {
+                updateDataInList(contactModels);
+            }
+            ContactReadTask readTask = new ContactReadTask(this);
+            readTask.setContactViewInterface(this);
+            readTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
-        ContactReadTask readTask = new ContactReadTask(this);
-        readTask.setContactViewInterface(this);
-        readTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
@@ -178,7 +186,7 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
     }
 
     private void updateDataInList(final ArrayList<ContactModel> contactModels) {
-//        new ContactListInteractor(mContext).addAllContacts(contactModels, this);
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -195,12 +203,18 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
 
     @Override
     public void onGetAllContacts(ArrayList<ContactModel> contactModels) {
-//        updateDataInList(contactModels);
+        updateDataInList(sortUserList(new ContactDbHelper(mContext).getContacts()));
     }
 
     @Override
     public void onGetAllContactsFromDb(ArrayList<ContactModel> contactModels) {
         updateDataInList(contactModels);
+    }
+
+    @Override
+    public void onGetContactsFinished(ArrayList<ContactModel> contactModels) {
+        updateDataInList(contactModels);
+        new ContactListInteractor(mContext).addAllContacts(contactModels, this);
     }
 
     @Override
@@ -336,5 +350,21 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
         canvas.drawText(text, (bm.getWidth() / 2) - 30, (bm.getHeight() / 2) + 30, paint);
 
         return new BitmapDrawable(bm);
+    }
+
+    private ArrayList<ContactModel> sortUserList(final ArrayList<ContactModel> models) {
+        Collections.sort(models, new Comparator<ContactModel>() {
+            @Override
+            public int compare(ContactModel lhs, ContactModel rhs) {
+                if (lhs.getStatus() == rhs.getStatus())
+                    return 0;
+                else if (rhs.getStatus() < lhs.getStatus()) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
+        });
+        return models;
     }
 }

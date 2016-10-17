@@ -15,8 +15,8 @@ public class CloudConstants {
     public static final int SUCCESS_CODE = 1000;
     public static final String SUCCESS_MESSAGE = "SUCCESS";
 
-    private static final String BASE_URL = "http://192.168.10.152/grouplearn/public/";
-//    private static final String BASE_URL = "http://bodyretreatbeautyzone.com/grouplearn/public/";
+//    private static final String BASE_URL = "http://192.168.10.152/grouplearn/public/";
+    private static final String BASE_URL = "http://bodyretreatbeautyzone.com/grouplearn/public/";
 
     public static String getBaseUrl() {
         String ip = new AppSharedPreference(MyApplication.getAppContext()).getStringPrefValue(PreferenceConstants.CUSTOM_URL);

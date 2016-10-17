@@ -13,6 +13,8 @@ public interface ContactViewInterface {
 
     public void onGetAllContactsFromDb(ArrayList<ContactModel> contactModels);
 
+    public void onGetContactsFinished(ArrayList<ContactModel> contactModels);
+
     public void onGetContactsFailed(AppError error);
 
 }

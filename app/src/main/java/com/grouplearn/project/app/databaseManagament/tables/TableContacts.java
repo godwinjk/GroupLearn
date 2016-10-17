@@ -26,9 +26,9 @@ public class TableContacts {
     public static final Uri CONTENT_URI = Uri.parse("content://" + DatabaseConstants.AUTHORITY + "/" + TABLE_NAME);
     public static final String SQL_CREATE_TABLE = String.format("create table %s"
                     + "(%s text , %s text," +
-                    "%s text ,%s text,%s text, " +
+                    "%s text ,%s text,%s text,%s text, " +
                     "%s text,%s text,%s text)", TABLE_NAME,
             CONTACT_ID, CONTACT_NAME,
-            CREATED_TIME, UPDATED_TIME, CONTACT_FOUND,
+            CREATED_TIME, UPDATED_TIME, CONTACT_FOUND, CONTACT_CLOUD_ID,
             CONTACT_ICON_ID, CONTACT_STATUS, CONTACT_NUMBER);
 }

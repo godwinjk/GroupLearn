@@ -882,7 +882,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
             }
         };
         CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
-        httpMethod.setRequestType(CloudHttpMethod.PUT_METHOD);
+        httpMethod.setRequestType(CloudHttpMethod.POST_METHOD);
         httpMethod.setUrl(mBaseurl + "groupinvite");
 
         HashMap<String, String> hashMap = new HashMap<>();
