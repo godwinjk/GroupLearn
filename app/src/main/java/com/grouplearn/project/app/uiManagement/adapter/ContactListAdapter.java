@@ -13,6 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.grouplearn.project.R;
@@ -74,6 +75,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             holder.tvContactNumber = (TextView) convertView.findViewById(R.id.tv_contact_number);
             holder.tvInvite = (TextView) convertView.findViewById(R.id.tv_invite);
             holder.ivIcon = (ImageView) convertView.findViewById(R.id.iv_contact_image);
+            holder.llContactItem = (LinearLayout) convertView.findViewById(R.id.ll_contact_item);
             convertView.setTag(holder);
         } else
             holder = (ContactItemHolder) convertView.getTag();
@@ -87,6 +89,8 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
         }
         if (type == 1) {
             holder.tvInvite.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvInvite.setVisibility(View.INVISIBLE);
         }
         holder.tvContactName.setText(model.getContactName());
         holder.tvContactNumber.setText(model.getContactNumber());
@@ -109,6 +113,16 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             @Override
             public void onClick(View v) {
                 if (model.getContactId() != null) {
+                    if (onRecyclerItemClickListener != null) {
+                        onRecyclerItemClickListener.onItemClicked(position, model, v);
+                    }
+                }
+            }
+        });
+        holder.llContactItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (model.getContactUniqueId() != null) {
                     if (onRecyclerItemClickListener != null) {
                         onRecyclerItemClickListener.onItemClicked(position, model, v);
                     }

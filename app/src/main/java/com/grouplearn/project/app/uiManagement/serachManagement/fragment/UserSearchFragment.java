@@ -1,6 +1,7 @@
 package com.grouplearn.project.app.uiManagement.serachManagement.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,8 +18,11 @@ import com.grouplearn.project.app.uiManagement.BaseFragment;
 import com.grouplearn.project.app.uiManagement.adapter.ContactListAdapter;
 import com.grouplearn.project.app.uiManagement.interactor.ContactListInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
+import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.serachManagement.SearchAllActivity;
+import com.grouplearn.project.app.uiManagement.userManagement.UserProfileActivity;
 import com.grouplearn.project.models.ContactModel;
+import com.grouplearn.project.models.UserModel;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -106,6 +110,27 @@ public class UserSearchFragment extends BaseFragment implements ContactViewInter
                 if (listAdapter != null && listAdapter.getCount() > 0)
                     tvNoItems.setVisibility(View.VISIBLE);
                 return false;
+            }
+        });
+        listAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
+            @Override
+            public void onItemClicked(int position, Object model, View v) {
+                ContactModel contactModel = (ContactModel) model;
+                UserModel userModel = new UserModel();
+                userModel.setUserDisplayName(contactModel.getContactName());
+                userModel.setUserStatus(contactModel.getContactStatus());
+                userModel.setUserId(Long.parseLong(contactModel.getContactUniqueId()));
+                userModel.setUserEmail(contactModel.getContactMailId());
+                Intent intent = new Intent(activity, UserProfileActivity.class);
+
+                intent.putExtra("user", userModel);
+
+                startActivity(intent);
+            }
+
+            @Override
+            public void onItemLongClicked(int position, Object model, View v) {
+
             }
         });
     }
