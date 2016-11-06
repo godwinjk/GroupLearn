@@ -10,6 +10,7 @@ import com.grouplearn.project.cloud.CloudConnectResponse;
 import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.contactManagement.contactAddOrEdit.CloudContactAddOrEditResponse;
+import com.grouplearn.project.cloud.contactManagement.search.CloudUserSearchResponse;
 import com.grouplearn.project.models.ContactModel;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
@@ -54,5 +55,26 @@ public class ContactListInteractor {
             }
         };
         new CloudContactManager(mContext).addEditContact(contactModels, callback);
+    }
+
+    public void searchAllContacts(String keyWord, final ContactViewInterface contactViewInterface) {
+        CloudContactManager manager = new CloudContactManager(mContext);
+        CloudResponseCallback callback = new CloudResponseCallback() {
+            @Override
+            public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
+                CloudUserSearchResponse response = (CloudUserSearchResponse) cloudResponse;
+                if (response.getContactCount() > 0) {
+                    contactViewInterface.onGetAllContacts(response.getContactModels());
+                } else {
+                    contactViewInterface.onGetContactsFailed(new AppError(ErrorHandler.NO_ITEMS, ErrorHandler.ErrorMessage.NO_ITEMS));
+                }
+            }
+
+            @Override
+            public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
+                contactViewInterface.onGetContactsFailed(new AppError(cloudError.getErrorCode(), cloudError.getErrorMessage()));
+            }
+        };
+        manager.searchContact(keyWord, callback);
     }
 }

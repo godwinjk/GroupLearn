@@ -3,6 +3,7 @@ package com.grouplearn.project.cloud.contactManagement;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.contactManagement.contactAddOrEdit.CloudContactAddOrEditRequest;
 import com.grouplearn.project.cloud.contactManagement.contactGet.CloudContactGetRequest;
+import com.grouplearn.project.cloud.contactManagement.search.CloudUserSearchRequest;
 import com.grouplearn.project.cloud.groupManagement.deleteGroup.CloudContactDeleteRequest;
 
 /**
@@ -14,4 +15,5 @@ public interface CloudContactManagerInterface {
     public void getContacts(CloudContactGetRequest request, CloudResponseCallback callback);
 
     public void deleteContact(CloudContactDeleteRequest request, CloudResponseCallback callback);
+    public void searchContact(CloudUserSearchRequest request, CloudResponseCallback callback);
 }

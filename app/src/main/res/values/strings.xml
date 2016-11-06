@@ -115,4 +115,6 @@
     </string>
     <string name="title_activity_chat_settings">ChatSettings</string>
     <string name="title_activity_invitation">InvitationActivity</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="no_network">Please check your internet connection.</string>
 </resources>

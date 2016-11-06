@@ -17,6 +17,7 @@ import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.contactManagement.contactAddOrEdit.CloudContactAddOrEditRequest;
 import com.grouplearn.project.cloud.contactManagement.contactGet.CloudContactGetRequest;
 import com.grouplearn.project.cloud.contactManagement.contactGet.CloudContactGetResponse;
+import com.grouplearn.project.cloud.contactManagement.search.CloudUserSearchRequest;
 import com.grouplearn.project.models.ContactModel;
 
 import java.util.ArrayList;
@@ -80,5 +81,15 @@ public class CloudContactManager {
             }
         };
         CloudConnectManager.getInstance(mContext).getCloudContactManager(mContext).getContacts(request, callback);
+    }
+
+    public void searchContact(String keyWord, CloudResponseCallback callback) {
+        CloudUserSearchRequest request = new CloudUserSearchRequest();
+        String token = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN);
+        request.setToken(token);
+        request.setKeyWord(keyWord);
+        request.setLimit(100);
+
+        CloudConnectManager.getInstance(mContext).getCloudContactManager(mContext).searchContact(request, callback);
     }
 }

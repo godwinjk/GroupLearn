@@ -1,7 +1,6 @@
 package com.grouplearn.project.app.uiManagement.serachManagement.fragment;
 
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,23 +22,11 @@ import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback
 import com.grouplearn.project.app.uiManagement.interfaces.GroupViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.cloud.networkManagement.CloudGenericHttpMethod;
-import com.grouplearn.project.models.GoogleSearchResult;
 import com.grouplearn.project.models.GroupModel;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,7 +37,7 @@ public class SearchFragment extends BaseFragment implements GroupViewInterface, 
     SearchRecyclerAdapter mRecyclerAdapter;
     SearchView svSearchView;
     RecyclerView rvSearchList;
-    TextView tvNoItems, tvSearchFromWeb;
+    TextView tvNoItems;
     int whichWindow = 0;
 
     public SearchFragment() {
@@ -79,7 +66,7 @@ public class SearchFragment extends BaseFragment implements GroupViewInterface, 
         svSearchView.setIconifiedByDefault(true);
 
         tvNoItems = (TextView) v.findViewById(R.id.tv_no_items);
-        tvSearchFromWeb = (TextView) v.findViewById(R.id.tv_search_web);
+
 
         rvSearchList = (RecyclerView) v.findViewById(R.id.rv_search_list);
         rvSearchList.setLayoutManager(new StaggeredGridLayoutManager(1, 1));
@@ -94,12 +81,7 @@ public class SearchFragment extends BaseFragment implements GroupViewInterface, 
 
     @Override
     protected void registerListeners() {
-        tvSearchFromWeb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-            }
-        });
         svSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(final String query) {
@@ -169,10 +151,12 @@ public class SearchFragment extends BaseFragment implements GroupViewInterface, 
         hideSoftKeyboard();
         Log.d(TAG, "MODEL RECIEVED FROM DB :  How Much ? :" + groupModels.size());
         mRecyclerAdapter.setGroupList(groupModels);
-        if (groupModels == null || groupModels.size() <= 0)
+        if (groupModels == null || groupModels.size() <= 0) {
             tvNoItems.setVisibility(View.VISIBLE);
-        else
+            tvNoItems.setText("No groups found with this keyword");
+        } else {
             tvNoItems.setVisibility(View.GONE);
+        }
     }
 
     @Override

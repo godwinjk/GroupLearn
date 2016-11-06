@@ -18,6 +18,10 @@ public class CloudContactDeleteRequest extends CloudConnectRequest {
         this.groupUniqueIdList = groupUniqueIdList;
     }
 
+    public void setGroupUniqueIdList(String groupId) {
+        this.groupUniqueIdList.add(groupId);
+    }
+
     @Override
     public int validate() {
         return 0;

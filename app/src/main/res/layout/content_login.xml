@@ -27,71 +27,110 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
+            android:id="@+id/ll_user_credentials"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:gravity="center"
-            android:minHeight="400dp"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:orientation="vertical"
 
-            <LinearLayout
-                android:id="@+id/ll_user_credentials"
+            android:padding="20dp">
+
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:background="@color/transparent_blue"
-                android:orientation="vertical"
+                android:layout_height="wrap_content">
 
-                android:padding="20dp">
-
-                <android.support.design.widget.TextInputLayout
+                <EditText
+                    android:id="@+id/et_username"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/username"
+                    android:drawablePadding="10dp"
+                    android:hint="Phone number"
+                    android:imeOptions="actionNext"
+                    android:inputType="phone"
+                    android:maxLines="1"
+                    android:padding="10dp" />
+            </android.support.design.widget.TextInputLayout>
 
-                    <EditText
-                        android:id="@+id/et_username"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Phone number"
-                        android:imeOptions="actionNext"
-                        android:inputType="phone"
-                        android:maxLines="1"
-                        android:padding="10dp" />
-                </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <com.grouplearn.project.utilities.views.CustomPasswordField
+                <EditText
+                    android:id="@+id/et_password"
                     android:layout_width="match_parent"
-                    android:id="@+id/pf_password"
-                    android:layout_height="wrap_content">
-
-                </com.grouplearn.project.utilities.views.CustomPasswordField>
-
-                <Button
-                    android:id="@+id/btn_login"
-                    android:layout_width="150dp"
-                    android:layout_height="45dp"
-                    android:layout_gravity="center"
-
-                    android:layout_marginTop="30dp"
+                    android:layout_height="wrap_content"
                     android:backgroundTint="@color/colorPrimary"
-                    android:clickable="true"
-                    android:text="@string/sign_in"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    android:drawableLeft="@drawable/password"
+                    android:drawablePadding="10dp"
+                    android:hint="Password"
+                    android:imeOptions="actionDone"
+                    android:inputType="textPassword"
+                    android:maxLength="32"
+                    android:maxLines="1"
+                    android:padding="10dp"
+                    android:textColor="#8D8D8D"
+                    android:textColorHint="@color/black_overlay"></EditText>
+            </android.support.design.widget.TextInputLayout>
 
-            </LinearLayout>
+            <Button
+                android:id="@+id/btn_login"
+                android:layout_width="150dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/round_btn_selector"
+                android:clickable="true"
+                android:text="@string/sign_in"
+                android:textColor="@color/white" />
 
             <Button
                 android:id="@+id/btn_sign_up"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:layout_margin="20dp"
-                android:backgroundTint="@color/colorPrimaryTextDark"
+                android:background="@null"
                 android:clickable="true"
-                android:text="@string/sign_up"
+
+                android:text="New User?"
                 android:textAllCaps="false"
-                android:textColor="@color/white" />
+                android:textColor="@color/colorPrimaryTextDark" />
         </LinearLayout>
     </ScrollView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:padding="5dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:text="By"
+            android:textColor="@color/colorPrimary"
+            android:textSize="12dp"
+            android:textStyle="italic|bold" />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/grouplearn_icon_128" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            android:padding="2dp"
+            android:text="Starlee Labs"
+            android:textColor="@color/colorPrimaryTextDark"
+            android:textSize="12dp"
+            android:textStyle="bold" />
+    </LinearLayout>
 </LinearLayout>

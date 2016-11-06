@@ -169,4 +169,9 @@ public class GroupDbHelper extends DataBaseHelper {
         mContentResolver.insert(TableSubscribedGroups.CONTENT_URI, cv);
         return getGodwinBot();
     }
+
+    public int deleteSubscribedGroup(String model) {
+        String where = TableSubscribedGroups.GROUP_ID + "='" + model + "'";
+        return mContentResolver.delete(TableSubscribedGroups.CONTENT_URI, where, null);
+    }
 }

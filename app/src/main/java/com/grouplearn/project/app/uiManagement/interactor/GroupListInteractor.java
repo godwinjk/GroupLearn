@@ -222,4 +222,5 @@ public class GroupListInteractor implements CloudResponseCallback {
         request.setRequestModels(model);
         CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).inviteToGroup(request, callback);
     }
+
 }

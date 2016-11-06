@@ -6,6 +6,7 @@ import android.content.Intent;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.SplashScreenActivity;
+import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.GroupRequestCallback;
@@ -17,6 +18,8 @@ import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.groupManagement.addGroup.CloudAddGroupRequest;
 import com.grouplearn.project.cloud.groupManagement.addSubscribedGroup.CloudAddSubscribedGroupRequest;
+import com.grouplearn.project.cloud.groupManagement.exitGroup.CloudExitGroupRequest;
+import com.grouplearn.project.cloud.groupManagement.exitGroup.CloudExitGroupResponse;
 import com.grouplearn.project.cloud.groupManagement.getGroupRequest.CloudGetSubscribeResponse;
 import com.grouplearn.project.cloud.groupManagement.updateGroupRequest.CloudUpdateSubscribeGroupRequest;
 import com.grouplearn.project.cloud.groupManagement.updateGroupRequest.CloudUpdateSubscribeGroupResponse;
@@ -189,5 +192,35 @@ public class CloudGroupManagement {
             }
         };
         CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).updateInvitation(request, callback);
+    }
+
+    public void exitFromSubscribedGroup(String uniqueId, final CloudOperationCallback operationCallback) {
+        String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
+        final CloudExitGroupRequest request = new CloudExitGroupRequest();
+        request.setToken(token);
+        request.setGroupUniqueIdList(uniqueId);
+        DisplayInfo.showLoader(mContext, "Please wait...");
+        CloudResponseCallback callback = new CloudResponseCallback() {
+            @Override
+            public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
+                DisplayInfo.dismissLoader(mContext);
+                CloudExitGroupResponse response = (CloudExitGroupResponse) cloudResponse;
+                ArrayList<String> requestModels = response.getGroupUniqueIdList();
+                if (requestModels.size() > 0) {
+                    for (String model : requestModels) {
+                        operationCallback.onCloudOperationSuccess();
+                        DisplayInfo.showToast(mContext, "Success");
+                        new GroupDbHelper(mContext).deleteSubscribedGroup(model);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
+                operationCallback.onCloudOperationFailed(new AppError(cloudError.getErrorCode(), cloudError.getErrorMessage()));
+                DisplayInfo.dismissLoader(mContext);
+            }
+        };
+        CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).exitFromGroup(request, callback);
     }
 }

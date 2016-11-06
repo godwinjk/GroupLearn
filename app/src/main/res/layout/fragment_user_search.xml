@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".app.uiManagement.serachManagement.fragment.SearchFragment">
+    tools:context="com.grouplearn.project.app.uiManagement.serachManagement.fragment.UserSearchFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,11 +25,11 @@
         </android.support.v7.widget.CardView>
 
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_search_list"
+        <ListView
+            android:id="@+id/lv_contacts"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="10dp"></android.support.v7.widget.RecyclerView>
+            android:padding="10dp"></ListView>
     </LinearLayout>
 
     <TextView
@@ -41,5 +41,5 @@
         android:drawableRight="@drawable/crying_32"
         android:gravity="center"
         android:padding="20dp"
-        android:text="Search groups" />
+        android:text="Search for users" />
 </RelativeLayout>

@@ -13,6 +13,7 @@ public class ContactModel extends BaseModel implements Parcelable {
     String contactIconId;
     String contactStatus;
     String contactNumber;
+    String contactMailId;
     int privacy;
     int status;
     Bitmap contactImage;
@@ -90,9 +91,18 @@ public class ContactModel extends BaseModel implements Parcelable {
         this.contactId = contactId;
     }
 
+    public String getContactMailId() {
+        return contactMailId;
+    }
+
+    public void setContactMailId(String contactMailId) {
+        this.contactMailId = contactMailId;
+    }
+
     protected ContactModel(Parcel in) {
         super(in);
         contactName = in.readString();
+        contactMailId = in.readString();
         contactUniqueId = in.readString();
         contactIconId = in.readString();
         contactStatus = in.readString();
@@ -118,6 +128,7 @@ public class ContactModel extends BaseModel implements Parcelable {
         super.writeToParcel(dest, flags);
 
         dest.writeString(contactName);
+        dest.writeString(contactMailId);
         dest.writeString(contactUniqueId);
         dest.writeString(contactIconId);
         dest.writeString(contactStatus);

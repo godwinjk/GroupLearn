@@ -144,10 +144,17 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 DisplayInfo.dismissLoader(mContext);
                 CloudGroupInvitationResponse response = (CloudGroupInvitationResponse) cloudResponse;
-                if (response.getInvitationCount() > 0) {
+                if (response.getRequestModels().size() > 0) {
                     for (RequestModel requestModel : response.getRequestModels()) {
-                        DisplayInfo.showToast(mContext, "Invitation sent successfully");
+                        if (requestModel.getStatus() == 1) {
+                            DisplayInfo.showToast(mContext, "Invitation sent successfully");
+                            finish();
+                        } else {
+                            DisplayInfo.showToast(mContext, requestModel.getMessage());
+                        }
                     }
+                } else {
+                    DisplayInfo.showToast(mContext, "Invitation sent failed");
                 }
             }
 

@@ -20,7 +20,7 @@ import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
-import com.grouplearn.project.app.uiManagement.groupManagement.GroupListActivity;
+import com.grouplearn.project.app.uiManagement.serachManagement.SearchAllActivity;
 import com.grouplearn.project.cloud.CloudConnectManager;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
@@ -34,14 +34,13 @@ import com.grouplearn.project.utilities.DisplayUtilities;
 import com.grouplearn.project.utilities.GeneralAlert;
 import com.grouplearn.project.utilities.InputValidator;
 import com.grouplearn.project.utilities.views.AppAlertDialog;
-import com.grouplearn.project.utilities.views.CustomPasswordField;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
     private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 10;
     Context mContext;
     EditText etUserName;
-    CustomPasswordField etPassword;
+    EditText etPassword;
     Button btnSignIn, btnSignUp;
     AppSharedPreference mPref;
     TextView tvTitle;
@@ -107,7 +106,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     public void initializeWidgets() {
         mPref = new AppSharedPreference(mContext);
         etUserName = (EditText) findViewById(R.id.et_username);
-        etPassword = (CustomPasswordField) findViewById(R.id.pf_password);
+        etPassword = (EditText) findViewById(R.id.et_password);
         btnSignIn = (Button) findViewById(R.id.btn_login);
         btnSignUp = (Button) findViewById(R.id.btn_sign_up);
         tvTitle = (TextView) findViewById(R.id.tv_title);
@@ -144,7 +143,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         int status = validator.validateUserName(etUserName);
         if (status != 0)
             return false;
-        status = validator.validatePassword(etPassword.getEditText());
+        status = validator.validatePassword(etPassword);
         if (status != 0)
             return false;
         return true;
@@ -190,7 +189,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     mPref.setBooleanPrefValue(PreferenceConstants.IS_ENTER_KEY_SEND_MESSAGE, true);
                     mPref.setBooleanPrefValue(PreferenceConstants.IS_SPEAK_ENABLED, false);
 
-                    startActivity(new Intent(mContext, GroupListActivity.class));
+                    Intent intent = new Intent(mContext, SearchAllActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                     finish();
                 }
             }

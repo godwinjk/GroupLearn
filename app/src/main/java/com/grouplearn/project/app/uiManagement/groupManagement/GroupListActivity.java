@@ -31,6 +31,7 @@ import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.SplashScreenActivity;
 import com.grouplearn.project.app.uiManagement.StatusActivity;
 import com.grouplearn.project.app.uiManagement.adapter.GroupListAdapter;
+import com.grouplearn.project.app.uiManagement.cloudHelper.CloudGroupManagement;
 import com.grouplearn.project.app.uiManagement.contactManagement.ContactListActivity;
 import com.grouplearn.project.app.uiManagement.controllers.NavigationMenuController;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
@@ -38,12 +39,14 @@ import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
 import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
 import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
+import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.GroupViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
 import com.grouplearn.project.app.uiManagement.serachManagement.SearchAllActivity;
 import com.grouplearn.project.app.uiManagement.settingsManagement.AboutActivity;
 import com.grouplearn.project.app.uiManagement.settingsManagement.SettingsActivity;
 import com.grouplearn.project.models.GroupModel;
+import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -243,7 +246,9 @@ public class GroupListActivity extends BaseActivity implements NavigationView.On
                     revealHide(200);
                 break;
             case R.id.ll_search_group:
-                startActivity(new Intent(mContext, SearchAllActivity.class));
+                Intent intent = new Intent(mContext, SearchAllActivity.class);
+                intent.putExtra("showDrawer", 1);
+                startActivity(intent);
                 break;
             case R.id.ll_add_group:
                 startActivity(new Intent(mContext, AddGroupActivity.class));
@@ -363,7 +368,7 @@ public class GroupListActivity extends BaseActivity implements NavigationView.On
         if (!model.getGroupUniqueId().equals("-11223344")) {
             menu.add(1, 1, 1, "Mark as read");
             menu.add(1, 2, 1, "Group info");
-//            menu.add(1, 3, 1, "Exit group");
+            menu.add(1, 3, 1, "Exit group");
         }
     }
 
@@ -372,19 +377,43 @@ public class GroupListActivity extends BaseActivity implements NavigationView.On
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int position = info.position;
+        final GroupModel model = (GroupModel) mGroupListAdapter.getItem(position);
+        final GroupListInteractor interactor = GroupListInteractor.getInstance(mContext);
         switch (item.getItemId()) {
             case 1:
                 new ChatDbHelper(mContext).updateAllRead(Long.parseLong(mGroupListAdapter.getGroupListData().get(position).getGroupUniqueId()));
-                GroupListInteractor interactor = GroupListInteractor.getInstance(mContext);
+
                 interactor.getSubscribedGroupsFromDatabase(GroupListActivity.this);
                 break;
             case 2:
                 Intent i = new Intent(mContext, GroupInfoActivity.class);
-                GroupModel model = (GroupModel) mGroupListAdapter.getItem(position);
+
                 i.putExtra("groupCloudId", model.getGroupUniqueId());
                 startActivity(i);
                 break;
             case 3:
+                CloudOperationCallback callback = new CloudOperationCallback() {
+                    @Override
+                    public void onCloudOperationSuccess() {
+                        DisplayInfo.dismissLoader(mContext);
+                        GroupDbHelper helper = new GroupDbHelper(mContext);
+                        helper.deleteSubscribedGroup(model.getGroupUniqueId());
+                        interactor.getSubscribedGroupsFromDatabase(GroupListActivity.this);
+
+                    }
+
+                    @Override
+                    public void onCloudOperationFailed(AppError error) {
+                        DisplayInfo.dismissLoader(mContext);
+                        DisplayInfo.showToast(mContext, "Something went wrong. Please try again later.");
+                    }
+                };
+                if (AppUtility.checkInternetConnection()) {
+                    DisplayInfo.showLoader(mContext, getString(R.string.please_wait));
+                    new CloudGroupManagement(mContext).exitFromSubscribedGroup(model.getGroupUniqueId(), callback);
+                } else {
+                    DisplayInfo.showToast(mContext, getString(R.string.no_network));
+                }
                 break;
         }
         return super.onContextItemSelected(item);
@@ -521,4 +550,5 @@ public class GroupListActivity extends BaseActivity implements NavigationView.On
         mDbHelper.getGodwinBot();
 
     }
+
 }

@@ -11,6 +11,8 @@ import com.grouplearn.project.cloud.contactManagement.contactAddOrEdit.CloudCont
 import com.grouplearn.project.cloud.contactManagement.contactAddOrEdit.CloudContactAddOrEditResponse;
 import com.grouplearn.project.cloud.contactManagement.contactDelete.CloudContactDeleteResponse;
 import com.grouplearn.project.cloud.contactManagement.contactGet.CloudContactGetRequest;
+import com.grouplearn.project.cloud.contactManagement.search.CloudUserSearchRequest;
+import com.grouplearn.project.cloud.contactManagement.search.CloudUserSearchResponse;
 import com.grouplearn.project.cloud.groupManagement.addGroup.CloudAddGroupResponse;
 import com.grouplearn.project.cloud.groupManagement.deleteGroup.CloudContactDeleteRequest;
 import com.grouplearn.project.cloud.networkManagement.CloudAPICallback;
@@ -301,6 +303,82 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
             }
         }
         httpMethod.setEntityString(entity.toString());
+        httpMethod.execute();
+    }
+
+    @Override
+    public void searchContact(final CloudUserSearchRequest cloudRequest, final CloudResponseCallback responseCallback) {
+        if (cloudRequest == null || responseCallback == null)
+            throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
+        CloudAPICallback listener = new CloudAPICallback() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                CloudUserSearchResponse response = new CloudUserSearchResponse();
+                if (jsonObject != null) {
+                    jsonObject = jsonObject.optJSONObject(RESPONSE);
+                    if (jsonObject != null) {
+                        JSONObject statusObject = jsonObject.optJSONObject(STATUS);
+                        JSONObject dataObject = jsonObject.optJSONObject(DATA);
+
+                        if (dataObject != null) {
+
+                            ArrayList<ContactModel> contactModels = new ArrayList<>();
+                            int count = dataObject.optInt("userCount");
+                            response.setContactCount(count);
+                            JSONArray userArray = dataObject.optJSONArray("userDetails");
+                            for (int i = 0; userArray != null && i < userArray.length(); i++) {
+                                JSONObject modelObject = userArray.optJSONObject(i);
+                                ContactModel contactModel = new ContactModel();
+                                contactModel.setContactNumber(modelObject.optString("userName"));
+                                contactModel.setContactName(modelObject.optString("userDisplayName"));
+                                contactModel.setContactMailId(modelObject.optString("userEmail"));
+                                contactModel.setContactUniqueId(modelObject.optString("userId"));
+                                contactModel.setPrivacy(modelObject.optInt("privacy"));
+                                contactModel.setTimeStamp(modelObject.optString("timestamp"));
+                                contactModel.setContactStatus(modelObject.optString("userStatus"));
+
+                                contactModels.add(contactModel);
+                            }
+                            response.setContactModels(contactModels);
+                            if (responseCallback != null) {
+                                responseCallback.onSuccess(cloudRequest, response);
+                            }
+                        } else {
+                            if (responseCallback != null) {
+                                responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_DATA_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_DATA_FROM_CLOUD));
+                            }
+                        }
+                    } else {
+                        if (responseCallback != null) {
+                            responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                        }
+                    }
+                } else {
+                    if (responseCallback != null) {
+                        responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(CloudError cloudError) {
+                if (responseCallback != null) {
+                    responseCallback.onFailure(cloudRequest, cloudError);
+                }
+            }
+        };
+        CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
+        httpMethod.setRequestType(CloudHttpMethod.GET_METHOD);
+        httpMethod.setUrl(mBaseurl + "user/1");
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("token", cloudRequest.getToken());
+        hashMap.put("start", "" + cloudRequest.getStartTime() + ".0000");
+        hashMap.put("limit", "" + cloudRequest.getLimit());
+        hashMap.put("key", cloudRequest.getKeyWord());
+
+        httpMethod.setHeaderMap(hashMap);
+
         httpMethod.execute();
     }
 }

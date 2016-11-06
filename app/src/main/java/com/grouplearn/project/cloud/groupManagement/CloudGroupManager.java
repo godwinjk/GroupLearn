@@ -499,12 +499,12 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
         CloudAPICallback listener = new CloudAPICallback() {
             @Override
             public void onSuccess(JSONObject jsonObject) {
-                CloudExitGroupResponse response = (CloudExitGroupResponse) new CloudConnectResponse();
+                CloudExitGroupResponse response = new CloudExitGroupResponse();
                 if (jsonObject != null) {
                     jsonObject = jsonObject.optJSONObject(RESPONSE);
                     if (jsonObject != null) {
                         JSONObject statusObject = jsonObject.optJSONObject(STATUS);
-                        JSONObject dataObject = jsonObject.optJSONObject(DATA);
+                        JSONArray dataArray = jsonObject.optJSONArray(DATA);
                         if (statusObject != null) {
                             response = (CloudExitGroupResponse) getUpdatedResponse(statusObject, response);
                             if (responseCallback != null) {
@@ -515,14 +515,12 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                 responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
                             }
                         }
-                        if (dataObject != null) {
-                            int groupCount = dataObject.optInt("groupCount", 0);
-                            JSONArray dataArray = dataObject.optJSONArray("groupDetails");
-                            response.setGroupCount(groupCount);
+                        if (dataArray != null) {
+
                             ArrayList<String> groupUniqueIdList = new ArrayList<>();
-                            for (int i = 0; dataArray != null && groupCount > 0 && i < dataArray.length(); i++) {
+                            for (int i = 0; dataArray != null && dataArray.length() > 0 && i < dataArray.length(); i++) {
                                 JSONObject modelObject = dataArray.optJSONObject(i);
-                                groupUniqueIdList.add(modelObject.optString("groupUniqueId"));
+                                groupUniqueIdList.add(modelObject.optString("groupId"));
                             }
                             response.setGroupUniqueIdList(groupUniqueIdList);
                             if (responseCallback != null) {
@@ -554,7 +552,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
         };
         CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
         httpMethod.setRequestType(CloudHttpMethod.POST_METHOD);
-        httpMethod.setUrl("");
+        httpMethod.setUrl(mBaseurl + "bulk-group-subscribe");
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("token", cloudRequest.getToken());
@@ -564,7 +562,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
         for (String uniqueId : cloudRequest.getGroupUniqueIdList()) {
             JSONObject modelObject = new JSONObject();
             try {
-                modelObject.put("groupUniqueId", uniqueId);
+                modelObject.put("groupId", uniqueId);
                 entity.put(modelObject);
             } catch (JSONException e) {
                 e.printStackTrace();
