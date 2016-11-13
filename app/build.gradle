@@ -8,8 +8,8 @@ android {
         applicationId "com.grouplearn.project"
         minSdkVersion 19
         targetSdkVersion 23
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 5
+        versionName "1.0.4"
 
         multiDexEnabled true
     }
@@ -53,7 +53,7 @@ dependencies {
     compile 'com.android.support:support-v4:24.2.1'
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'com.mcxiaoke.volley:library-aar:1.0.0'
-    compile 'com.google.firebase:firebase-messaging:9.4.0'
+    compile 'com.google.firebase:firebase-messaging:9.8.0'
     compile 'com.android.support:palette-v7:24.2.1'
     compile 'io.github.rockerhieu:emojicon:1.4.1'
     testCompile 'junit:junit:4.12'

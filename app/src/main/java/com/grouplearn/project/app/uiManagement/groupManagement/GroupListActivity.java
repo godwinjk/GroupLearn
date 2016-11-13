@@ -78,6 +78,15 @@ public class GroupListActivity extends BaseActivity implements NavigationView.On
         initializeWidgets();
         registerListeners();
 
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+mFab.setVisibility(View.GONE);
         revealHide(0);
         makeGodwinBot();
     }

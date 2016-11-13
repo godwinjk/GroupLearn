@@ -117,4 +117,7 @@
     <string name="title_activity_invitation">InvitationActivity</string>
     <string name="please_wait">Please wait...</string>
     <string name="no_network">Please check your internet connection.</string>
+    <string name="title_activity_search_groups">SearchGroupsActivity</string>
+    <string name="title_activity_group_list_new">GroupListNewActivity</string>
+    <string name="title_activity_search_user">SearchUserActivity</string>
 </resources>

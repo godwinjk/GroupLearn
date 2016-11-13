@@ -130,6 +130,18 @@
         <activity
             android:name=".app.uiManagement.groupManagement.InvitationActivity"
             android:label="@string/title_activity_invitation"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.serachManagement.SearchGroupsActivity"
+            android:label="@string/title_activity_search_groups"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.groupManagement.GroupListNewActivity"
+            android:label="@string/title_activity_group_list_new"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.serachManagement.SearchUserActivity"
+            android:label="@string/title_activity_search_user"
             android:theme="@style/AppTheme1"></activity>
     </application>
 

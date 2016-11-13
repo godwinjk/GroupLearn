@@ -4,7 +4,11 @@
     <group
         android:id="@+id/group1"
         android:checkableBehavior="single">
-
+        <item
+            android:id="@+id/nav_groups"
+            android:checked="false"
+            android:icon="@drawable/ic_menu_contacts"
+            android:title="Subscribed Groups" />
         <item
             android:id="@+id/nav_status"
             android:checked="false"

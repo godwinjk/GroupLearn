@@ -5,41 +5,79 @@
     android:layout_height="match_parent"
     tools:context=".app.uiManagement.serachManagement.fragment.SearchFragment">
 
-    <LinearLayout
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/content_search_groups"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="com.grouplearn.project.app.uiManagement.serachManagement.SearchGroupsActivity"
+        tools:showIn="@layout/activity_search_groups">
 
-        <android.support.v7.widget.CardView
+        <LinearLayout
+            android:id="@+id/ll_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardUseCompatPadding="true">
+            android:layout_alignParentTop="true"
+            android:orientation="vertical">
 
-            <android.support.v7.widget.SearchView
-                android:id="@+id/sv_items"
+            <ImageView
+                android:id="@+id/iv_show"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="70dp"
+                android:src="@drawable/students" />
 
-                <requestFocus />
-            </android.support.v7.widget.SearchView>
-        </android.support.v7.widget.CardView>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="GroupLearn"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Search courses here" />
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cv_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="false"
+                android:layout_margin="10dp"
+                app:cardUseCompatPadding="true">
+
+                <android.support.v7.widget.SearchView
+                    android:id="@+id/sv_items"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:queryHint="Enter name to search groups"
+                    app:queryHint="Enter name to search groups">
+
+                    <requestFocus />
+                </android.support.v7.widget.SearchView>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
 
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_search_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_below="@+id/ll_search"
             android:padding="10dp"></android.support.v7.widget.RecyclerView>
-    </LinearLayout>
 
-    <TextView
-        android:id="@+id/tv_no_items"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:drawablePadding="10dp"
-        android:drawableRight="@drawable/crying_32"
-        android:gravity="center"
-        android:padding="20dp"
-        android:text="Search groups" />
+        <TextView
+            android:id="@+id/tv_no_items"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:drawablePadding="10dp"
+            android:gravity="center"
+            android:padding="20dp"
+            android:text="Click to search groups." />
+    </RelativeLayout>
 </RelativeLayout>

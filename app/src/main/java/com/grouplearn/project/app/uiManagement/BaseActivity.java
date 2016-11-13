@@ -13,7 +13,7 @@ import com.grouplearn.project.R;
 import com.grouplearn.project.utilities.GeneralAlert;
 
 public abstract class BaseActivity extends AppCompatActivity {
-    Toolbar mToolbar;
+    protected Toolbar mToolbar;
     public static final int APP_ACTIVE = 0;
     public static final int APP_NOT_ACTIVE = 0;
     public static final int APP_PAUSED = 1;
