@@ -23,8 +23,8 @@ public class NotificationSettingsActivity extends BaseActivity implements View.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification_settings);
-        Toolbar toolbar = setupToolbar("Privacy", true);
-
+        Toolbar toolbar = setupToolbar("GroupLearn", true);
+        toolbar.setSubtitle("Notification Settings");
         mContext = this;
         mPref = new AppSharedPreference(mContext);
 

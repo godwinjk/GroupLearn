@@ -44,7 +44,8 @@ public class SearchGroupsActivity extends BaseActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_groups);
-        setupToolbar("Search Groups", true);
+        mToolbar = setupToolbar("GroupLearn", true);
+        mToolbar.setSubtitle("Search Groups");
 
         initializeWidgets();
         registerListeners();
@@ -70,7 +71,7 @@ public class SearchGroupsActivity extends BaseActivity implements View.OnClickLi
         searchText.setBackground(null);
         searchText.setHintTextColor(getResources().getColor(R.color.colorPrimary));
         searchText.setTextColor(getResources().getColor(R.color.black));
-        searchText.setHint("Enter string to search");
+        searchText.setHint("eg: Java, Android, iOS");
 
         svSearchView.performClick();
         fab.setVisibility(View.GONE);

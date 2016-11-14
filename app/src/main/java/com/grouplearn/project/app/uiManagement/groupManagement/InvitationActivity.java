@@ -33,7 +33,8 @@ public class InvitationActivity extends BaseActivity implements GroupRequestCall
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_invitation);
-        Toolbar toolbar = setupToolbar("Invitations", true);
+        Toolbar toolbar = setupToolbar("GroupLearn", true);
+        toolbar.setSubtitle("Invitations");
         mContext = this;
 
         initializeWidgets();

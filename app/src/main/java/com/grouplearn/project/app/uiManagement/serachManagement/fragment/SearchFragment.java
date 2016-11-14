@@ -86,9 +86,8 @@ public class SearchFragment extends BaseFragment implements GroupViewInterface, 
 
         EditText searchText = ((EditText) svSearchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
         searchText.setBackground(null);
-        searchText.setHintTextColor(getResources().getColor(R.color.colorPrimary));
         searchText.setTextColor(getResources().getColor(R.color.black));
-        searchText.setHint("Enter string to search");
+        searchText.setHint("eg: Java, Android, iOS");
 
         svSearchView.performClick();
         tvNoItems.setVisibility(View.GONE);

@@ -9,11 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.MenuItem;
@@ -29,11 +25,8 @@ import android.widget.TextView;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.SplashScreenActivity;
-import com.grouplearn.project.app.uiManagement.StatusActivity;
 import com.grouplearn.project.app.uiManagement.adapter.GroupListAdapter;
 import com.grouplearn.project.app.uiManagement.cloudHelper.CloudGroupManagement;
-import com.grouplearn.project.app.uiManagement.contactManagement.ContactListActivity;
-import com.grouplearn.project.app.uiManagement.controllers.NavigationMenuController;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
@@ -43,8 +36,6 @@ import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback
 import com.grouplearn.project.app.uiManagement.interfaces.GroupViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
 import com.grouplearn.project.app.uiManagement.serachManagement.SearchAllActivity;
-import com.grouplearn.project.app.uiManagement.settingsManagement.AboutActivity;
-import com.grouplearn.project.app.uiManagement.settingsManagement.SettingsActivity;
 import com.grouplearn.project.models.GroupModel;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
@@ -53,7 +44,7 @@ import com.grouplearn.project.utilities.views.DisplayInfo;
 
 import java.util.ArrayList;
 
-public class GroupListActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GroupViewInterface {
+public class GroupListActivity extends BaseActivity implements View.OnClickListener, GroupViewInterface {
     private static final String TAG = "GroupListActivity";
     private static final long TRANSLATE_DURATION_MILLIS = 500;
     FloatingActionButton mFab;
@@ -61,49 +52,27 @@ public class GroupListActivity extends BaseActivity implements NavigationView.On
     GroupListAdapter mGroupListAdapter;
     ListView lvGroupListView;
     TextView tvNoGroups;
-    DrawerLayout mDrawerLayout;
-    ActionBarDrawerToggle mDrawerToggle;
-    NavigationView mNavigationView;
+
     Toolbar mToolbar;
     private boolean mVisible = true;
-    NavigationMenuController mNavController;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_group_list);
-        mToolbar = setupToolbar(R.string.title_group_learn, false);
+        setContentView(R.layout.activity_group_list);
+        mToolbar = setupToolbar(R.string.title_group_learn, true);
+        mToolbar.setSubtitle("My Groups");
         mContext = this;
 
         initializeWidgets();
         registerListeners();
 
-        mDrawerToggle.setDrawerIndicatorEnabled(true);
-        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
-mFab.setVisibility(View.GONE);
+        mFab.setVisibility(View.GONE);
         revealHide(0);
         makeGodwinBot();
     }
 
-    private void createNavigationView() {
-        if (mNavController != null) {
-            mNavigationView.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mNavController.refreshMenu();
-                }
-            }, 100);
-        } else {
-            mNavController = new NavigationMenuController(mContext, mNavigationView);
-        }
-        mNavigationView = mNavController.createNavigationMenu();
-    }
 
     @Override
     public boolean onSearchRequested() {
@@ -158,7 +127,6 @@ mFab.setVisibility(View.GONE);
     @Override
     protected void onResume() {
         super.onResume();
-        createNavigationView();
 
         GroupListInteractor interactor = GroupListInteractor.getInstance(mContext);
         interactor.getSubscribedGroups(this);
@@ -197,12 +165,9 @@ mFab.setVisibility(View.GONE);
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         lvGroupListView = (ListView) findViewById(R.id.lv_group_list);
         tvNoGroups = (TextView) findViewById(R.id.tv_no_groups);
-        mGroupListAdapter = new GroupListAdapter(mContext);
+        mGroupListAdapter = new GroupListAdapter(mContext, 1);
         lvGroupListView.setAdapter(mGroupListAdapter);
 
-        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
         onSearchRequested();
     }
@@ -217,13 +182,10 @@ mFab.setVisibility(View.GONE);
                 String groupUniqueId = ((GroupModel) mGroupListAdapter.getItem(position)).getGroupUniqueId();
 
                 chatIntent.putExtra("groupCloudId", groupUniqueId);
-                startActivity(chatIntent);
+//                startActivity(chatIntent);
 //                }
             }
         });
-        mNavigationView.setNavigationItemSelectedListener(this);
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
 
         lvGroupListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -316,57 +278,6 @@ mFab.setVisibility(View.GONE);
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_status) {
-            startActivity(new Intent(mContext, StatusActivity.class));
-        } else if (id == R.id.nav_about) {
-            startActivity(new Intent(mContext, AboutActivity.class));
-        } else if (id == R.id.nav_contacts) {
-            startActivity(new Intent(mContext, ContactListActivity.class));
-        } else if (id == R.id.nav_settings) {
-            startActivity(new Intent(mContext, SettingsActivity.class));
-        } else if (id == R.id.nav_request) {
-            startActivity(new Intent(mContext, RequestAcceptingActivity.class));
-        } else if (id == R.id.nav_invitations) {
-            startActivity(new Intent(mContext, InvitationActivity.class));
-        } else if (id == R.id.nav_signout) {
-            new SignOutInteractor(mContext).doSignOut(new SignOutListener() {
-                @Override
-                public void onSignOutSuccessful() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Intent intent = new Intent(mContext, SplashScreenActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            DisplayInfo.showToast(mContext, "Sign out successfully.");
-                            startActivity(intent);
-                            finish();
-                        }
-                    });
-                }
-
-                @Override
-                public void onSignOutFailed() {
-
-                }
-
-                @Override
-                public void onSignOutCanceled() {
-
-                }
-            });
-        }
-        mNavigationView.postInvalidate();
-        mNavigationView.invalidate();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {

@@ -41,7 +41,8 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_groups);
-        setupToolbar("Groups", true);
+        setupToolbar("GroupLearn", true);
+
         mContext = this;
         initializeWidgets();
         registerListeners();

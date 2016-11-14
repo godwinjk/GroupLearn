@@ -21,7 +21,8 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        Toolbar toolbar = setupToolbar("Settings", true);
+        Toolbar toolbar = setupToolbar("GroupLearn", true);
+        toolbar.setSubtitle("Settings");
         mContext = this;
 
         initializeWidgets();

@@ -17,11 +17,18 @@ import java.util.ArrayList;
  * Created by Godwin Joseph on 07-05-2016 14:24 for Group Learn application.
  */
 public class GroupListAdapter extends BaseAdapter {
+    private int mode = 0;
     Context mContext;
     LayoutInflater inflater;
     private ArrayList<GroupModel> mGroupList = new ArrayList<>();
 
     public GroupListAdapter(Context mContext) {
+        this.mContext = mContext;
+        this.inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    public GroupListAdapter(Context mContext, int mode) {
+        this.mode = 1;
         this.mContext = mContext;
         this.inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -72,6 +79,10 @@ public class GroupListAdapter extends BaseAdapter {
             }
             holder.tvLastMessage.setVisibility(View.VISIBLE);
             holder.tvLastMessage.setText(lastMesage);
+        }
+        if (mode==1){
+            holder.tvLastMessage.setVisibility(View.GONE);
+            holder.tvMessageCount.setVisibility(View.GONE);
         }
         return convertView;
     }

@@ -23,7 +23,8 @@ public class ChatSettings extends BaseActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_settings);
-        Toolbar toolbar = setupToolbar("Chat settings", true);
+        Toolbar toolbar = setupToolbar("GroupLearn", true);
+        toolbar.setSubtitle("Chat settings");
 
         mContext = this;
         mPref = new AppSharedPreference(mContext);

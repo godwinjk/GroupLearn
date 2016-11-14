@@ -33,7 +33,8 @@ public class RequestAcceptingActivity extends BaseActivity implements GroupReque
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_acceptiong);
-        Toolbar toolbar = setupToolbar("Requests", true);
+        Toolbar toolbar = setupToolbar("GroupLearn", true);
+        toolbar.setSubtitle("Requests");
         mContext = this;
 
         initializeWidgets();

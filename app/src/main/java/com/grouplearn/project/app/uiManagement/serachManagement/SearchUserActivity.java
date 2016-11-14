@@ -36,7 +36,8 @@ public class SearchUserActivity extends BaseActivity implements ContactViewInter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_user);
-        setupToolbar("Search User", true);
+        setupToolbar("GroupLearn", true);
+        mToolbar.setSubtitle("Search Users");
         mContext = this;
         initializeWidgets();
         registerListeners();
@@ -58,7 +59,7 @@ public class SearchUserActivity extends BaseActivity implements ContactViewInter
         searchText.setBackground(null);
         searchText.setHintTextColor(getResources().getColor(R.color.colorPrimary));
         searchText.setTextColor(getResources().getColor(R.color.black));
-        searchText.setHint("Enter string to search");
+        searchText.setHint("eg: John, George");
 
         svSearchView.performClick();
     }

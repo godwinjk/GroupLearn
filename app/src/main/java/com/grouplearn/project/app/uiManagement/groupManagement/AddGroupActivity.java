@@ -24,7 +24,8 @@ public class AddGroupActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_group);
-        setupToolbar("Add Topic", true);
+        setupToolbar("GroupLearn", true);
+        mToolbar.setSubtitle("Add Topic");
         mContext = this;
         initializeWidgets();
         registerListeners();

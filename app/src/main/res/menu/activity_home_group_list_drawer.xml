@@ -8,7 +8,7 @@
             android:id="@+id/nav_groups"
             android:checked="false"
             android:icon="@drawable/ic_menu_contacts"
-            android:title="Subscribed Groups" />
+            android:title="My Groups" />
         <item
             android:id="@+id/nav_status"
             android:checked="false"
