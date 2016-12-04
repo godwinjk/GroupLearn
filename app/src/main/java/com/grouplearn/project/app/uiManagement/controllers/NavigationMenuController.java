@@ -20,7 +20,7 @@ import android.widget.TextView;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
-import com.grouplearn.project.app.uiManagement.userManagement.UserProfileActivity;
+import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
 
 /**
  * Created by Godwin Joseph on 01-06-2016 11:08 for Group Learn application.

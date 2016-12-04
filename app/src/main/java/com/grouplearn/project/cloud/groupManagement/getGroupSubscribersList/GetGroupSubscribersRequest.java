@@ -1,9 +1,6 @@
 package com.grouplearn.project.cloud.groupManagement.getGroupSubscribersList;
 
 import com.grouplearn.project.cloud.CloudConnectRequest;
-import com.grouplearn.project.models.UserModel;
-
-import java.util.ArrayList;
 
 /**
  * Created by Godwin Joseph on 07-10-2016 18:44 for GroupLearn application.

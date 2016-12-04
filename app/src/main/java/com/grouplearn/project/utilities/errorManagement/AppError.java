@@ -1,5 +1,7 @@
 package com.grouplearn.project.utilities.errorManagement;
 
+import com.grouplearn.project.cloud.CloudError;
+
 /**
  * Created by Godwin Joseph on 10-05-2016 11:28 for Group Learn application.
  */
@@ -10,6 +12,11 @@ public class AppError {
     public AppError(int errorCode, String errorMessage) {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
+    }
+
+    public AppError(CloudError error) {
+        this.errorCode = error.getErrorCode();
+        this.errorMessage = error.getErrorMessage();
     }
 
     public int getErrorCode() {

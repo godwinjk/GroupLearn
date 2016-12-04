@@ -9,8 +9,8 @@ import android.net.Uri;
 import com.grouplearn.project.app.databaseManagament.DatabaseHandler;
 import com.grouplearn.project.app.databaseManagament.tables.TableGroups;
 import com.grouplearn.project.app.databaseManagament.tables.TableSubscribedGroups;
-import com.grouplearn.project.models.GroupModel;
-import com.grouplearn.project.models.MessageModel;
+import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.models.GLMessage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,8 +31,8 @@ public class GroupDbHelper extends DataBaseHelper {
         dbHandler = new DatabaseHandler(mContext);
     }
 
-    public ArrayList<GroupModel> getSubscribedGroups() {
-        ArrayList<GroupModel> groupModels = new ArrayList<>();
+    public ArrayList<GLGroup> getSubscribedGroups() {
+        ArrayList<GLGroup> groupModels = new ArrayList<>();
         Cursor cursor = dbHandler.getAllSubscribedGroups();
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -43,8 +43,8 @@ public class GroupDbHelper extends DataBaseHelper {
         return getSortedListBasedOnMessage(groupModels);
     }
 
-    public ArrayList<GroupModel> getSubscribedGroupsWithName(String name) {
-        ArrayList<GroupModel> groupModels = new ArrayList<>();
+    public ArrayList<GLGroup> getSubscribedGroupsWithName(String name) {
+        ArrayList<GLGroup> groupModels = new ArrayList<>();
         Cursor cursor = dbHandler.getAllGroupWithName(name);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -55,7 +55,7 @@ public class GroupDbHelper extends DataBaseHelper {
         return groupModels;
     }
 
-    public GroupModel getGroupInfo(String groupUniqueId) {
+    public GLGroup getGroupInfo(String groupUniqueId) {
         Cursor cursor = dbHandler.getSubscribedGroupInfo(groupUniqueId);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -64,7 +64,7 @@ public class GroupDbHelper extends DataBaseHelper {
         return null;
     }
 
-    private GroupModel makeGroupModelFromCursor(Cursor cursor) {
+    private GLGroup makeGroupModelFromCursor(Cursor cursor) {
         String groupName = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.GROUP_NAME));
         String groupIconId = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.GROUP_ICON_ID));
         String groupUniqueId = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.GROUP_ID));
@@ -72,7 +72,7 @@ public class GroupDbHelper extends DataBaseHelper {
         String groupUpdatedTime = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.UPDATED_TIME));
         String groupDescription = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.UPDATED_TIME));
 
-        GroupModel model = new GroupModel();
+        GLGroup model = new GLGroup();
         model.setGroupName(groupName);
         model.setGroupIconId(groupIconId);
         model.setGroupDescription(groupDescription);
@@ -82,7 +82,7 @@ public class GroupDbHelper extends DataBaseHelper {
 
         ChatDbHelper chatDbHelper = new ChatDbHelper(mContext);
         long numberOfNewMessage = chatDbHelper.getNumberOfNewMessage(Long.parseLong(groupUniqueId));
-        MessageModel lastMessage = chatDbHelper.getLastMessages(Long.parseLong(groupUniqueId));
+        GLMessage lastMessage = chatDbHelper.getLastMessages(Long.parseLong(groupUniqueId));
         model.setMessageModel(lastMessage);
         if (lastMessage != null) {
             String message = lastMessage.getSenderName() + " : " + lastMessage.getMessageBody();
@@ -95,7 +95,7 @@ public class GroupDbHelper extends DataBaseHelper {
         return model;
     }
 
-    public void addSubscribedGroup(GroupModel model) {
+    public void addSubscribedGroup(GLGroup model) {
         ContentValues cv = new ContentValues();
         cv.put(TableSubscribedGroups.GROUP_ID, model.getGroupUniqueId());
         cv.put(TableSubscribedGroups.GROUP_ICON_ID, model.getGroupIconId());
@@ -107,11 +107,11 @@ public class GroupDbHelper extends DataBaseHelper {
             mContentResolver.insert(TableSubscribedGroups.CONTENT_URI, getContentValuesForGroup(model));
     }
 
-    public Uri addGroup(GroupModel model) {
+    public Uri addGroup(GLGroup model) {
         return mContentResolver.insert(TableGroups.CONTENT_URI, getContentValuesForGroup(model));
     }
 
-    private ContentValues getContentValuesForGroup(GroupModel model) {
+    private ContentValues getContentValuesForGroup(GLGroup model) {
         ContentValues cv = new ContentValues();
         cv.put(TableSubscribedGroups.GROUP_NAME, model.getGroupName());
         cv.put(TableSubscribedGroups.GROUP_ICON_ID, model.getGroupIconId());
@@ -122,12 +122,12 @@ public class GroupDbHelper extends DataBaseHelper {
         return cv;
     }
 
-    private ArrayList<GroupModel> getSortedListBasedOnMessage(ArrayList<GroupModel> groupModels) {
+    private ArrayList<GLGroup> getSortedListBasedOnMessage(ArrayList<GLGroup> groupModels) {
 //        for (GroupModel model : groupModels) {
 //            if (model.geMessageModel() != null && model.geMessageModel().getTimeStamp() != null) {
-        Comparator<GroupModel> comparator = new Comparator<GroupModel>() {
+        Comparator<GLGroup> comparator = new Comparator<GLGroup>() {
             @Override
-            public int compare(GroupModel lhs, GroupModel rhs) {
+            public int compare(GLGroup lhs, GLGroup rhs) {
                 if (lhs.geMessageModel() != null && lhs.geMessageModel().getTimeStamp() != null || rhs.geMessageModel() != null && rhs.geMessageModel().getTimeStamp() != null) {
                     if (lhs.geMessageModel() == null)
                         return 1;
@@ -145,7 +145,7 @@ public class GroupDbHelper extends DataBaseHelper {
 //        }
     }
 
-    public GroupModel getGodwinBot() {
+    public GLGroup getGodwinBot() {
         String where = TableSubscribedGroups.GROUP_ID + "=" + -11223344;
         long num = getNumberOfRowsInDatabase(TableSubscribedGroups.TABLE_NAME, where);
         if (num > 0) {
@@ -158,7 +158,7 @@ public class GroupDbHelper extends DataBaseHelper {
         return makeGodwinBot();
     }
 
-    private GroupModel makeGodwinBot() {
+    private GLGroup makeGodwinBot() {
         ContentValues cv = new ContentValues();
         cv.put(TableSubscribedGroups.GROUP_ID, -11223344);
         cv.put(TableSubscribedGroups.GROUP_ICON_ID, 10);

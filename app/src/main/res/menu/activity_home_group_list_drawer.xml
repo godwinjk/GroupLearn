@@ -1,29 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <item
+        android:id="@+id/nav_course"
+        android:title="Course">
+        <menu>
+            <item
+                android:id="@+id/nav_add_course"
+                android:checked="false"
+                android:icon="@drawable/course_add"
+                android:title="Create Course" />
+            <item
+                android:id="@+id/nav_search_course"
+                android:checked="false"
+                android:icon="@drawable/search_course_128"
+                android:title="Search Course" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/nav_groups"
+        android:title="Group">
+        <menu>
+            <item
+                android:id="@+id/nav_my_groups"
+                android:checked="false"
+                android:icon="@drawable/my_group_128"
+                android:title="My Groups" />
+            <item
+                android:id="@+id/nav_add_group"
+                android:checked="false"
+                android:icon="@drawable/add_group_128"
+                android:title="Create Group" />
+            <item
+                android:id="@+id/nav_search_group"
+                android:checked="false"
+                android:icon="@drawable/group_search"
+                android:title="Search Group" />
+        </menu>
+    </item>
     <group
         android:id="@+id/group1"
         android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_groups"
-            android:checked="false"
-            android:icon="@drawable/ic_menu_contacts"
-            android:title="My Groups" />
+
         <item
             android:id="@+id/nav_status"
             android:checked="false"
             android:icon="@drawable/ic_menu_smile"
             android:title="Status" />
     </group>
-    <group
-        android:id="@+id/group2"
-        android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_contacts"
-            android:checked="false"
-            android:icon="@drawable/ic_menu_contacts"
-            android:title="Contacts" />
-    </group>
+    <item
+        android:id="@+id/nav_contacts"
+        android:title="Contact">
+        <menu>
+            <item
+                android:id="@+id/nav_contacts_list"
+                android:checked="false"
+                android:icon="@drawable/ic_menu_contacts"
+                android:title="All Contacts" />
+            <item
+                android:id="@+id/nav_contacts_search"
+                android:checked="false"
+                android:icon="@drawable/search_user"
+                android:title="Search User" />
+        </menu>
+    </item>
     <group
         android:id="@+id/group3"
         android:checkableBehavior="single">

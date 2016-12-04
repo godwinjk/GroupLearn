@@ -8,9 +8,8 @@ import android.view.ViewGroup;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.ProfileViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.models.ContactModel;
-import com.grouplearn.project.models.GroupModel;
-import com.grouplearn.project.models.UserModel;
+import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.models.GLUser;
 
 import java.util.ArrayList;
 
@@ -20,8 +19,8 @@ import java.util.ArrayList;
 public class ProfileRecyclerAdapter extends RecyclerView.Adapter<ProfileViewHolder> {
     public final static int GROUP_LIST = 0;
     public final static int USER_LIST = 1;
-    ArrayList<GroupModel> groupList = new ArrayList<>();
-    ArrayList<UserModel> userList = new ArrayList<>();
+    ArrayList<GLGroup> groupList = new ArrayList<>();
+    ArrayList<GLUser> userList = new ArrayList<>();
     int whichAdapter = 0;
 
     OnRecyclerItemClickListener mItemClickListener;
@@ -41,11 +40,11 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<ProfileViewHold
     @Override
     public void onBindViewHolder(ProfileViewHolder holder, final int position) {
         if (getItemViewType(position) == 0) {
-            GroupModel groupModel = groupList.get(position);
+            GLGroup groupModel = groupList.get(position);
             holder.tvName.setText(groupModel.getGroupName());
             holder.tvDetails.setText(groupModel.getGroupDescription());
         } else {
-            UserModel userModel = userList.get(position);
+            GLUser userModel = userList.get(position);
             holder.tvName.setText(userModel.getUserDisplayName());
             holder.tvDetails.setText(userModel.getUserStatus());
         }
@@ -88,20 +87,20 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<ProfileViewHold
         this.whichAdapter = whichAdapter;
     }
 
-    public ArrayList<GroupModel> getGroupList() {
+    public ArrayList<GLGroup> getGroupList() {
         return groupList;
     }
 
-    public void setGroupList(ArrayList<GroupModel> groupList) {
+    public void setGroupList(ArrayList<GLGroup> groupList) {
         this.groupList = groupList;
         notifyDataSetChanged();
     }
 
-    public ArrayList<UserModel> getUserList() {
+    public ArrayList<GLUser> getUserList() {
         return userList;
     }
 
-    public void setUserList(ArrayList<UserModel> userList) {
+    public void setUserList(ArrayList<GLUser> userList) {
         this.userList = userList;
         notifyDataSetChanged();
     }

@@ -27,8 +27,8 @@ import com.grouplearn.project.cloud.groupManagement.getInvitations.CloudGetGroup
 import com.grouplearn.project.cloud.groupManagement.getSubscribedGroups.CloudGetSubscribedGroupsRequest;
 import com.grouplearn.project.cloud.groupManagement.getSubscribedGroups.CloudGetSubscribedGroupsResponse;
 import com.grouplearn.project.cloud.groupManagement.inviteGroup.CloudGroupInvitationRequest;
-import com.grouplearn.project.models.GroupModel;
-import com.grouplearn.project.models.RequestModel;
+import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.models.GLRequest;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.AppAlertDialog;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -112,14 +112,14 @@ public class GroupListInteractor implements CloudResponseCallback {
     }
 
     private void insertSubscribedGroupsToDb(CloudGetSubscribedGroupsResponse response) {
-        ArrayList<GroupModel> groupModels = response.getGroupModelArrayList();
-        for (GroupModel model : groupModels) {
+        ArrayList<GLGroup> groupModels = response.getGroupModelArrayList();
+        for (GLGroup model : groupModels) {
             dbHelper.addSubscribedGroup(model);
         }
         mGroupViewInterface.onGroupFetchSuccess(dbHelper.getSubscribedGroups());
     }
 
-    public void addGroup(GroupModel model) {
+    public void addGroup(GLGroup model) {
         final CloudAddGroupRequest request = new CloudAddGroupRequest();
         request.setGroupModels(model);
         request.setToken(mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN));
@@ -143,14 +143,14 @@ public class GroupListInteractor implements CloudResponseCallback {
     }
 
     private void insertGroupsToDb(CloudGetGroupsResponse response) {
-        ArrayList<GroupModel> groupModels = response.getGroupModelArrayList();
+        ArrayList<GLGroup> groupModels = response.getGroupModelArrayList();
 //        for (GroupModel model : groupModels) {
 //            dbHelper.addGroup(model);
 //        }
         mGroupViewInterface.onGroupFetchSuccess(groupModels);
     }
 
-    public void addSubscribedGroup(GroupModel groupModel) {
+    public void addSubscribedGroup(GLGroup groupModel) {
         final CloudAddSubscribedGroupRequest request = new CloudAddSubscribedGroupRequest();
         String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
         request.setGroupModels(groupModel);
@@ -215,7 +215,7 @@ public class GroupListInteractor implements CloudResponseCallback {
         CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).getAllInvitations(request, callback);
     }
 
-    public void inviteToGroup(RequestModel model, CloudResponseCallback callback) {
+    public void inviteToGroup(GLRequest model, CloudResponseCallback callback) {
         CloudGroupInvitationRequest request = new CloudGroupInvitationRequest();
         String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
         request.setToken(token);

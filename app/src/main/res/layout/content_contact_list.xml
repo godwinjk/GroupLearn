@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
 
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".app.uiManagement.contactManagement.ContactListActivity"
+    tools:context=".app.uiManagement.contact.ContactListActivity"
     tools:showIn="@layout/activity_contact_list">
 
     <TextView

@@ -9,7 +9,7 @@ import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstan
 import com.grouplearn.project.app.uiManagement.cloudHelper.CloudMessageHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.interfaces.MessageConversationCallback;
-import com.grouplearn.project.models.MessageModel;
+import com.grouplearn.project.models.GLMessage;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 
@@ -53,7 +53,7 @@ public class MessageInteractor implements MessageConversationCallback {
     public void updateMessageToCloud() {
 
         ChatDbHelper mDbHelper = new ChatDbHelper(mContext);
-        ArrayList<MessageModel> messageModels = (ArrayList<MessageModel>) mDbHelper.getUnSyncedMessages();
+        ArrayList<GLMessage> messageModels = (ArrayList<GLMessage>) mDbHelper.getUnSyncedMessages();
         if (messageModels != null && messageModels.size() > 0) {
             isMessageSyncing = true;
             new CloudMessageHelper(mContext).setAllMessages(messageModels, this);
@@ -61,7 +61,7 @@ public class MessageInteractor implements MessageConversationCallback {
     }
 
     @Override
-    public void onGetAllMessagesSuccess(ArrayList<MessageModel> messageModels) {
+    public void onGetAllMessagesSuccess(ArrayList<GLMessage> messageModels) {
         Intent i = new Intent("chat");
         mContext.sendBroadcast(i);
         isMessageUpdatingRunning = false;
@@ -73,7 +73,7 @@ public class MessageInteractor implements MessageConversationCallback {
     }
 
     @Override
-    public void onSetAllMessagesSuccess(ArrayList<MessageModel> messageModels) {
+    public void onSetAllMessagesSuccess(ArrayList<GLMessage> messageModels) {
         isMessageSyncing = false;
         new ChatDbHelper(mContext).updateAllSent(messageModels);
         Log.d(TAG, "SUCCESS TO UPDATE MESSAGE ||SUCCESS TO UPDATE MESSAGE ||SUCCESS TO UPDATE MESSAGE ||SUCCESS TO UPDATE MESSAGE ||");

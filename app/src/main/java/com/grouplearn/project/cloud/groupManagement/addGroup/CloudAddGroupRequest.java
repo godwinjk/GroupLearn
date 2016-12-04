@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.groupManagement.addGroup;
 
 import com.grouplearn.project.cloud.CloudConnectRequest;
-import com.grouplearn.project.models.GroupModel;
+import com.grouplearn.project.models.GLGroup;
 
 import java.util.ArrayList;
 
@@ -9,17 +9,17 @@ import java.util.ArrayList;
  * Created by Godwin Joseph on 13-05-2016 17:02 for Group Learn application.
  */
 public class CloudAddGroupRequest extends CloudConnectRequest {
-    ArrayList<GroupModel> groupModelArrayList = new ArrayList<>();
+    ArrayList<GLGroup> groupModelArrayList = new ArrayList<>();
 
-    public ArrayList<GroupModel> getGroupModelArrayList() {
+    public ArrayList<GLGroup> getGroupModelArrayList() {
         return groupModelArrayList;
     }
 
-    public void setGroupModels(ArrayList<GroupModel> groupModelArrayList) {
+    public void setGroupModels(ArrayList<GLGroup> groupModelArrayList) {
         this.groupModelArrayList = groupModelArrayList;
     }
 
-    public void setGroupModels(GroupModel model) {
+    public void setGroupModels(GLGroup model) {
         groupModelArrayList.add(model);
         setGroupModels(groupModelArrayList);
     }

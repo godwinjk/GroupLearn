@@ -18,7 +18,7 @@ import com.grouplearn.project.cloud.contactManagement.contactAddOrEdit.CloudCont
 import com.grouplearn.project.cloud.contactManagement.contactGet.CloudContactGetRequest;
 import com.grouplearn.project.cloud.contactManagement.contactGet.CloudContactGetResponse;
 import com.grouplearn.project.cloud.contactManagement.search.CloudUserSearchRequest;
-import com.grouplearn.project.models.ContactModel;
+import com.grouplearn.project.models.GLContact;
 
 import java.util.ArrayList;
 
@@ -32,7 +32,7 @@ public class CloudContactManager {
         this.mContext = mContext;
     }
 
-    public void addEditContact(ArrayList<ContactModel> contactModels, CloudResponseCallback callback) {
+    public void addEditContact(ArrayList<GLContact> contactModels, CloudResponseCallback callback) {
         CloudContactAddOrEditRequest request = new CloudContactAddOrEditRequest();
         String token = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN);
         request.setToken(token);

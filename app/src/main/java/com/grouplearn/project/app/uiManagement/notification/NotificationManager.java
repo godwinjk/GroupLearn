@@ -17,8 +17,8 @@ import com.grouplearn.project.app.MyApplication;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
-import com.grouplearn.project.app.uiManagement.groupManagement.GroupListActivity;
-import com.grouplearn.project.app.uiManagement.groupManagement.RequestAcceptingActivity;
+import com.grouplearn.project.app.uiManagement.group.GroupListActivity;
+import com.grouplearn.project.app.uiManagement.group.RequestAcceptingActivity;
 
 /**
  * Created by Godwin Joseph on 13-10-2016 12:39 for GroupLearn application.

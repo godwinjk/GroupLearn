@@ -120,4 +120,6 @@
     <string name="title_activity_search_groups">SearchGroupsActivity</string>
     <string name="title_activity_group_list_new">GroupListNewActivity</string>
     <string name="title_activity_search_user">SearchUserActivity</string>
+    <string name="title_activity_course_adding">CourseAddingActivity</string>
+    <string name="title_activity_course_list">CourseListActivity</string>
 </resources>

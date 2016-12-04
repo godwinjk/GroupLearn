@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".app.uiManagement.groupManagement.GroupChatActivity">
+    tools:context=".app.uiManagement.group.GroupChatActivity">
 
     <include layout="@layout/content_group_chat" />
 
@@ -23,6 +23,7 @@
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <ImageView
+                android:transitionName="transition_group_icon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="end"

@@ -4,9 +4,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.grouplearn.project.app.uiManagement.serachManagement.fragment.GoogleSearchFragment;
-import com.grouplearn.project.app.uiManagement.serachManagement.fragment.SearchFragment;
-import com.grouplearn.project.app.uiManagement.serachManagement.fragment.UserSearchFragment;
+import com.grouplearn.project.app.uiManagement.search.fragment.GoogleSearchFragment;
+import com.grouplearn.project.app.uiManagement.search.fragment.SearchFragment;
+import com.grouplearn.project.app.uiManagement.search.fragment.UserSearchFragment;
 
 /**
  * Created by Godwin Joseph on 03-08-2016 12:02 for Group Learn application.

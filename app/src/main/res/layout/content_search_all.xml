@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
 
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".app.uiManagement.serachManagement.SearchAllActivity"
+    tools:context=".app.uiManagement.search.SearchAllActivity"
     tools:showIn="@layout/activity_search_all">
 
     <android.support.v4.view.ViewPager

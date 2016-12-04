@@ -6,7 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.grouplearn.project.app.databaseManagament.tables.TableChat;
-import com.grouplearn.project.models.MessageModel;
+import com.grouplearn.project.models.GLMessage;
 import com.grouplearn.project.utilities.ChatUtilities;
 
 import java.math.BigDecimal;
@@ -23,14 +23,14 @@ public class ChatDbHelper extends DataBaseHelper {
         contentResolver = mContext.getContentResolver();
     }
 
-    public void addMessageToDb(MessageModel messageModel) {
+    public void addMessageToDb(GLMessage messageModel) {
         ContentValues cv = getContentValues(messageModel);
         contentResolver.insert(TableChat.CONTENT_URI, cv);
     }
 
-    public void addMessageToDb(ArrayList<MessageModel> messageModels) {
+    public void addMessageToDb(ArrayList<GLMessage> messageModels) {
         BigDecimal updatedTime = new BigDecimal("0");
-        for (MessageModel model : messageModels) {
+        for (GLMessage model : messageModels) {
 
             if (updateMessageInDb(model) <= 0) {
                 addMessageToDb(model);
@@ -41,7 +41,7 @@ public class ChatDbHelper extends DataBaseHelper {
         new ServerSyncTimes(mContext).updateLastServerSyncTimeForAPICall(ServerSyncTimes.MESSAGE_GET, updatedTime.longValue());
     }
 
-    public long updateMessageInDb(MessageModel model) {
+    public long updateMessageInDb(GLMessage model) {
         String where = TableChat.CHAT_ID + "=" + model.getMessageId();
         ContentValues cv = new ContentValues();
         cv.put(TableChat.USER_NAME, model.getSenderName());
@@ -55,8 +55,8 @@ public class ChatDbHelper extends DataBaseHelper {
         contentResolver.update(TableChat.CONTENT_URI, cv, where, null);
     }
 
-    public void updateAllSent(ArrayList<MessageModel> messageModels) {
-        for (MessageModel model : messageModels) {
+    public void updateAllSent(ArrayList<GLMessage> messageModels) {
+        for (GLMessage model : messageModels) {
             String where = TableChat.TEMP_ID + "=" + model.getTempId();
             ContentValues cv = new ContentValues();
             cv.put(TableChat.SENT_STATUS, ChatUtilities.SENT_SUCCESS);
@@ -65,10 +65,10 @@ public class ChatDbHelper extends DataBaseHelper {
         }
     }
 
-    public ArrayList<MessageModel> getMessages(long groupId) {
+    public ArrayList<GLMessage> getMessages(long groupId) {
         updateAllRead(groupId);
 
-        ArrayList<MessageModel> messageModels = new ArrayList<>();
+        ArrayList<GLMessage> messageModels = new ArrayList<>();
         String where = TableChat.GROUP_ID + "='" + groupId + "'";
         String sort = TableChat.TIME_STAMP + " ASC";
         Cursor cursor = contentResolver.query(TableChat.CONTENT_URI, null, where, null, sort);
@@ -81,8 +81,8 @@ public class ChatDbHelper extends DataBaseHelper {
         return messageModels;
     }
 
-    public MessageModel getLastMessages(long groupId) {
-        MessageModel messageModel = null;
+    public GLMessage getLastMessages(long groupId) {
+        GLMessage messageModel = null;
         String where = TableChat.GROUP_ID + "='" + groupId + "'";
         String sort = TableChat.TIME_STAMP + " DESC";
         Cursor cursor = contentResolver.query(TableChat.CONTENT_URI, null, where, null, sort);
@@ -99,7 +99,7 @@ public class ChatDbHelper extends DataBaseHelper {
         return getNumberOfRowsInDatabase(TableChat.TABLE_NAME, where);
     }
 
-    private ContentValues getContentValues(MessageModel model) {
+    private ContentValues getContentValues(GLMessage model) {
         ContentValues cv = new ContentValues();
         cv.put(TableChat.USER_NAME, model.getSenderName());
         cv.put(TableChat.USER_ID, model.getSenderId());
@@ -120,8 +120,8 @@ public class ChatDbHelper extends DataBaseHelper {
         return getNumberOfRowsInDatabase(TableChat.TABLE_NAME, where);
     }
 
-    private MessageModel getMessageFromCursor(Cursor cursor) {
-        MessageModel model = new MessageModel();
+    private GLMessage getMessageFromCursor(Cursor cursor) {
+        GLMessage model = new GLMessage();
         String message = cursor.getString(cursor.getColumnIndex(TableChat.CHAT_MESSAGE));
 
         model.setSenderName(cursor.getString(cursor.getColumnIndex(TableChat.USER_NAME)));
@@ -140,7 +140,7 @@ public class ChatDbHelper extends DataBaseHelper {
     }
 
     public Object getUnSyncedMessages() {
-        ArrayList<MessageModel> messageModels = new ArrayList<>();
+        ArrayList<GLMessage> messageModels = new ArrayList<>();
         String where = TableChat.SENT_STATUS + "=" + ChatUtilities.NOT_SENT;
         Cursor cursor = contentResolver.query(TableChat.CONTENT_URI, null, where, null, null);
         if (cursor != null && cursor.getCount() > 0) {

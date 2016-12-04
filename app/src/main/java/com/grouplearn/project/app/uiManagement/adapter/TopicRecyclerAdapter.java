@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.TopicCardViewHolder;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
-import com.grouplearn.project.models.GroupModel;
+import com.grouplearn.project.models.GLGroup;
 import com.grouplearn.project.utilities.views.AppAlertDialog;
 
 import java.util.ArrayList;
@@ -19,18 +19,18 @@ import java.util.ArrayList;
  * Created by Godwin Joseph on 15-05-2016 10:26 for Group Learn application.
  */
 public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicCardViewHolder> {
-    ArrayList<GroupModel> mTopicList;
+    ArrayList<GLGroup> mTopicList;
     Context mContext;
 
     public TopicRecyclerAdapter(Context mContext) {
         this.mContext = mContext;
     }
 
-    public ArrayList<GroupModel> getTopicList() {
+    public ArrayList<GLGroup> getTopicList() {
         return mTopicList;
     }
 
-    public void setTopicList(ArrayList<GroupModel> mTopicList) {
+    public void setTopicList(ArrayList<GLGroup> mTopicList) {
         this.mTopicList = mTopicList;
         notifyDataSetChanged();
     }
@@ -43,7 +43,7 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicCardViewHold
 
     @Override
     public void onBindViewHolder(TopicCardViewHolder holder, int position) {
-        final GroupModel mTopicModel = mTopicList.get(position);
+        final GLGroup mTopicModel = mTopicList.get(position);
         holder.setTopicName(mTopicModel.getGroupName());
         holder.tvTopicName.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,7 +60,7 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicCardViewHold
         return mTopicList.size();
     }
 
-    private void showAlertToAddGroup(final GroupModel model) {
+    private void showAlertToAddGroup(final GLGroup model) {
         AppAlertDialog dialog = AppAlertDialog.getAlertDialog(mContext);
         dialog.setTitle("Are you sure?");
         dialog.setMessage("Are you sure want to add this group?");

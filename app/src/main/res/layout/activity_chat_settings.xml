@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.grouplearn.project.app.uiManagement.settingsManagement.ChatSettings">
+    tools:context="com.grouplearn.project.app.uiManagement.settings.ChatSettings">
 
     <include layout="@layout/layout_toolbar" />
 

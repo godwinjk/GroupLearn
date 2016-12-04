@@ -11,7 +11,7 @@ import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.contactManagement.contactAddOrEdit.CloudContactAddOrEditResponse;
 import com.grouplearn.project.cloud.contactManagement.search.CloudUserSearchResponse;
-import com.grouplearn.project.models.ContactModel;
+import com.grouplearn.project.models.GLContact;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 
@@ -32,7 +32,7 @@ public class ContactListInteractor {
         new CloudContactManager(mContext).getAllContact();
     }
 
-    public void addAllContacts(final ArrayList<ContactModel> contactModels, final ContactViewInterface contactViewInterface) {
+    public void addAllContacts(final ArrayList<GLContact> contactModels, final ContactViewInterface contactViewInterface) {
 
         CloudResponseCallback callback = new CloudResponseCallback() {
             @Override
@@ -40,7 +40,7 @@ public class ContactListInteractor {
                 CloudContactAddOrEditResponse response = (CloudContactAddOrEditResponse) cloudResponse;
                 if (response.getContactModels().size() > 0) {
                     ContactDbHelper dbHelper = new ContactDbHelper(mContext);
-                    for (ContactModel model : response.getContactModels()) {
+                    for (GLContact model : response.getContactModels()) {
                         dbHelper.addContact(model);
                     }
                     contactViewInterface.onGetAllContacts(response.getContactModels());

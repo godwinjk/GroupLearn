@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.SearchViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.models.GroupModel;
+import com.grouplearn.project.models.GLGroup;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * Created by Godwin Joseph on 03-08-2016 11:55 for Group Learn application.
  */
 public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchViewHolder> {
-    ArrayList<GroupModel> groupList = new ArrayList<>();
+    ArrayList<GLGroup> groupList = new ArrayList<>();
 
     OnRecyclerItemClickListener mItemClickListener;
 
@@ -35,7 +35,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchViewHolder
     @Override
     public void onBindViewHolder(SearchViewHolder holder, final int position) {
         if (getItemViewType(position) == 0) {
-            GroupModel groupModel = groupList.get(position);
+            GLGroup groupModel = groupList.get(position);
             holder.tvName.setText(groupModel.getGroupName());
             holder.tvDetails.setText(groupModel.getGroupDescription());
             holder.tvAdd.setText("Request");
@@ -58,11 +58,11 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchViewHolder
     }
 
 
-    public ArrayList<GroupModel> getGroupList() {
+    public ArrayList<GLGroup> getGroupList() {
         return groupList;
     }
 
-    public void setGroupList(ArrayList<GroupModel> groupList) {
+    public void setGroupList(ArrayList<GLGroup> groupList) {
         this.groupList = groupList;
         notifyDataSetChanged();
     }

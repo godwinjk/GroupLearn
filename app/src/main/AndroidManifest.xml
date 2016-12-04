@@ -43,26 +43,26 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".app.uiManagement.userManagement.LoginActivity"
+            android:name=".app.uiManagement.user.LoginActivity"
             android:label="@string/title_activity_login"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.groupManagement.GroupListActivity"
+            android:name=".app.uiManagement.group.GroupListActivity"
             android:label="@string/title_activity_group_list"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".app.uiManagement.userManagement.SignupActivity"
+            android:name=".app.uiManagement.user.SignupActivity"
             android:label="@string/title_activity_signup"
             android:noHistory="true"
             android:theme="@style/AppTheme1" />
         <activity android:name=".app.uiManagement.BaseActivity" />
         <activity
-            android:name=".app.uiManagement.groupManagement.GroupChatActivity"
+            android:name=".app.uiManagement.group.GroupChatActivity"
             android:label="@string/title_activity_group_chat"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".app.uiManagement.groupManagement.AddGroupActivity"
+            android:name=".app.uiManagement.group.AddGroupActivity"
             android:label="@string/title_activity_add_group"
             android:theme="@style/AppTheme1" />
 
@@ -76,36 +76,36 @@
             android:label="@string/title_activity_status"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.contactManagement.ContactListActivity"
+            android:name=".app.uiManagement.contact.ContactListActivity"
             android:label="@string/title_activity_contact_list"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.userManagement.UserProfileActivity"
+            android:name=".app.uiManagement.user.UserProfileActivity"
             android:label="@string/title_activity_user_profile"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.serachManagement.SearchAllActivity"
+            android:name=".app.uiManagement.search.SearchAllActivity"
             android:label="@string/title_activity_search_all"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.groupManagement.GroupInfoActivity"
+            android:name=".app.uiManagement.group.GroupInfoActivity"
             android:label="@string/title_activity_group_info"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.settingsManagement.SettingsActivity"
+            android:name=".app.uiManagement.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.settingsManagement.AboutActivity"
+            android:name=".app.uiManagement.settings.AboutActivity"
             android:label="@string/title_activity_about"
             android:theme="@style/AppTheme1"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".app.uiManagement.groupManagement.RequestAcceptingActivity"
+            android:name=".app.uiManagement.group.RequestAcceptingActivity"
             android:label="@string/title_activity_request_acceptiong"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.settingsManagement.NotificationSettingsActivity"
+            android:name=".app.uiManagement.settings.NotificationSettingsActivity"
             android:label="@string/title_activity_privacy_settings"
             android:theme="@style/AppTheme1" />
 
@@ -124,28 +124,36 @@
             android:name="it.moondroid.chatbot.MainActivity"
             android:label="@string/app_name" />
         <activity
-            android:name=".app.uiManagement.groupManagement.SubscribedGroupRequestListActivity"
+            android:name=".app.uiManagement.group.SubscribedGroupRequestListActivity"
             android:label="@string/title_activity_subscribed_group_request_list"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.settingsManagement.ChatSettings"
+            android:name=".app.uiManagement.settings.ChatSettings"
             android:label="@string/title_activity_chat_settings"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.groupManagement.InvitationActivity"
+            android:name=".app.uiManagement.group.InvitationActivity"
             android:label="@string/title_activity_invitation"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.serachManagement.SearchGroupsActivity"
+            android:name=".app.uiManagement.search.SearchGroupsActivity"
             android:label="@string/title_activity_search_groups"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.groupManagement.GroupListNewActivity"
+            android:name=".app.uiManagement.group.GroupListNewActivity"
             android:label="@string/title_activity_group_list_new"
             android:theme="@style/AppTheme1" />
         <activity
-            android:name=".app.uiManagement.serachManagement.SearchUserActivity"
+            android:name=".app.uiManagement.search.SearchUserActivity"
             android:label="@string/title_activity_search_user"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.course.CourseAddingActivity"
+            android:label="@string/title_activity_course_adding"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.course.CourseSearchActivity"
+            android:label="@string/title_activity_course_list"
             android:theme="@style/AppTheme1"></activity>
     </application>
 

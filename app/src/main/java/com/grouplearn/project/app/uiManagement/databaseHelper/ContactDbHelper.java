@@ -6,7 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.grouplearn.project.app.databaseManagament.tables.TableContacts;
-import com.grouplearn.project.models.ContactModel;
+import com.grouplearn.project.models.GLContact;
 
 import java.util.ArrayList;
 
@@ -23,20 +23,20 @@ public class ContactDbHelper extends DataBaseHelper {
         this.mContentResolver = mContext.getContentResolver();
     }
 
-    public void addContact(ArrayList<ContactModel> models) {
-        for (ContactModel model : models) {
+    public void addContact(ArrayList<GLContact> models) {
+        for (GLContact model : models) {
             addContact(model);
         }
     }
 
-    public void addContact(ContactModel model) {
+    public void addContact(GLContact model) {
         ContentValues cv = getContentValuesForContacts(model);
         int count = updateContact(model);
         if (count <= 0)
             mContentResolver.insert(TableContacts.CONTENT_URI, cv);
     }
 
-    public int updateContact(ContactModel model) {
+    public int updateContact(GLContact model) {
         ContentValues cv = new ContentValues();
         String where = TableContacts.CONTACT_NUMBER + " = '" + model.getContactNumber() + "'";
         cv.put(TableContacts.CONTACT_FOUND, model.getStatus());
@@ -44,14 +44,14 @@ public class ContactDbHelper extends DataBaseHelper {
         return mContentResolver.update(TableContacts.CONTENT_URI, cv, where, null);
     }
 
-    public ArrayList<ContactModel> getContacts() {
+    public ArrayList<GLContact> getContacts() {
         String sort = TableContacts.CONTACT_FOUND + " ASC";
         Cursor cursor = mContentResolver.query(TableContacts.CONTENT_URI, null, null, null, sort);
-        ArrayList<ContactModel> contactModels = new ArrayList<>();
+        ArrayList<GLContact> contactModels = new ArrayList<>();
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
-                ContactModel contactModel = getContactFromCursor(cursor);
+                GLContact contactModel = getContactFromCursor(cursor);
                 contactModels.add(contactModel);
             } while (cursor.moveToNext());
         }
@@ -59,7 +59,7 @@ public class ContactDbHelper extends DataBaseHelper {
         return contactModels;
     }
 
-    private ContentValues getContentValuesForContacts(ContactModel model) {
+    private ContentValues getContentValuesForContacts(GLContact model) {
         ContentValues cv = new ContentValues();
         cv.put(TableContacts.CONTACT_ID, model.getContactId());
         cv.put(TableContacts.CONTACT_CLOUD_ID, model.getContactUniqueId());
@@ -71,9 +71,9 @@ public class ContactDbHelper extends DataBaseHelper {
         return cv;
     }
 
-    private ContactModel getContactFromCursor(Cursor cursor) {
+    private GLContact getContactFromCursor(Cursor cursor) {
         if (cursor != null) {
-            ContactModel model = new ContactModel();
+            GLContact model = new GLContact();
             model.setContactIconId(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_ICON_ID)));
             model.setContactId(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_ID)));
             model.setContactUniqueId(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_CLOUD_ID)));
@@ -91,15 +91,15 @@ public class ContactDbHelper extends DataBaseHelper {
         return getNumberOfRowsInDatabase(TableContacts.TABLE_NAME, where);
     }
 
-    public ArrayList<ContactModel> getContactsInCloud() {
+    public ArrayList<GLContact> getContactsInCloud() {
         String where = TableContacts.CONTACT_FOUND + "=1";
         String sort = TableContacts.CONTACT_FOUND + " ASC";
         Cursor cursor = mContentResolver.query(TableContacts.CONTENT_URI, null, where, null, sort);
-        ArrayList<ContactModel> contactModels = new ArrayList<>();
+        ArrayList<GLContact> contactModels = new ArrayList<>();
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
-                ContactModel contactModel = getContactFromCursor(cursor);
+                GLContact contactModel = getContactFromCursor(cursor);
                 contactModels.add(contactModel);
             } while (cursor.moveToNext());
         }

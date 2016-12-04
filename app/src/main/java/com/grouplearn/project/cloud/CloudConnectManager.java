@@ -6,8 +6,12 @@ import com.grouplearn.project.cloud.appManagement.AppRegistrationInterface;
 import com.grouplearn.project.cloud.appManagement.AppRegistrationManager;
 import com.grouplearn.project.cloud.contactManagement.CloudContactManager;
 import com.grouplearn.project.cloud.contactManagement.CloudContactManagerInterface;
+import com.grouplearn.project.cloud.courseManagement.CloudCourseManager;
+import com.grouplearn.project.cloud.courseManagement.CloudCourseManagerInterface;
 import com.grouplearn.project.cloud.groupManagement.CloudGroupManager;
 import com.grouplearn.project.cloud.groupManagement.CloudGroupManagerInterface;
+import com.grouplearn.project.cloud.interest.CloudInterestManager;
+import com.grouplearn.project.cloud.interest.CloudInterestManagerInterface;
 import com.grouplearn.project.cloud.message.CloudMessageManager;
 import com.grouplearn.project.cloud.message.CloudMessageManagerInterface;
 import com.grouplearn.project.cloud.userManagement.CloudUserManager;
@@ -47,5 +51,13 @@ public class CloudConnectManager {
 
     public CloudMessageManagerInterface getCloudMessageManager(Context context) {
         return new CloudMessageManager(context);
+    }
+
+    public CloudCourseManagerInterface getCloudCourseManager(Context context) {
+        return new CloudCourseManager(context);
+    }
+
+    public CloudInterestManagerInterface getCloudInterestManager(Context context) {
+        return new CloudInterestManager(context);
     }
 }

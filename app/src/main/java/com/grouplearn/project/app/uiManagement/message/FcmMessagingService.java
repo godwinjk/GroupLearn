@@ -11,7 +11,7 @@ import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstan
 import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
 import com.grouplearn.project.app.uiManagement.notification.NotificationManager;
-import com.grouplearn.project.models.MessageModel;
+import com.grouplearn.project.models.GLMessage;
 import com.grouplearn.project.utilities.ChatUtilities;
 import com.grouplearn.project.utilities.Log;
 
@@ -44,7 +44,7 @@ public class FcmMessagingService extends FirebaseMessagingService {
     private String processNotification(String body) {
 
         ChatDbHelper mDbHelper = new ChatDbHelper(this);
-        MessageModel model = new MessageModel();
+        GLMessage model = new GLMessage();
         StringBuilder message = new StringBuilder();
         try {
             JSONObject bodyObject = new JSONObject(body);

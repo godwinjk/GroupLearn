@@ -13,7 +13,7 @@ import android.widget.LinearLayout;
 
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.ChatViewHolder;
-import com.grouplearn.project.models.MessageModel;
+import com.grouplearn.project.models.GLMessage;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ import java.util.ArrayList;
  * Created by Godwin Joseph on 25-09-2016 13:29 for Group Learn application.
  */
 public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatViewHolder> {
-    ArrayList<MessageModel> messageModels = new ArrayList<>();
+    ArrayList<GLMessage> messageModels = new ArrayList<>();
     Context mContext;
     long myUserId;
 
@@ -29,11 +29,11 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatViewHolder> {
         this.mContext = mContext;
     }
 
-    public ArrayList<MessageModel> getMessageModels() {
+    public ArrayList<GLMessage> getMessageModels() {
         return messageModels;
     }
 
-    public void setMessageModels(ArrayList<MessageModel> messageModels) {
+    public void setMessageModels(ArrayList<GLMessage> messageModels) {
         this.messageModels = messageModels;
         notifyDataSetChanged();
     }
@@ -47,7 +47,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatViewHolder> {
 
     @Override
     public void onBindViewHolder(ChatViewHolder holder, int position) {
-        MessageModel model = messageModels.get(position);
+        GLMessage model = messageModels.get(position);
         String senderName = "Me";
         if (getItemViewType(position) > 0) {
             senderName = model.getSenderName();
@@ -66,7 +66,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        MessageModel model = messageModels.get(position);
+        GLMessage model = messageModels.get(position);
         int senderId = (int) model.getSenderId();
         int viewType = 0;
         if (senderId != myUserId) {

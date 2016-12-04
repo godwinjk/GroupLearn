@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.groupManagement.getGroupSubscribersList;
 
 import com.grouplearn.project.cloud.CloudConnectResponse;
-import com.grouplearn.project.models.UserModel;
+import com.grouplearn.project.models.GLUser;
 
 import java.util.ArrayList;
 
@@ -10,14 +10,14 @@ import java.util.ArrayList;
  */
 
 public class GetGroupSubscribersResponse extends CloudConnectResponse {
-    ArrayList<UserModel> userModels = new ArrayList<>();
+    ArrayList<GLUser> userModels = new ArrayList<>();
     int userCount;
 
-    public ArrayList<UserModel> getUserModels() {
+    public ArrayList<GLUser> getUserModels() {
         return userModels;
     }
 
-    public void setUserModels(ArrayList<UserModel> userModels) {
+    public void setUserModels(ArrayList<GLUser> userModels) {
         this.userModels = userModels;
     }
 

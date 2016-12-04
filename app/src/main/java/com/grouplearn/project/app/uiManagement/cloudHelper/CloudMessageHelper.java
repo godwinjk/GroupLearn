@@ -21,7 +21,7 @@ import com.grouplearn.project.cloud.message.messageGet.CloudGetMessageRequest;
 import com.grouplearn.project.cloud.message.messageGet.CloudGetMessageResponse;
 import com.grouplearn.project.cloud.message.messageSet.CloudSetMessageRequest;
 import com.grouplearn.project.cloud.message.messageSet.CloudSetMessageResponse;
-import com.grouplearn.project.models.MessageModel;
+import com.grouplearn.project.models.GLMessage;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 
@@ -100,7 +100,7 @@ public class CloudMessageHelper {
         CloudConnectManager.getInstance(mContext).getCloudMessageManager(mContext).getAllMessages(request, callback);
     }
 
-    public void setAllMessages(ArrayList<MessageModel> messages, @NonNull final MessageConversationCallback conversationCallback) {
+    public void setAllMessages(ArrayList<GLMessage> messages, @NonNull final MessageConversationCallback conversationCallback) {
         CloudSetMessageRequest request = new CloudSetMessageRequest();
         String token = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN);
         request.setToken(token);

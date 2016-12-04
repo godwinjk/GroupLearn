@@ -12,7 +12,7 @@ import com.grouplearn.project.cloud.message.messageSet.CloudSetMessageRequest;
 import com.grouplearn.project.cloud.message.messageSet.CloudSetMessageResponse;
 import com.grouplearn.project.cloud.networkManagement.CloudAPICallback;
 import com.grouplearn.project.cloud.networkManagement.CloudHttpMethod;
-import com.grouplearn.project.models.MessageModel;
+import com.grouplearn.project.models.GLMessage;
 import com.grouplearn.project.utilities.ChatUtilities;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 
@@ -54,10 +54,10 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
                             response.setMessageCount(messageCount);
                             JSONArray messageArray = dataObject.optJSONArray("messageDetails");
 
-                            ArrayList<MessageModel> messageModels = new ArrayList<>();
+                            ArrayList<GLMessage> messageModels = new ArrayList<>();
                             for (int i = 0; messageArray != null && i < messageArray.length(); i++) {
                                 JSONObject modelObject = messageArray.optJSONObject(i);
-                                MessageModel messageModel = new MessageModel();
+                                GLMessage messageModel = new GLMessage();
                                 messageModel.setMessageBody(modelObject.optString("message"));
                                 messageModel.setMessageType(modelObject.optInt("messageType"));
                                 messageModel.setReceiverId(modelObject.optLong("groupId"));
@@ -129,10 +129,10 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
 //                                response.setMessageCount(messageCount);
 //                                JSONArray messageArray = dataArray.optJSONArray("messageDetails");
 
-                                ArrayList<MessageModel> messageModels = new ArrayList<>();
+                                ArrayList<GLMessage> messageModels = new ArrayList<>();
                                 for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
                                     JSONObject modelObject = dataArray.optJSONObject(i);
-                                    MessageModel messageModel = new MessageModel();
+                                    GLMessage messageModel = new GLMessage();
                                     messageModel.setMessageBody(modelObject.optString("message"));
                                     messageModel.setMessageType(modelObject.optInt("messageType"));
                                     messageModel.setReceiverId(modelObject.optLong("groupId"));
@@ -186,7 +186,7 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
 
         httpMethod.setHeaderMap(hashMap);
         JSONArray entity = new JSONArray();
-        for (MessageModel model : cloudRequest.getMessageModels()) {
+        for (GLMessage model : cloudRequest.getMessageModels()) {
             JSONObject modelObject = new JSONObject();
             try {
                 modelObject.put("groupId", model.getReceiverId());

@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.InvitationViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.models.RequestModel;
+import com.grouplearn.project.models.GLRequest;
 
 import java.util.ArrayList;
 
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 public class InvitationRecyclerAdapter extends RecyclerView.Adapter<InvitationViewHolder> {
     Context mContext;
-    ArrayList<RequestModel> invitationList = new ArrayList<>();
+    ArrayList<GLRequest> invitationList = new ArrayList<>();
     OnRecyclerItemClickListener onRecyclerItemClickListener;
 
     public InvitationRecyclerAdapter(Context mContext) {
@@ -34,7 +34,7 @@ public class InvitationRecyclerAdapter extends RecyclerView.Adapter<InvitationVi
 
     @Override
     public void onBindViewHolder(InvitationViewHolder holder, final int position) {
-        final RequestModel model = invitationList.get(position);
+        final GLRequest model = invitationList.get(position);
         holder.tvName.setText(model.getGroupName());
         holder.tvMessage.setText(model.getDefinition());
 
@@ -61,11 +61,11 @@ public class InvitationRecyclerAdapter extends RecyclerView.Adapter<InvitationVi
         return invitationList.size();
     }
 
-    public ArrayList<RequestModel> getInvitationList() {
+    public ArrayList<GLRequest> getInvitationList() {
         return invitationList;
     }
 
-    public void setInvitationList(ArrayList<RequestModel> invitationList) {
+    public void setInvitationList(ArrayList<GLRequest> invitationList) {
         this.invitationList = invitationList;
         notifyDataSetChanged();
     }

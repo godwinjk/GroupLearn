@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
 
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.grouplearn.project.app.uiManagement.settingsManagement.ChatSettings"
+    tools:context="com.grouplearn.project.app.uiManagement.settings.ChatSettings"
     tools:showIn="@layout/activity_chat_settings">
 
     <LinearLayout

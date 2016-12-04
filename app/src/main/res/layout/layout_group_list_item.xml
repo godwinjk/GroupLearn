@@ -5,16 +5,32 @@
     android:gravity="center"
     android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/tv_msg_count"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10dp"
+        android:background="@drawable/shape_circle"
+        android:gravity="center"
+        android:text="1"
+        android:textColor="@color/white"
+        android:textSize="8dp" />
+
     <LinearLayout
+        android:id="@+id/ll_group_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
 
         <ImageView
             android:id="@+id/iv_group_icon"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
+            android:transitionName="transition_group_icon"
             android:background="@drawable/shape_circle"
             android:src="@drawable/group_person" />
 
@@ -42,16 +58,4 @@
                 android:textSize="12dp" />
         </LinearLayout>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tv_msg_count"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_alignParentRight="true"
-        android:layout_margin="10dp"
-        android:background="@drawable/shape_circle"
-        android:gravity="center"
-        android:text="1"
-        android:textColor="@color/white"
-        android:textSize="8dp" />
 </RelativeLayout>

@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.message.messageSet;
 
 import com.grouplearn.project.cloud.CloudConnectResponse;
-import com.grouplearn.project.models.MessageModel;
+import com.grouplearn.project.models.GLMessage;
 
 import java.util.ArrayList;
 
@@ -9,18 +9,18 @@ import java.util.ArrayList;
  * Created by Godwin Joseph on 03-10-2016 10:20 for Group Learn application.
  */
 public class CloudSetMessageResponse extends CloudConnectResponse {
-    ArrayList<MessageModel> messageModels = new ArrayList<>();
+    ArrayList<GLMessage> messageModels = new ArrayList<>();
     int messageCount = 0;
 
-    public ArrayList<MessageModel> getMessageModels() {
+    public ArrayList<GLMessage> getMessageModels() {
         return messageModels;
     }
 
-    public void setMessageModels(ArrayList<MessageModel> messageModels) {
+    public void setMessageModels(ArrayList<GLMessage> messageModels) {
         this.messageModels = messageModels;
     }
 
-    public void setMessageModels(MessageModel messageModel) {
+    public void setMessageModels(GLMessage messageModel) {
         this.messageModels.add(messageModel);
     }
 

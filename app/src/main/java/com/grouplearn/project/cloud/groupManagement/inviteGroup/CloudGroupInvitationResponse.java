@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.groupManagement.inviteGroup;
 
 import com.grouplearn.project.cloud.CloudConnectResponse;
-import com.grouplearn.project.models.RequestModel;
+import com.grouplearn.project.models.GLRequest;
 
 import java.util.ArrayList;
 
@@ -11,17 +11,17 @@ import java.util.ArrayList;
 
 public class CloudGroupInvitationResponse extends CloudConnectResponse {
     int invitationCount = 0;
-    ArrayList<RequestModel> requestModels = new ArrayList<>();
+    ArrayList<GLRequest> requestModels = new ArrayList<>();
 
-    public ArrayList<RequestModel> getRequestModels() {
+    public ArrayList<GLRequest> getRequestModels() {
         return requestModels;
     }
 
-    public void setRequestModels(ArrayList<RequestModel> requestModels) {
+    public void setRequestModels(ArrayList<GLRequest> requestModels) {
         this.requestModels = requestModels;
     }
 
-    public void setRequestModels(RequestModel requestModels) {
+    public void setRequestModels(GLRequest requestModels) {
         this.requestModels.add(requestModels);
     }
 

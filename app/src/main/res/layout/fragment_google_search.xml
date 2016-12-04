@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.grouplearn.project.app.uiManagement.serachManagement.fragment.GoogleSearchFragment">
+    tools:context="com.grouplearn.project.app.uiManagement.search.fragment.GoogleSearchFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

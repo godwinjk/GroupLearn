@@ -25,8 +25,8 @@ import com.grouplearn.project.cloud.groupManagement.updateGroupRequest.CloudUpda
 import com.grouplearn.project.cloud.groupManagement.updateGroupRequest.CloudUpdateSubscribeGroupResponse;
 import com.grouplearn.project.cloud.groupManagement.updateInvitation.CloudUpdateGroupInvitationRequest;
 import com.grouplearn.project.cloud.groupManagement.updateInvitation.CloudUpdateGroupInvitationResponse;
-import com.grouplearn.project.models.GroupModel;
-import com.grouplearn.project.models.RequestModel;
+import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.models.GLRequest;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.AppAlertDialog;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -45,7 +45,7 @@ public class CloudGroupManagement {
         this.mPref = new AppSharedPreference(mContext);
     }
 
-    public void addGroup(GroupModel model, CloudResponseCallback callback) {
+    public void addGroup(GLGroup model, CloudResponseCallback callback) {
         String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
         CloudAddGroupRequest request = new CloudAddGroupRequest();
         request.setGroupModels(model);
@@ -53,7 +53,7 @@ public class CloudGroupManagement {
         CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).addGroup(request, callback);
     }
 
-    public void addSubscribedGroup(GroupModel groupModel, final CloudOperationCallback operationCallback) {
+    public void addSubscribedGroup(GLGroup groupModel, final CloudOperationCallback operationCallback) {
         String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
         final CloudAddSubscribedGroupRequest request = new CloudAddSubscribedGroupRequest();
         request.setToken(token);
@@ -124,7 +124,7 @@ public class CloudGroupManagement {
         CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).addSubscribedGroup(request, callback);
     }
 
-    public void updateSubscribeGroups(RequestModel requestModel, final CloudOperationCallback operationCallback) {
+    public void updateSubscribeGroups(GLRequest requestModel, final CloudOperationCallback operationCallback) {
         String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
         final CloudUpdateSubscribeGroupRequest request = new CloudUpdateSubscribeGroupRequest();
         request.setToken(token);
@@ -135,9 +135,9 @@ public class CloudGroupManagement {
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 DisplayInfo.dismissLoader(mContext);
                 CloudUpdateSubscribeGroupResponse response = (CloudUpdateSubscribeGroupResponse) cloudResponse;
-                ArrayList<RequestModel> requestModels = response.getRequestModels();
+                ArrayList<GLRequest> requestModels = response.getRequestModels();
                 if (requestModels.size() > 0) {
-                    for (RequestModel model : requestModels) {
+                    for (GLRequest model : requestModels) {
                         if (model.getStatus() == 0) {
                             operationCallback.onCloudOperationFailed(new AppError(model.getStatus(), model.getMessage()));
                             DisplayInfo.showToast(mContext, "Failed");
@@ -159,7 +159,7 @@ public class CloudGroupManagement {
         CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).updateGroupRequest(request, callback);
     }
 
-    public void updateInvitations(RequestModel requestModel, final CloudOperationCallback operationCallback) {
+    public void updateInvitations(GLRequest requestModel, final CloudOperationCallback operationCallback) {
         String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
         final CloudUpdateGroupInvitationRequest request = new CloudUpdateGroupInvitationRequest();
         request.setToken(token);
@@ -170,9 +170,9 @@ public class CloudGroupManagement {
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 DisplayInfo.dismissLoader(mContext);
                 CloudUpdateGroupInvitationResponse response = (CloudUpdateGroupInvitationResponse) cloudResponse;
-                ArrayList<RequestModel> requestModels = response.getRequestModels();
+                ArrayList<GLRequest> requestModels = response.getRequestModels();
                 if (requestModels.size() > 0) {
-                    for (RequestModel model : requestModels) {
+                    for (GLRequest model : requestModels) {
                         if (model.getStatus() == 0) {
                             operationCallback.onCloudOperationFailed(new AppError(model.getStatus(), model.getMessage()));
                             DisplayInfo.showToast(mContext, "Failed");

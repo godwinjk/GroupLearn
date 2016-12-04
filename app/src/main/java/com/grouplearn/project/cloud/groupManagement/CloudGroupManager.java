@@ -33,9 +33,9 @@ import com.grouplearn.project.cloud.groupManagement.updateInvitation.CloudUpdate
 import com.grouplearn.project.cloud.groupManagement.updateInvitation.CloudUpdateGroupInvitationResponse;
 import com.grouplearn.project.cloud.networkManagement.CloudAPICallback;
 import com.grouplearn.project.cloud.networkManagement.CloudHttpMethod;
-import com.grouplearn.project.models.GroupModel;
-import com.grouplearn.project.models.RequestModel;
-import com.grouplearn.project.models.UserModel;
+import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.models.GLRequest;
+import com.grouplearn.project.models.GLUser;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 
 import org.json.JSONArray;
@@ -74,10 +74,10 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                             response = getUpdatedResponse(statusObject, response);
                             JSONArray dataArray = jsonObject.optJSONArray(DATA);
                             if (dataArray != null) {
-                                ArrayList<GroupModel> groupModelArrayList = new ArrayList<>();
+                                ArrayList<GLGroup> groupModelArrayList = new ArrayList<>();
                                 for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
                                     JSONObject modelObject = dataArray.optJSONObject(i);
-                                    GroupModel groupModel = new GroupModel();
+                                    GLGroup groupModel = new GLGroup();
                                     groupModel.setGroupCreatedTime(modelObject.optString("createdTime"));
                                     groupModel.setGroupUpdatedTime(modelObject.optString("updatedTime"));
                                     groupModel.setGroupUniqueId(modelObject.optString("groupId"));
@@ -128,7 +128,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
 
         httpMethod.setHeaderMap(hashMap);
         JSONArray entity = new JSONArray();
-        for (GroupModel model : cloudRequest.getGroupModelArrayList()) {
+        for (GLGroup model : cloudRequest.getGroupModelArrayList()) {
             JSONObject modelObject = new JSONObject();
             try {
                 modelObject.put("groupName", model.getGroupName());
@@ -170,10 +170,10 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
 
 //                            JSONArray dataArray = dataArray.optJSONArray("groupDetails");
 
-                            ArrayList<GroupModel> groupModelArrayList = new ArrayList<>();
+                            ArrayList<GLGroup> groupModelArrayList = new ArrayList<>();
                             for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
                                 JSONObject modelObject = dataArray.optJSONObject(i);
-                                GroupModel groupModel = new GroupModel();
+                                GLGroup groupModel = new GLGroup();
                                 groupModel.setGroupCreatedTime(modelObject.optString("createdTime"));
                                 groupModel.setGroupUpdatedTime(modelObject.optString("updatedTime"));
                                 groupModel.setGroupUniqueId(modelObject.optString("groupId"));
@@ -223,7 +223,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
 
         httpMethod.setHeaderMap(hashMap);
         JSONArray entity = new JSONArray();
-        for (GroupModel model : cloudRequest.getGroupModelArrayList()) {
+        for (GLGroup model : cloudRequest.getGroupModelArrayList()) {
             JSONObject modelObject = new JSONObject();
             try {
                 modelObject.put("groupId", model.getGroupUniqueId());
@@ -257,10 +257,10 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                             response = (CloudUpdateSubscribeGroupResponse) getUpdatedResponse(statusObject, response);
                             JSONArray dataArray = jsonObject.optJSONArray(DATA);
                             if (dataArray != null) {
-                                ArrayList<RequestModel> groupModelArrayList = new ArrayList<>();
+                                ArrayList<GLRequest> groupModelArrayList = new ArrayList<>();
                                 for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
                                     JSONObject modelObject = dataArray.optJSONObject(i);
-                                    RequestModel groupModel = new RequestModel();
+                                    GLRequest groupModel = new GLRequest();
                                     groupModel.setStatus(modelObject.optInt("status"));
                                     groupModel.setMessage(modelObject.optString("message"));
                                     groupModel.setGroupId(modelObject.optString("requestedGroupId"));
@@ -312,7 +312,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
 
         httpMethod.setHeaderMap(hashMap);
         JSONArray entity = new JSONArray();
-        for (RequestModel model : cloudRequest.getRequestModels()) {
+        for (GLRequest model : cloudRequest.getRequestModels()) {
             JSONObject modelObject = new JSONObject();
             try {
                 modelObject.put("requestedGroupId", model.getGroupId());
@@ -354,10 +354,10 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                             JSONArray dataArray = dataObject.optJSONArray("subscribedGroupDetails");
                             ((CloudGetSubscribedGroupsResponse) response).setGroupCount(groupCount);
 
-                            ArrayList<GroupModel> groupModelArrayList = new ArrayList<>();
+                            ArrayList<GLGroup> groupModelArrayList = new ArrayList<>();
                             for (int i = 0; dataArray != null && groupCount > 0 && i < dataArray.length(); i++) {
                                 JSONObject modelObject = dataArray.optJSONObject(i);
-                                GroupModel groupModel = new GroupModel();
+                                GLGroup groupModel = new GLGroup();
                                 groupModel.setGroupCreatedTime(modelObject.optString("createdTime"));
                                 groupModel.setGroupUpdatedTime(modelObject.optString("updatedTime"));
                                 groupModel.setGroupUniqueId(modelObject.optString("subscribedGroupId"));
@@ -435,10 +435,10 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                             JSONArray dataArray = dataObject.optJSONArray("subscribedGroupDetails");
                             response.setNumberOfRequests(groupCount);
 
-                            ArrayList<RequestModel> groupModelArrayList = new ArrayList<>();
+                            ArrayList<GLRequest> groupModelArrayList = new ArrayList<>();
                             for (int i = 0; dataArray != null && groupCount > 0 && i < dataArray.length(); i++) {
                                 JSONObject modelObject = dataArray.optJSONObject(i);
-                                RequestModel groupModel = new RequestModel();
+                                GLRequest groupModel = new GLRequest();
 //                                groupModel.setCreatedTime(modelObject.optString("createdTime"));
 //                                groupModel.setUpdatedTime(modelObject.optString("updatedTime"));
                                 groupModel.setGroupId(modelObject.optString("requestedGroupId"));
@@ -592,10 +592,10 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                 JSONArray dataArray = dataObject.optJSONArray("groupDetails");
                                 ((CloudGetGroupsResponse) response).setGroupCount(groupCount);
 
-                                ArrayList<GroupModel> groupModelArrayList = new ArrayList<>();
+                                ArrayList<GLGroup> groupModelArrayList = new ArrayList<>();
                                 for (int i = 0; dataArray != null /*&& groupCount > 0*/ && i < dataArray.length(); i++) {
                                     JSONObject modelObject = dataArray.optJSONObject(i);
-                                    GroupModel groupModel = new GroupModel();
+                                    GLGroup groupModel = new GLGroup();
                                     groupModel.setGroupCreatedTime(modelObject.optString("createdTime"));
                                     groupModel.setGroupUpdatedTime(modelObject.optString("updatedTime"));
                                     groupModel.setGroupUniqueId(modelObject.optString("groupId"));
@@ -675,10 +675,10 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                 JSONArray dataArray = dataObject.optJSONArray("groupSubscribedUsersDetails");
                                 ((GetGroupSubscribersResponse) response).setUserCount(userCount);
 
-                                ArrayList<UserModel> userModels = new ArrayList<>();
+                                ArrayList<GLUser> userModels = new ArrayList<>();
                                 for (int i = 0; dataArray != null /*&& groupCount > 0*/ && i < dataArray.length(); i++) {
                                     JSONObject modelObject = dataArray.optJSONObject(i);
-                                    UserModel userModel = new UserModel();
+                                    GLUser userModel = new GLUser();
                                     userModel.setUserId(modelObject.optLong("userId"));
                                     userModel.setUserName(modelObject.optString("userName"));
                                     userModel.setUserStatus(modelObject.optString("userStatus"));
@@ -754,10 +754,10 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                 JSONArray dataArray = dataObject.optJSONArray("invitationGroupDetails");
                                 response.setInvitationCount(invitationCount);
 
-                                ArrayList<RequestModel> groupModelArrayList = new ArrayList<>();
+                                ArrayList<GLRequest> groupModelArrayList = new ArrayList<>();
                                 for (int i = 0; dataArray != null && invitationCount > 0 && i < dataArray.length(); i++) {
                                     JSONObject modelObject = dataArray.optJSONObject(i);
-                                    RequestModel groupModel = new RequestModel();
+                                    GLRequest groupModel = new GLRequest();
 //                                groupModel.setCreatedTime(modelObject.optString("createdTime"));
 //                                groupModel.setUpdatedTime(modelObject.optString("updatedTime"));
                                     groupModel.setGroupId(modelObject.optString("invitedGroupId"));
@@ -832,10 +832,10 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                             response = (CloudGroupInvitationResponse) getUpdatedResponse(statusObject, response);
                             JSONArray dataArray = jsonObject.optJSONArray(DATA);
                             if (dataArray != null) {
-                                ArrayList<RequestModel> groupModelArrayList = new ArrayList<>();
+                                ArrayList<GLRequest> groupModelArrayList = new ArrayList<>();
                                 for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
                                     JSONObject modelObject = dataArray.optJSONObject(i);
-                                    RequestModel groupModel = new RequestModel();
+                                    GLRequest groupModel = new GLRequest();
                                     groupModel.setStatus(modelObject.optInt("status"));
                                     groupModel.setMessage(modelObject.optString("message"));
 
@@ -888,7 +888,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
 
         httpMethod.setHeaderMap(hashMap);
         JSONArray entity = new JSONArray();
-        for (RequestModel model : cloudRequest.getRequestModels()) {
+        for (GLRequest model : cloudRequest.getRequestModels()) {
             JSONObject modelObject = new JSONObject();
             try {
                 modelObject.put("groupId", model.getGroupId());
@@ -921,10 +921,10 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                             response = (CloudUpdateGroupInvitationResponse) getUpdatedResponse(statusObject, response);
                             JSONArray dataArray = jsonObject.optJSONArray(DATA);
                             if (dataArray != null) {
-                                ArrayList<RequestModel> groupModelArrayList = new ArrayList<>();
+                                ArrayList<GLRequest> groupModelArrayList = new ArrayList<>();
                                 for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
                                     JSONObject modelObject = dataArray.optJSONObject(i);
-                                    RequestModel groupModel = new RequestModel();
+                                    GLRequest groupModel = new GLRequest();
                                     groupModel.setStatus(modelObject.optInt("status"));
                                     groupModel.setMessage(modelObject.optString("message"));
                                     groupModel.setGroupId(modelObject.optString("invitedGroupId"));
@@ -976,7 +976,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
 
         httpMethod.setHeaderMap(hashMap);
         JSONArray entity = new JSONArray();
-        for (RequestModel model : cloudRequest.getRequestModels()) {
+        for (GLRequest model : cloudRequest.getRequestModels()) {
             JSONObject modelObject = new JSONObject();
             try {
                 modelObject.put("invitedGroupId", model.getGroupId());

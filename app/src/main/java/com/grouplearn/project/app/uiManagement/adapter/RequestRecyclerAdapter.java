@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.RequestViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.models.RequestModel;
+import com.grouplearn.project.models.GLRequest;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * Created by Godwin Joseph on 05-08-2016 10:35 for Group Learn application.
  */
 public class RequestRecyclerAdapter extends RecyclerView.Adapter<RequestViewHolder> {
-    ArrayList<RequestModel> requestModels = new ArrayList<>();
+    ArrayList<GLRequest> requestModels = new ArrayList<>();
     OnRecyclerItemClickListener onRecyclerItemClickListener;
 
     @Override
@@ -33,7 +33,7 @@ public class RequestRecyclerAdapter extends RecyclerView.Adapter<RequestViewHold
 
     @Override
     public void onBindViewHolder(final RequestViewHolder holder, final int position) {
-        final RequestModel requestModel = requestModels.get(position);
+        final GLRequest requestModel = requestModels.get(position);
         if (getItemViewType(position) == 1) {
 
         } else {
@@ -68,11 +68,11 @@ public class RequestRecyclerAdapter extends RecyclerView.Adapter<RequestViewHold
         return super.getItemViewType(position);
     }
 
-    public ArrayList<RequestModel> getRequestModels() {
+    public ArrayList<GLRequest> getRequestModels() {
         return requestModels;
     }
 
-    public void setRequestModels(ArrayList<RequestModel> requestModels) {
+    public void setRequestModels(ArrayList<GLRequest> requestModels) {
         this.requestModels = requestModels;
         notifyDataSetChanged();
     }

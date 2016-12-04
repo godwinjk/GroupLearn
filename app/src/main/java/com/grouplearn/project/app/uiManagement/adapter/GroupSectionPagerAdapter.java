@@ -4,8 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.grouplearn.project.app.uiManagement.groupManagement.GroupListFragment;
-import com.grouplearn.project.app.uiManagement.serachManagement.fragment.SearchFragment;
+import com.grouplearn.project.app.uiManagement.group.GroupListFragment;
+import com.grouplearn.project.app.uiManagement.search.fragment.SearchFragment;
 
 /**
  * Created by Godwin Joseph on 13-11-2016 15:51 for GroupLearn application.

@@ -19,7 +19,7 @@ import android.widget.TextView;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.ContactItemHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.models.ContactModel;
+import com.grouplearn.project.models.GLContact;
 
 import java.util.ArrayList;
 
@@ -30,8 +30,8 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
     private static final String TAG = "ContactListAdapter";
     Context mContext;
     LayoutInflater inflater;
-    ArrayList<ContactModel> mContactModels = new ArrayList<>();
-    ArrayList<ContactModel> filterContacts = new ArrayList<>();
+    ArrayList<GLContact> mContactModels = new ArrayList<>();
+    ArrayList<GLContact> filterContacts = new ArrayList<>();
     SearchFilter searchFilter;
     String filterText;
     OnRecyclerItemClickListener onRecyclerItemClickListener;
@@ -44,7 +44,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
         searchFilter = new SearchFilter();
     }
 
-    public void setContactList(ArrayList<ContactModel> contactModels) {
+    public void setContactList(ArrayList<GLContact> contactModels) {
         mContactModels = contactModels;
         filterContacts = contactModels;
         notifyDataSetChanged();
@@ -80,7 +80,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
         } else
             holder = (ContactItemHolder) convertView.getTag();
 
-        final ContactModel model = (ContactModel) getItem(position);
+        final GLContact model = (GLContact) getItem(position);
 
         if (model.getStatus() == 1) {
             holder.tvInvite.setVisibility(View.INVISIBLE);
@@ -145,7 +145,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             String filterString = constraint.toString().toLowerCase();
             filterText = filterString;
             FilterResults results = new FilterResults();
-            final ArrayList<ContactModel> list = doMySearch(filterString);
+            final ArrayList<GLContact> list = doMySearch(filterString);
             results.values = list;
             results.count = list.size();
             return results;
@@ -153,13 +153,13 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            filterContacts = (ArrayList<ContactModel>) results.values;
+            filterContacts = (ArrayList<GLContact>) results.values;
             notifyDataSetChanged();
         }
 
-        private ArrayList<ContactModel> doMySearch(String query) {
-            ArrayList<ContactModel> contactModels = new ArrayList<>();               //Temporary arrayList of storing devices.
-            for (ContactModel contactModel : mContactModels) {
+        private ArrayList<GLContact> doMySearch(String query) {
+            ArrayList<GLContact> contactModels = new ArrayList<>();               //Temporary arrayList of storing devices.
+            for (GLContact contactModel : mContactModels) {
                 String zoneName = contactModel.getContactName().toLowerCase();
                 if (zoneName.contains(query)) {
                     contactModels.add(contactModel);

@@ -3,7 +3,6 @@ package com.grouplearn.project.app.uiManagement;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -37,7 +36,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public abstract void registerListeners();
 
-    @StringRes
     public Toolbar setupToolbar(int resourceTitleId, boolean showNavigationButton) {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -62,7 +60,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onBackPressed();
             }
         });
         return mToolbar;
