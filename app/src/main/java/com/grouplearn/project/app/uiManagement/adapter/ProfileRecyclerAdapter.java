@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.ProfileViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.models.GLGroup;
-import com.grouplearn.project.models.GLUser;
+import com.grouplearn.project.bean.GLGroup;
+import com.grouplearn.project.bean.GLUser;
 
 import java.util.ArrayList;
 

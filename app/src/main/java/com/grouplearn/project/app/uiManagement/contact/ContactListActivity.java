@@ -40,9 +40,9 @@ import com.grouplearn.project.cloud.CloudConnectResponse;
 import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.groupManagement.inviteGroup.CloudGroupInvitationResponse;
-import com.grouplearn.project.models.GLContact;
-import com.grouplearn.project.models.GLGroup;
-import com.grouplearn.project.models.GLRequest;
+import com.grouplearn.project.bean.GLContact;
+import com.grouplearn.project.bean.GLGroup;
+import com.grouplearn.project.bean.GLRequest;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
@@ -69,7 +69,7 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
         setContentView(R.layout.activity_contact_list);
         Toolbar toolbar = setupToolbar("Contacts", true);
         mContext = this;
-        String groupUniqueId = getIntent().getStringExtra("groupCloudId");
+        long groupUniqueId = getIntent().getLongExtra("groupCloudId",-1);
         groupModel = new GroupDbHelper(mContext).getGroupInfo(groupUniqueId);
 
         initializeWidgets();
@@ -89,7 +89,6 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
         mAdapter = new ContactListAdapter(mContext, type);
         lvContacts.setAdapter(mAdapter);
         tvNoContacts = (TextView) findViewById(R.id.tv_no_contacts);
-
     }
 
     @Override
@@ -179,7 +178,7 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
         } else {
             ArrayList<GLContact> contactModels = mDbHelper.getContacts();
             if (contactModels != null && contactModels.size() > 0) {
-                updateDataInList(contactModels);
+                updateDataInList(sortUserList(contactModels));
             }
             ContactReadTask readTask = new ContactReadTask(this);
             readTask.setContactViewInterface(this);
@@ -193,7 +192,6 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
     }
 
     private void updateDataInList(final ArrayList<GLContact> contactModels) {
-
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -215,12 +213,12 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
 
     @Override
     public void onGetAllContactsFromDb(ArrayList<GLContact> contactModels) {
-        updateDataInList(contactModels);
+//        updateDataInList(sortUserList(contactModels));
     }
 
     @Override
     public void onGetContactsFinished(ArrayList<GLContact> contactModels) {
-        updateDataInList(contactModels);
+        updateDataInList(sortUserList(contactModels));
         new ContactListInteractor(mContext).addAllContacts(contactModels, this);
     }
 
@@ -250,7 +248,6 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
                     tvNoContacts.setVisibility(View.VISIBLE);
                     tvNoContacts.setText("No contacts with " + newText);
                 }
-
                 return false;
             }
         });
@@ -363,6 +360,7 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
         Collections.sort(models, new Comparator<GLContact>() {
             @Override
             public int compare(GLContact lhs, GLContact rhs) {
+//                return lhs.getContactName().compareToIgnoreCase(rhs.getContactName());
                 if (lhs.getStatus() == rhs.getStatus())
                     return 0;
                 else if (rhs.getStatus() < lhs.getStatus()) {

@@ -27,8 +27,8 @@ import com.grouplearn.project.cloud.groupManagement.getInvitations.CloudGetGroup
 import com.grouplearn.project.cloud.groupManagement.getSubscribedGroups.CloudGetSubscribedGroupsRequest;
 import com.grouplearn.project.cloud.groupManagement.getSubscribedGroups.CloudGetSubscribedGroupsResponse;
 import com.grouplearn.project.cloud.groupManagement.inviteGroup.CloudGroupInvitationRequest;
-import com.grouplearn.project.models.GLGroup;
-import com.grouplearn.project.models.GLRequest;
+import com.grouplearn.project.bean.GLGroup;
+import com.grouplearn.project.bean.GLRequest;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.AppAlertDialog;
 import com.grouplearn.project.utilities.views.DisplayInfo;

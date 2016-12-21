@@ -11,7 +11,7 @@ import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.contactManagement.contactAddOrEdit.CloudContactAddOrEditResponse;
 import com.grouplearn.project.cloud.contactManagement.search.CloudUserSearchResponse;
-import com.grouplearn.project.models.GLContact;
+import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 

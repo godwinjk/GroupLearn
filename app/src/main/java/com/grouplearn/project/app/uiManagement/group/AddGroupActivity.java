@@ -12,8 +12,10 @@ import android.view.MenuItem;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
-import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.utilities.AppConstants;
+import com.grouplearn.project.utilities.AppUtility;
+import com.grouplearn.project.utilities.views.DisplayInfo;
 
 public class AddGroupActivity extends BaseActivity {
     TextInputLayout etGroupName;
@@ -72,8 +74,12 @@ public class AddGroupActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_save:
-                if (validate())
-                    saveGroup();
+                if (validate()) {
+                    if (AppUtility.checkInternetConnection())
+                        saveGroup();
+                } else {
+                    DisplayInfo.showToast(mContext, getString(R.string.no_network));
+                }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -106,6 +112,8 @@ public class AddGroupActivity extends BaseActivity {
         model.setGroupDescription(description);
         model.setPrivacy(AppConstants.GROUP_VISIBLE_TO_ALL);
         GroupListInteractor.getInstance(mContext).addGroup(model);
+        etDescription.getEditText().setText("");
+        etGroupName.getEditText().setText("");
         hideSoftKeyboard();
     }
 }

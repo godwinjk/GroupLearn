@@ -7,6 +7,24 @@ import com.grouplearn.project.cloud.CloudConnectResponse;
  */
 public class CloudStatusResponse extends CloudConnectResponse {
     String status;
+    int privacy = -1;
+    String displayName;
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public int getPrivacy() {
+        return privacy;
+    }
+
+    public void setPrivacy(int privacy) {
+        this.privacy = privacy;
+    }
 
     public String getStatus() {
         return status;

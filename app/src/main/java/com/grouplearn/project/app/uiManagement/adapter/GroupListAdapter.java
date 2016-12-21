@@ -10,7 +10,7 @@ import android.widget.BaseAdapter;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.GroupViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.bean.GLGroup;
 
 import java.util.ArrayList;
 
@@ -86,14 +86,24 @@ public class GroupListAdapter extends BaseAdapter {
             holder.tvLastMessage.setVisibility(View.GONE);
             holder.tvMessageCount.setVisibility(View.GONE);
         }
-        holder.llMain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, mGroupModel, holder.ivGroupIcon);
-                }
-            }
-        });
+//        holder.llMain.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (onRecyclerItemClickListener != null) {
+//                    onRecyclerItemClickListener.onItemClicked(position, mGroupModel, holder.ivGroupIcon);
+//                }
+//            }
+//        });
+//        holder.llMain.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//                if (onRecyclerItemClickListener != null) {
+//                    onRecyclerItemClickListener.onItemLongClicked(position, mGroupModel, holder.ivGroupIcon);
+//                }
+//                return false;
+//            }
+//
+//        });
         return convertView;
     }
 

@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.contactManagement.contactAddOrEdit;
 
 import com.grouplearn.project.cloud.CloudConnectRequest;
-import com.grouplearn.project.models.GLContact;
+import com.grouplearn.project.bean.GLContact;
 
 import java.util.ArrayList;
 

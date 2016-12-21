@@ -154,7 +154,31 @@
         <activity
             android:name=".app.uiManagement.course.CourseSearchActivity"
             android:label="@string/title_activity_course_list"
-            android:theme="@style/AppTheme1"></activity>
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.course.MyCourseActivity"
+            android:label="@string/title_activity_my_course"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.course.CourseMenuActivity"
+            android:label="@string/title_activity_course_menu"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.group.GroupMenuActivity"
+            android:label="@string/title_activity_group_menu"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.user.ProfileMenuActivity"
+            android:label="@string/title_activity_profile_menu"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.user.ForgotActivity"
+            android:label="@string/title_activity_forgot"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.settings.BrowserActivity"
+            android:label="@string/title_activity_browser"
+            android:theme="@style/AppTheme1" />
     </application>
 
 </manifest>

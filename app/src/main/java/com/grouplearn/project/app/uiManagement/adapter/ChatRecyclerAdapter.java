@@ -13,7 +13,7 @@ import android.widget.LinearLayout;
 
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.ChatViewHolder;
-import com.grouplearn.project.models.GLMessage;
+import com.grouplearn.project.bean.GLMessage;
 
 import java.util.ArrayList;
 

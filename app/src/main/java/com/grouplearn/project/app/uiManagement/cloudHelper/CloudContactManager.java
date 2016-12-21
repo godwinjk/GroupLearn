@@ -18,7 +18,7 @@ import com.grouplearn.project.cloud.contactManagement.contactAddOrEdit.CloudCont
 import com.grouplearn.project.cloud.contactManagement.contactGet.CloudContactGetRequest;
 import com.grouplearn.project.cloud.contactManagement.contactGet.CloudContactGetResponse;
 import com.grouplearn.project.cloud.contactManagement.search.CloudUserSearchRequest;
-import com.grouplearn.project.models.GLContact;
+import com.grouplearn.project.bean.GLContact;
 
 import java.util.ArrayList;
 

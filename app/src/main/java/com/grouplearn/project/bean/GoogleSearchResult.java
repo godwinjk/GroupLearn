@@ -1,4 +1,4 @@
-package com.grouplearn.project.models;
+package com.grouplearn.project.bean;
 
 /**
  * Created by Godwin Joseph on 16-09-2016 13:50 for Group Learn application.

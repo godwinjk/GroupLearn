@@ -11,126 +11,107 @@
     tools:context=".app.uiManagement.user.LoginActivity"
     tools:showIn="@layout/activity_login">
 
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="20dp"
-        android:text="Group Learn"
-        android:textColor="@color/colorPrimaryTextDark"
-        android:textSize="30dp"
-        android:textStyle="bold" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
-            android:id="@+id/ll_user_credentials"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:orientation="vertical"
-
-            android:padding="20dp">
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/et_username"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/username"
-                    android:drawablePadding="10dp"
-                    android:hint="Phone number"
-                    android:imeOptions="actionNext"
-                    android:inputType="phone"
-                    android:maxLines="1"
-                    android:padding="10dp" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/et_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/colorPrimary"
-                    android:drawableLeft="@drawable/password"
-                    android:drawablePadding="10dp"
-                    android:hint="Password"
-                    android:imeOptions="actionDone"
-                    android:inputType="textPassword"
-                    android:maxLength="32"
-                    android:maxLines="1"
-                    android:padding="10dp"
-                    android:textColor="#8D8D8D"
-                    android:textColorHint="@color/black_overlay"></EditText>
-            </android.support.design.widget.TextInputLayout>
-
-            <Button
-                android:id="@+id/btn_login"
-                android:layout_width="150dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="30dp"
-                android:background="@drawable/round_btn_selector"
-                android:clickable="true"
-                android:text="@string/sign_in"
-                android:textColor="@color/white" />
-
-            <Button
-                android:id="@+id/btn_sign_up"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:layout_margin="20dp"
-                android:background="@null"
-                android:clickable="true"
-
-                android:text="New User?"
-                android:textAllCaps="false"
-                android:textColor="@color/colorPrimaryTextDark" />
-        </LinearLayout>
-    </ScrollView>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="bottom"
-        android:orientation="vertical"
-        android:padding="5dp">
+        android:layout_weight="2"
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="5dp"
             android:gravity="center"
-            android:text="By"
-            android:textColor="@color/colorPrimary"
-            android:textSize="12dp"
-            android:textStyle="italic|bold" />
-
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:src="@drawable/grouplearn_icon_128" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:gravity="center"
-            android:padding="2dp"
-            android:text="Starlee Labs"
+            android:padding="20dp"
+            android:text="Group Learn"
             android:textColor="@color/colorPrimaryTextDark"
-            android:textSize="12dp"
+            android:textSize="30dp"
             android:textStyle="bold" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/ll_user_credentials"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/et_username"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/username"
+                        android:drawablePadding="10dp"
+                        android:hint="Phone number"
+                        android:imeOptions="actionNext"
+                        android:inputType="phone"
+                        android:maxLines="1"
+                        android:padding="10dp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/et_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/colorPrimary"
+                        android:drawableLeft="@drawable/password"
+                        android:drawablePadding="10dp"
+                        android:hint="Password"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPassword"
+                        android:maxLength="32"
+                        android:maxLines="1"
+                        android:padding="10dp"
+                        android:textColor="#8D8D8D"
+                        android:textColorHint="@color/black_overlay"></EditText>
+                </android.support.design.widget.TextInputLayout>
+
+                <Button
+                    android:id="@+id/btn_login"
+                    android:layout_width="150dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/round_btn_selector"
+                    android:clickable="true"
+                    android:text="@string/sign_in"
+                    android:textColor="@color/white" />
+
+                <Button
+                    android:id="@+id/btn_sign_up"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:clickable="true"
+                    android:text="New User? SIGN UP"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorPrimaryTextDark" />
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/btn_forgot_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:clickable="true"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="Forgot password?"
+        android:textAllCaps="false" />
+
 </LinearLayout>

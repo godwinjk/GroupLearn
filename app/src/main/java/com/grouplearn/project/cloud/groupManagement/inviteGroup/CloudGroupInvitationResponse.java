@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.groupManagement.inviteGroup;
 
 import com.grouplearn.project.cloud.CloudConnectResponse;
-import com.grouplearn.project.models.GLRequest;
+import com.grouplearn.project.bean.GLRequest;
 
 import java.util.ArrayList;
 

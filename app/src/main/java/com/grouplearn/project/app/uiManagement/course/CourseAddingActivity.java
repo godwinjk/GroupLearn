@@ -13,8 +13,9 @@ import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstan
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.cloudHelper.CloudCourseManager;
 import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
-import com.grouplearn.project.models.GLCourse;
+import com.grouplearn.project.bean.GLCourse;
 import com.grouplearn.project.utilities.AppUtility;
+import com.grouplearn.project.utilities.InputValidator;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
@@ -71,7 +72,7 @@ public class CourseAddingActivity extends BaseActivity implements View.OnClickLi
         } else if (TextUtils.isEmpty(etCourseDefinition.getEditText().getText().toString())) {
             etCourseDefinition.setError("Course description is mandatory");
             return false;
-        } else if (etCourseDefinition.getEditText().getText().toString().length() > 10 && etCourseDefinition.getEditText().getText().toString().length() < 140) {
+        } else if (etCourseDefinition.getEditText().getText().toString().length() < 10 && etCourseDefinition.getEditText().getText().toString().length() > 140) {
             etCourseDefinition.setError("Course description should be 10-140 character long");
             return false;
         } else if (TextUtils.isEmpty(etContactDetails.getEditText().getText().toString())) {
@@ -80,9 +81,14 @@ public class CourseAddingActivity extends BaseActivity implements View.OnClickLi
         } else if (etContactDetails.getEditText().getText().toString().length() > 10) {
             etContactDetails.setError("Contact should be atleast 10 character long");
             return false;
-        } /*else if (TextUtils.isEmpty(etSiteUrl.getEditText().getText().toString())) {
-            return false;
-        }*/
+        } else if (TextUtils.isEmpty(etSiteUrl.getEditText().getText().toString())) {
+            etSiteUrl.setError("Web address is mandatory");
+        } else if (!TextUtils.isEmpty(etSiteUrl.getEditText().getText().toString())) {
+            if (!InputValidator.isURI(etSiteUrl.getEditText().getText().toString())) {
+                etSiteUrl.setError("Invalid web address");
+                return false;
+            }
+        }
         return true;
     }
 
@@ -107,7 +113,7 @@ public class CourseAddingActivity extends BaseActivity implements View.OnClickLi
                     @Override
                     public void run() {
                         DisplayInfo.dismissLoader(mContext);
-                        DisplayInfo.showToast(mContext, "Course created succesully");
+                        DisplayInfo.showToast(mContext, "Course created successfully");
                         finish();
                     }
                 });
@@ -122,7 +128,6 @@ public class CourseAddingActivity extends BaseActivity implements View.OnClickLi
                         DisplayInfo.showToast(mContext, "Course name already exist . Please choose a different one.");
                     }
                 });
-
             }
         };
         CloudCourseManager manager = new CloudCourseManager(mContext);

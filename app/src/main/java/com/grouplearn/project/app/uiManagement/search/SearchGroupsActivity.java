@@ -23,7 +23,7 @@ import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.GroupViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
@@ -47,6 +47,7 @@ public class SearchGroupsActivity extends BaseActivity implements View.OnClickLi
         mToolbar = setupToolbar("GroupLearn", true);
         mToolbar.setSubtitle("Search Groups");
 
+        mContext=this;
         initializeWidgets();
         registerListeners();
     }

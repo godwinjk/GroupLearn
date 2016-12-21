@@ -122,4 +122,10 @@
     <string name="title_activity_search_user">SearchUserActivity</string>
     <string name="title_activity_course_adding">CourseAddingActivity</string>
     <string name="title_activity_course_list">CourseListActivity</string>
+    <string name="title_activity_my_course">MyCourseActivity</string>
+    <string name="title_activity_course_menu">CourseMenuActivity</string>
+    <string name="title_activity_group_menu">GroupMenuActivity</string>
+    <string name="title_activity_profile_menu">ProfileMenuActivity</string>
+    <string name="title_activity_forgot">ForgotActivity</string>
+    <string name="title_activity_browser">BrowserActivity</string>
 </resources>

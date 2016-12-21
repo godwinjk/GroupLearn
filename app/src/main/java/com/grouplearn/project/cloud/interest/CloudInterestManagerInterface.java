@@ -2,6 +2,7 @@ package com.grouplearn.project.cloud.interest;
 
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.interest.add.CloudAddInterestRequest;
+import com.grouplearn.project.cloud.interest.delete.CloudDeleteInterestRequest;
 import com.grouplearn.project.cloud.interest.get.CloudGetInterestRequest;
 
 /**
@@ -12,6 +13,6 @@ public interface CloudInterestManagerInterface {
     public void addInterest(CloudAddInterestRequest request, CloudResponseCallback callback);
 
     public void editInterest(CloudAddInterestRequest request, CloudResponseCallback callback);
-
+    public void deleteInterest(CloudDeleteInterestRequest request, CloudResponseCallback callback);
     public void getInterest(CloudGetInterestRequest request, CloudResponseCallback callback);
 }

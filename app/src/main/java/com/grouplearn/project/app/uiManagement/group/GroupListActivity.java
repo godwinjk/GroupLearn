@@ -36,7 +36,7 @@ import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback
 import com.grouplearn.project.app.uiManagement.interfaces.GroupViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
 import com.grouplearn.project.app.uiManagement.search.SearchAllActivity;
-import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
@@ -177,7 +177,7 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent chatIntent = new Intent(mContext, GroupChatActivity.class);
-                String groupUniqueId = ((GLGroup) mGroupListAdapter.getItem(position)).getGroupUniqueId();
+                long groupUniqueId = ((GLGroup) mGroupListAdapter.getItem(position)).getGroupUniqueId();
 
                 chatIntent.putExtra("groupCloudId", groupUniqueId);
 //                startActivity(chatIntent);
@@ -283,7 +283,7 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         int position = info.position;
         GLGroup model = mGroupListAdapter.getGroupListData().get(position);
-        if (!model.getGroupUniqueId().equals("-11223344")) {
+        if (model.getGroupUniqueId()==-11223344) {
             menu.add(1, 1, 1, "Mark as read");
             menu.add(1, 2, 1, "Group info");
             menu.add(1, 3, 1, "Exit group");
@@ -299,7 +299,7 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
         final GroupListInteractor interactor = GroupListInteractor.getInstance(mContext);
         switch (item.getItemId()) {
             case 1:
-                new ChatDbHelper(mContext).updateAllRead(Long.parseLong(mGroupListAdapter.getGroupListData().get(position).getGroupUniqueId()));
+                new ChatDbHelper(mContext).updateAllRead(mGroupListAdapter.getGroupListData().get(position).getGroupUniqueId());
 
                 interactor.getSubscribedGroupsFromDatabase(GroupListActivity.this);
                 break;

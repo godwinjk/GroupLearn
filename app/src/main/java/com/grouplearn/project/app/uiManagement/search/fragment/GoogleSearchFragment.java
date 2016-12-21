@@ -17,7 +17,7 @@ import android.widget.ListView;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.BaseFragment;
 import com.grouplearn.project.app.uiManagement.search.GoogleSearchCallback;
-import com.grouplearn.project.models.GoogleSearchResult;
+import com.grouplearn.project.bean.GoogleSearchResult;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;

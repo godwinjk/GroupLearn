@@ -11,7 +11,7 @@ import android.provider.MediaStore;
 
 import com.grouplearn.project.app.uiManagement.databaseHelper.ContactDbHelper;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
-import com.grouplearn.project.models.GLContact;
+import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.utilities.Log;
 
 import java.io.IOException;
@@ -27,7 +27,6 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
     Context mContext;
     ArrayList<GLContact> contactList = new ArrayList<>();
     ContactViewInterface contactViewInterface;
-
 
     public ContactReadTask(Context mContext) {
         this.mContext = mContext;
@@ -74,15 +73,17 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
                     new ContactDbHelper(mContext).addContact(contactModel);
                     sort(contactList);
                     count++;
-                    if (contactViewInterface != null && count % 10 == 0) {
+                    if (count % 10 == 0) {
                         ArrayList<GLContact> contactModels = new ArrayList<>();
                         contactModels = (ArrayList<GLContact>) contactList.clone();
-                        contactViewInterface.onGetAllContactsFromDb(contactModels);
+                        if (contactViewInterface != null)
+                            contactViewInterface.onGetAllContactsFromDb(contactModels);
                     }
                 }
             }
             cur.close();
-            contactViewInterface.onGetContactsFinished(contactList);
+            if (contactViewInterface != null)
+                contactViewInterface.onGetContactsFinished(contactList);
         }
         return contactList;
     }

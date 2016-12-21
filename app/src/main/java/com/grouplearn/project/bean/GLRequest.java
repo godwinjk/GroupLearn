@@ -1,4 +1,4 @@
-package com.grouplearn.project.models;
+package com.grouplearn.project.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,13 +8,22 @@ import android.os.Parcelable;
  */
 public class GLRequest extends BaseModel implements Parcelable {
     String userName;
-    String userId;
+    long userId;
     String userMessage;
-    String groupId;
+    long groupId;
     String groupName;
     String groupIconId;
     String requestStatus;
     int action;
+    private String iconUrl;
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
     private String definition;
 
     public String getUserName() {
@@ -25,28 +34,12 @@ public class GLRequest extends BaseModel implements Parcelable {
         this.userName = userName;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public String getUserMessage() {
         return userMessage;
     }
 
     public void setUserMessage(String userMessage) {
         this.userMessage = userMessage;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
     }
 
     public String getRequestStatus() {
@@ -69,6 +62,22 @@ public class GLRequest extends BaseModel implements Parcelable {
         return groupIconId;
     }
 
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+    public long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
     public void setGroupIconId(String groupIconId) {
         this.groupIconId = groupIconId;
     }
@@ -84,9 +93,9 @@ public class GLRequest extends BaseModel implements Parcelable {
     protected GLRequest(Parcel in) {
         super(in);
         userName = in.readString();
-        userId = in.readString();
+        userId = in.readLong();
         userMessage = in.readString();
-        groupId = in.readString();
+        groupId = in.readLong();
         groupName = in.readString();
         groupIconId = in.readString();
         requestStatus = in.readString();
@@ -107,9 +116,9 @@ public class GLRequest extends BaseModel implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         writeToParcel(dest, flags);
         dest.writeString(userName);
-        dest.writeString(userId);
+        dest.writeLong(userId);
         dest.writeString(userMessage);
-        dest.writeString(groupId);
+        dest.writeLong(groupId);
         dest.writeString(groupName);
         dest.writeString(groupIconId);
         dest.writeString(requestStatus);

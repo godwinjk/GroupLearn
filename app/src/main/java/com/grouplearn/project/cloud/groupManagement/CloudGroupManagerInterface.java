@@ -13,6 +13,7 @@ import com.grouplearn.project.cloud.groupManagement.getSubscribedGroups.CloudGet
 import com.grouplearn.project.cloud.groupManagement.inviteGroup.CloudGroupInvitationRequest;
 import com.grouplearn.project.cloud.groupManagement.updateGroupRequest.CloudUpdateSubscribeGroupRequest;
 import com.grouplearn.project.cloud.groupManagement.updateInvitation.CloudUpdateGroupInvitationRequest;
+import com.grouplearn.project.cloud.groupManagement.upload.CloudUploadGroupImageRequest;
 
 /**
  * Created by Godwin Joseph on 18-05-2016 23:25 for Group Learn application.
@@ -41,5 +42,7 @@ public interface CloudGroupManagerInterface {
     public void updateInvitation(CloudUpdateGroupInvitationRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
 
     public void deleteGroup(CloudContactDeleteRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
+
+    public void uploadImage(CloudUploadGroupImageRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
 
 }

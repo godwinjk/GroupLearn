@@ -15,6 +15,7 @@ import android.net.Uri;
 import com.grouplearn.project.app.databaseManagament.constants.DatabaseConstants;
 import com.grouplearn.project.app.databaseManagament.tables.TableChat;
 import com.grouplearn.project.app.databaseManagament.tables.TableContacts;
+import com.grouplearn.project.app.databaseManagament.tables.TableCourse;
 import com.grouplearn.project.app.databaseManagament.tables.TableGroups;
 import com.grouplearn.project.app.databaseManagament.tables.TableServerSyncDetails;
 import com.grouplearn.project.app.databaseManagament.tables.TableSubscribedGroups;
@@ -37,7 +38,8 @@ public class DatabaseProvider extends ContentProvider {
                 TableServerSyncDetails.TABLE_INDEX);
         uriMatcher.addURI(DatabaseConstants.AUTHORITY, TableContacts.TABLE_NAME,
                 TableContacts.TABLE_INDEX);
-
+        uriMatcher.addURI(DatabaseConstants.AUTHORITY, TableCourse.TABLE_NAME,
+                TableCourse.TABLE_INDEX);
     }
 
     private DbHelper mDbHelper;
@@ -66,6 +68,10 @@ public class DatabaseProvider extends ContentProvider {
                 count = mSqldb.delete(databasetable, selection, selectionArgs);
                 break;
             case TableContacts.TABLE_INDEX:
+                databasetable = uri.getPathSegments().get(0);
+                count = mSqldb.delete(databasetable, selection, selectionArgs);
+                break;
+            case TableCourse.TABLE_INDEX:
                 databasetable = uri.getPathSegments().get(0);
                 count = mSqldb.delete(databasetable, selection, selectionArgs);
                 break;
@@ -130,6 +136,16 @@ public class DatabaseProvider extends ContentProvider {
                 // ---if added successfully---
                 if (rowID > 0) {
                     retUri = ContentUris.withAppendedId(TableContacts.CONTENT_URI,
+                            rowID);
+                    getContext().getContentResolver().notifyChange(uri, null);
+                    return retUri;
+                }
+                throw new SQLException("Failed to insert row into " + uri);
+            case TableCourse.TABLE_INDEX:
+                rowID = mSqldb.insert(TableCourse.TABLE_NAME, "", values);
+                // ---if added successfully---
+                if (rowID > 0) {
+                    retUri = ContentUris.withAppendedId(TableCourse.CONTENT_URI,
                             rowID);
                     getContext().getContentResolver().notifyChange(uri, null);
                     return retUri;
@@ -213,6 +229,16 @@ public class DatabaseProvider extends ContentProvider {
                     cursor.setNotificationUri(getContext().getContentResolver(),
                             uri);
                 break;
+            case TableCourse.TABLE_INDEX:
+                mSqldb = mDbHelper.getReadableDatabase();
+                tableName = uri.getLastPathSegment();
+                queryBuilder.setTables(tableName);
+                cursor = queryBuilder.query(mSqldb, projection, selection,
+                        selectionArgs, null, null, sortOrder);
+                if (cursor != null)
+                    cursor.setNotificationUri(getContext().getContentResolver(),
+                            uri);
+                break;
         }
         return cursor;
     }
@@ -244,6 +270,10 @@ public class DatabaseProvider extends ContentProvider {
                 count = mSqldb.update(TableContacts.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
+            case TableCourse.TABLE_INDEX:
+                count = mSqldb.update(TableCourse.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
         }
         getContext().getContentResolver().notifyChange(uri, null);
         return count;
@@ -256,25 +286,21 @@ public class DatabaseProvider extends ContentProvider {
         private Context mContext;
 
         public DbHelper(Context context) {
-
             super(context, DatabaseConstants.DB_NAME, null, DatabaseConstants.DB_VERSION);
             this.mContext = context;
-
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             // db.execSQL("drop if exists "+DataBaseConstants.TABLE_CATEGORY);
             db.execSQL("drop table  if exists " + TableSubscribedGroups.TABLE_NAME);
-
             db.execSQL("drop table  if exists " + TableChat.TABLE_NAME);
-
             db.execSQL("drop table  if exists " + TableGroups.TABLE_NAME);
             db.execSQL("drop table  if exists " + TableServerSyncDetails.TABLE_NAME);
             db.execSQL("drop table  if exists " + TableContacts.TABLE_NAME);
+            db.execSQL("drop table  if exists " + TableCourse.TABLE_NAME);
 
             onCreate(db);
-
         }
 
         @Override
@@ -284,6 +310,7 @@ public class DatabaseProvider extends ContentProvider {
             db.execSQL(TableChat.SQL_CREATE_TABLE);
             db.execSQL(TableServerSyncDetails.SQL_CREATE_TABLE);
             db.execSQL(TableContacts.SQL_CREATE_TABLE);
+            db.execSQL(TableCourse.SQL_CREATE_TABLE);
 
         }
     }

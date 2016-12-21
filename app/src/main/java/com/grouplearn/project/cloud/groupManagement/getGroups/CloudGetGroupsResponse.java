@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.groupManagement.getGroups;
 
 import com.grouplearn.project.cloud.CloudConnectResponse;
-import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.bean.GLGroup;
 
 import java.util.ArrayList;
 

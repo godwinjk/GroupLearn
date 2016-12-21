@@ -16,17 +16,15 @@ import android.view.View;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.SplashScreenActivity;
-import com.grouplearn.project.app.uiManagement.StatusActivity;
 import com.grouplearn.project.app.uiManagement.adapter.SearchPagerAdapter;
 import com.grouplearn.project.app.uiManagement.contact.ContactListActivity;
 import com.grouplearn.project.app.uiManagement.controllers.NavigationMenuController;
 import com.grouplearn.project.app.uiManagement.group.GroupListActivity;
-import com.grouplearn.project.app.uiManagement.group.InvitationActivity;
-import com.grouplearn.project.app.uiManagement.group.RequestAcceptingActivity;
 import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
 import com.grouplearn.project.app.uiManagement.settings.AboutActivity;
 import com.grouplearn.project.app.uiManagement.settings.SettingsActivity;
+import com.grouplearn.project.app.uiManagement.user.ProfileMenuActivity;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
 public class SearchAllActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -111,9 +109,7 @@ public class SearchAllActivity extends BaseActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.nav_status) {
-            startActivity(new Intent(mContext, StatusActivity.class));
-        } else if (id == R.id.nav_about) {
+       if (id == R.id.nav_about) {
             startActivity(new Intent(mContext, AboutActivity.class));
         } else if (id == R.id.nav_groups) {
             startActivity(new Intent(mContext, GroupListActivity.class));
@@ -121,10 +117,8 @@ public class SearchAllActivity extends BaseActivity implements NavigationView.On
             startActivity(new Intent(mContext, ContactListActivity.class));
         } else if (id == R.id.nav_settings) {
             startActivity(new Intent(mContext, SettingsActivity.class));
-        } else if (id == R.id.nav_request) {
-            startActivity(new Intent(mContext, RequestAcceptingActivity.class));
-        } else if (id == R.id.nav_invitations) {
-            startActivity(new Intent(mContext, InvitationActivity.class));
+        } else if (id == R.id.nav_profile) {
+            startActivity(new Intent(mContext, ProfileMenuActivity.class));
         } else if (id == R.id.nav_signout) {
             new SignOutInteractor(mContext).doSignOut(new SignOutListener() {
                 @Override
@@ -158,5 +152,4 @@ public class SearchAllActivity extends BaseActivity implements NavigationView.On
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
 }

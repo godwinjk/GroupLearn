@@ -8,12 +8,12 @@ import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.courseManagement.add.CloudAddCourseRequest;
 import com.grouplearn.project.cloud.courseManagement.add.CloudAddCourseResponse;
+import com.grouplearn.project.cloud.courseManagement.delete.CloudDeleteCourseRequest;
 import com.grouplearn.project.cloud.courseManagement.get.CloudGetCourseRequest;
 import com.grouplearn.project.cloud.courseManagement.get.CloudGetCourseResponse;
-import com.grouplearn.project.cloud.groupManagement.getGroups.CloudGetGroupsRequest;
 import com.grouplearn.project.cloud.networkManagement.CloudAPICallback;
 import com.grouplearn.project.cloud.networkManagement.CloudHttpMethod;
-import com.grouplearn.project.models.GLCourse;
+import com.grouplearn.project.bean.GLCourse;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 
 import org.json.JSONArray;
@@ -62,6 +62,8 @@ public class CloudCourseManager extends BaseManager implements CloudCourseManage
                                     glCourse.setCourseName(modelObject.optString("courseName"));
                                     glCourse.setCourseIconId(modelObject.optString("courseIconId"));
                                     glCourse.setCourseStatus(modelObject.optInt("courseStatus"));
+                                    glCourse.setStatus(modelObject.optInt("status"));
+                                    glCourse.setMessage(modelObject.optString("message"));
 
                                     glCourses.add(glCourse);
                                 }
@@ -125,7 +127,6 @@ public class CloudCourseManager extends BaseManager implements CloudCourseManage
         httpMethod.setEntityString(entity.toString());
         httpMethod.execute();
     }
-
 
     @Override
     public void editCourses(final CloudAddCourseRequest cloudRequest, final CloudResponseCallback responseCallback) {
@@ -217,8 +218,95 @@ public class CloudCourseManager extends BaseManager implements CloudCourseManage
     }
 
     @Override
-    public void deleteCourses(CloudGetGroupsRequest request, CloudResponseCallback callback) {
+    public void deleteCourses(final CloudDeleteCourseRequest request, final CloudResponseCallback callback) {
+        if (request == null || callback == null)
+            throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
+        CloudAPICallback listener = new CloudAPICallback() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                CloudAddCourseResponse response = new CloudAddCourseResponse();
+                if (jsonObject != null) {
+                    jsonObject = jsonObject.optJSONObject(RESPONSE);
+                    if (jsonObject != null) {
+                        JSONObject statusObject = jsonObject.optJSONObject(STATUS);
+                        if (statusObject != null) {
+                            response = (CloudAddCourseResponse) getUpdatedResponse(statusObject, response);
+                            JSONArray dataArray = jsonObject.optJSONArray(DATA);
+                            if (dataArray != null) {
+                                ArrayList<GLCourse> glCourses = new ArrayList<>();
+                                for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
+                                    JSONObject modelObject = dataArray.optJSONObject(i);
+                                    GLCourse glCourse = new GLCourse();
 
+                                    glCourse.setCourseId(modelObject.optLong("courseId"));
+                                    glCourse.setCourseName(modelObject.optString("courseName"));
+                                    glCourse.setCourseIconId(modelObject.optString("courseIconId"));
+                                    glCourse.setCourseStatus(modelObject.optInt("courseStatus"));
+                                    glCourse.setStatus(modelObject.optInt("status"));
+                                    glCourse.setMessage(modelObject.optString("message"));
+
+                                    glCourses.add(glCourse);
+                                }
+                                response.setGlCourses(glCourses);
+                                if (callback != null) {
+                                    callback.onSuccess(request, response);
+                                }
+                            } else {
+                                if (callback != null) {
+                                    callback.onFailure(request, new CloudError(ErrorHandler.INVALID_DATA_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_DATA_FROM_CLOUD));
+                                }
+                            }
+                        } else {
+                            if (callback != null) {
+                                callback.onFailure(request, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                            }
+                        }
+                    } else {
+                        if (callback != null) {
+                            callback.onFailure(request, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                        }
+                    }
+                } else {
+                    if (callback != null) {
+                        callback.onFailure(request, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(CloudError cloudError) {
+                if (callback != null) {
+                    callback.onFailure(request, cloudError);
+                }
+            }
+        };
+        CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
+        httpMethod.setRequestType(CloudHttpMethod.POST_METHOD);
+        httpMethod.setUrl(mBaseurl + "course-delete");
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("token", request.getToken());
+
+        httpMethod.setHeaderMap(hashMap);
+        JSONArray entity = new JSONArray();
+        for (GLCourse model : request.getGlCourses()) {
+            JSONObject modelObject = new JSONObject();
+            try {
+                modelObject.put("courseName", model.getCourseName());
+                modelObject.put("courseIconId", 10/*model.getGroupIconId()*/);
+                modelObject.put("url", model.getUrl());
+                modelObject.put("courseId", model.getCourseId());
+
+                modelObject.put("definition", model.getDefinition());
+                modelObject.put("contact", model.getContactDetails());
+
+                entity.put(modelObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        httpMethod.setEntityString(entity.toString());
+        httpMethod.execute();
     }
 
     @Override
@@ -255,6 +343,9 @@ public class CloudCourseManager extends BaseManager implements CloudCourseManage
                                     glCourse.setCourseIconId(modelObject.optString("courseIconId"));
                                     glCourse.setContactDetails(modelObject.optString("contact"));
                                     glCourse.setUrl(modelObject.optString("url"));
+                                    glCourse.setIconUrl(modelObject.optString("groupIconUrl"));
+                                    glCourse.setGroupIconId(modelObject.optString("groupIconId"));
+
                                     glCourse.setTimeStamp(modelObject.optString("timestamp"));
 
                                     glCourses.add(glCourse);
@@ -294,7 +385,7 @@ public class CloudCourseManager extends BaseManager implements CloudCourseManage
         };
         CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
         httpMethod.setRequestType(CloudHttpMethod.GET_METHOD);
-        httpMethod.setUrl(mBaseurl + "course/1?start=" + cloudRequest.getStartTime() + "&limit=" + cloudRequest.getLimit() + "&key=" + cloudRequest.getKey());
+        httpMethod.setUrl(mBaseurl + "course/1?start=" + cloudRequest.getStartTime() + "&limit=" + cloudRequest.getLimit() + "&key=" + cloudRequest.getKey() + "&userId=" + cloudRequest.getUserId());
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("token", cloudRequest.getToken());

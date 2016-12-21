@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.interest.add;
 
 import com.grouplearn.project.cloud.CloudConnectRequest;
-import com.grouplearn.project.models.GLInterest;
+import com.grouplearn.project.bean.GLInterest;
 
 import java.util.ArrayList;
 

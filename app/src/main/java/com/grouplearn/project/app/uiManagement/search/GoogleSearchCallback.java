@@ -1,6 +1,6 @@
 package com.grouplearn.project.app.uiManagement.search;
 
-import com.grouplearn.project.models.GoogleSearchResult;
+import com.grouplearn.project.bean.GoogleSearchResult;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 
 import java.util.ArrayList;

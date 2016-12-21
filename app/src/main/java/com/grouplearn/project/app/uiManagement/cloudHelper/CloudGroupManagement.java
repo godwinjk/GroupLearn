@@ -25,8 +25,8 @@ import com.grouplearn.project.cloud.groupManagement.updateGroupRequest.CloudUpda
 import com.grouplearn.project.cloud.groupManagement.updateGroupRequest.CloudUpdateSubscribeGroupResponse;
 import com.grouplearn.project.cloud.groupManagement.updateInvitation.CloudUpdateGroupInvitationRequest;
 import com.grouplearn.project.cloud.groupManagement.updateInvitation.CloudUpdateGroupInvitationResponse;
-import com.grouplearn.project.models.GLGroup;
-import com.grouplearn.project.models.GLRequest;
+import com.grouplearn.project.bean.GLGroup;
+import com.grouplearn.project.bean.GLRequest;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.AppAlertDialog;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -194,7 +194,7 @@ public class CloudGroupManagement {
         CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).updateInvitation(request, callback);
     }
 
-    public void exitFromSubscribedGroup(String uniqueId, final CloudOperationCallback operationCallback) {
+    public void exitFromSubscribedGroup(long uniqueId, final CloudOperationCallback operationCallback) {
         String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
         final CloudExitGroupRequest request = new CloudExitGroupRequest();
         request.setToken(token);
@@ -205,9 +205,9 @@ public class CloudGroupManagement {
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 DisplayInfo.dismissLoader(mContext);
                 CloudExitGroupResponse response = (CloudExitGroupResponse) cloudResponse;
-                ArrayList<String> requestModels = response.getGroupUniqueIdList();
+                ArrayList<Long> requestModels = response.getGroupUniqueIdList();
                 if (requestModels.size() > 0) {
-                    for (String model : requestModels) {
+                    for (Long model : requestModels) {
                         operationCallback.onCloudOperationSuccess();
                         DisplayInfo.showToast(mContext, "Success");
                         new GroupDbHelper(mContext).deleteSubscribedGroup(model);

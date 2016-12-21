@@ -2,6 +2,8 @@ package com.grouplearn.project.cloud.contactManagement;
 
 import android.content.Context;
 
+import com.grouplearn.project.bean.GLContact;
+import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.cloud.BaseManager;
 import com.grouplearn.project.cloud.CloudConnectResponse;
 import com.grouplearn.project.cloud.CloudConstants;
@@ -17,8 +19,6 @@ import com.grouplearn.project.cloud.groupManagement.addGroup.CloudAddGroupRespon
 import com.grouplearn.project.cloud.groupManagement.deleteGroup.CloudContactDeleteRequest;
 import com.grouplearn.project.cloud.networkManagement.CloudAPICallback;
 import com.grouplearn.project.cloud.networkManagement.CloudHttpMethod;
-import com.grouplearn.project.models.GLContact;
-import com.grouplearn.project.models.GLGroup;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 
 import org.json.JSONArray;
@@ -69,7 +69,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                                 GLContact contactModel = new GLContact();
 
                                 contactModel.setContactNumber(modelObject.optString("contactName"));
-                                contactModel.setContactUniqueId(modelObject.optString("contactUserId"));
+                                contactModel.setContactUniqueId(modelObject.optLong("contactUserId"));
                                 contactModel.setContactIconId(modelObject.optString("contactIconId"));
                                 contactModel.setPrivacy(modelObject.optInt("privacy"));
                                 contactModel.setContactStatus(modelObject.optString("userStatus"));
@@ -161,7 +161,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                                 GLGroup groupModel = new GLGroup();
                                 groupModel.setGroupCreatedTime(modelObject.optString("createdTime"));
                                 groupModel.setGroupUpdatedTime(modelObject.optString("updatedTime"));
-                                groupModel.setGroupUniqueId(modelObject.optString("groupId"));
+                                groupModel.setGroupUniqueId(modelObject.optLong("groupId"));
                                 groupModel.setGroupName(modelObject.optString("groupName"));
                                 groupModel.setGroupIconId(modelObject.optString("groupIconId"));
 
@@ -212,6 +212,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                 modelObject.put("contactName", model.getContactName());
                 modelObject.put("contactId", model.getContactUniqueId());
                 modelObject.put("contactStatus", model.getContactStatus());
+                modelObject.put("userIconUrl", model.getIconUrl());
                 entity.put(modelObject);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -251,7 +252,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                                 JSONObject modelObject = dataArray.optJSONObject(i);
                                 GLContact contactModel = new GLContact();
                                 contactModel.setContactName(modelObject.optString("contactUserName"));
-                                contactModel.setContactUniqueId(modelObject.optString("contactUserId"));
+                                contactModel.setContactUniqueId(modelObject.optLong("contactUserId"));
                                 contactModel.setContactIconId(modelObject.optString("contactIconId"));
 
                                 groupModelArrayList.add(contactModel);
@@ -293,7 +294,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
 
         httpMethod.setHeaderMap(hashMap);
         JSONArray entity = new JSONArray();
-        for (String string : cloudRequest.getGroupUniqueIdList()) {
+        for (Long string : cloudRequest.getGroupUniqueIdList()) {
             JSONObject modelObject = new JSONObject();
             try {
                 modelObject.put("contactUserId", string);
@@ -332,10 +333,11 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                                 contactModel.setContactNumber(modelObject.optString("userName"));
                                 contactModel.setContactName(modelObject.optString("userDisplayName"));
                                 contactModel.setContactMailId(modelObject.optString("userEmail"));
-                                contactModel.setContactUniqueId(modelObject.optString("userId"));
+                                contactModel.setContactUniqueId(modelObject.optLong("userId"));
                                 contactModel.setPrivacy(modelObject.optInt("privacy"));
                                 contactModel.setTimeStamp(modelObject.optString("timestamp"));
                                 contactModel.setContactStatus(modelObject.optString("userStatus"));
+                                contactModel.setStatus(1);
 
                                 contactModels.add(contactModel);
                             }

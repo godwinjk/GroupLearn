@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.interest.delete;
 
 import com.grouplearn.project.cloud.CloudConnectRequest;
-import com.grouplearn.project.models.GLInterest;
+import com.grouplearn.project.bean.GLInterest;
 
 import java.util.ArrayList;
 
@@ -18,6 +18,10 @@ public class CloudDeleteInterestRequest extends CloudConnectRequest {
 
     public void setInterests(ArrayList<GLInterest> interests) {
         this.interests = interests;
+    }
+
+    public void setInterests(GLInterest interest) {
+        this.interests.add(interest);
     }
 
     @Override

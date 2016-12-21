@@ -9,7 +9,7 @@ import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstan
 import com.grouplearn.project.app.uiManagement.cloudHelper.CloudMessageHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.interfaces.MessageConversationCallback;
-import com.grouplearn.project.models.GLMessage;
+import com.grouplearn.project.bean.GLMessage;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 

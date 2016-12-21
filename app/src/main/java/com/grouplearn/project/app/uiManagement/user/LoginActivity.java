@@ -20,7 +20,7 @@ import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
-import com.grouplearn.project.app.uiManagement.search.SearchAllActivity;
+import com.grouplearn.project.app.uiManagement.group.GroupListNewActivity;
 import com.grouplearn.project.cloud.CloudConnectManager;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
@@ -43,7 +43,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     EditText etPassword;
     Button btnSignIn, btnSignUp;
     AppSharedPreference mPref;
-    TextView tvTitle;
+    TextView tvTitle,btnForgotPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +61,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     public void registerListeners() {
         btnSignIn.setOnClickListener(this);
         btnSignUp.setOnClickListener(this);
+        btnForgotPassword.setOnClickListener(this);
         tvTitle.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -100,7 +101,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 }
             }
         });
-
     }
 
     public void initializeWidgets() {
@@ -109,6 +109,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         etPassword = (EditText) findViewById(R.id.et_password);
         btnSignIn = (Button) findViewById(R.id.btn_login);
         btnSignUp = (Button) findViewById(R.id.btn_sign_up);
+        btnForgotPassword = (TextView) findViewById(R.id.btn_forgot_password);
         tvTitle = (TextView) findViewById(R.id.tv_title);
         String userName = mPref.getStringPrefValue(PreferenceConstants.USER_NAME);
         if (userName != null) {
@@ -134,6 +135,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 break;
             case R.id.btn_sign_up:
                 startActivity(new Intent(mContext, SignupActivity.class));
+                break;
+            case R.id.btn_forgot_password:
+                startActivity(new Intent(mContext, ForgotActivity.class));
                 break;
         }
     }
@@ -189,7 +193,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     mPref.setBooleanPrefValue(PreferenceConstants.IS_ENTER_KEY_SEND_MESSAGE, true);
                     mPref.setBooleanPrefValue(PreferenceConstants.IS_SPEAK_ENABLED, false);
 
-                    Intent intent = new Intent(mContext, SearchAllActivity.class);
+                    Intent intent = new Intent(mContext, GroupListNewActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish();

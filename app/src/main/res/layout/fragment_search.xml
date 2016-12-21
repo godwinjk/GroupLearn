@@ -40,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Search courses here" />
+                android:text="Search groups here" />
 
             <android.support.v7.widget.CardView
                 android:id="@+id/cv_search"
@@ -61,7 +61,6 @@
                 </android.support.v7.widget.SearchView>
             </android.support.v7.widget.CardView>
         </LinearLayout>
-
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_search_list"

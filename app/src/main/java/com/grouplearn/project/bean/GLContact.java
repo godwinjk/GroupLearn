@@ -1,4 +1,4 @@
-package com.grouplearn.project.models;
+package com.grouplearn.project.bean;
 
 import android.graphics.Bitmap;
 import android.os.Parcel;
@@ -9,7 +9,7 @@ import android.os.Parcelable;
  */
 public class GLContact extends BaseModel implements Parcelable {
     String contactName;
-    String contactUniqueId;
+    long contactUniqueId;
     String contactIconId;
     String contactStatus;
     String contactNumber;
@@ -18,6 +18,15 @@ public class GLContact extends BaseModel implements Parcelable {
     int status;
     Bitmap contactImage;
     private String contactId;
+    private String iconUrl;
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
 
     public String getContactNumber() {
         return contactNumber;
@@ -35,11 +44,11 @@ public class GLContact extends BaseModel implements Parcelable {
         this.contactName = contactName;
     }
 
-    public String getContactUniqueId() {
+    public long getContactUniqueId() {
         return contactUniqueId;
     }
 
-    public void setContactUniqueId(String contactUniqueId) {
+    public void setContactUniqueId(long contactUniqueId) {
         this.contactUniqueId = contactUniqueId;
     }
 
@@ -103,7 +112,7 @@ public class GLContact extends BaseModel implements Parcelable {
         super(in);
         contactName = in.readString();
         contactMailId = in.readString();
-        contactUniqueId = in.readString();
+        contactUniqueId = in.readLong();
         contactIconId = in.readString();
         contactStatus = in.readString();
         contactNumber = in.readString();
@@ -129,7 +138,7 @@ public class GLContact extends BaseModel implements Parcelable {
 
         dest.writeString(contactName);
         dest.writeString(contactMailId);
-        dest.writeString(contactUniqueId);
+        dest.writeLong(contactUniqueId);
         dest.writeString(contactIconId);
         dest.writeString(contactStatus);
         dest.writeString(contactNumber);

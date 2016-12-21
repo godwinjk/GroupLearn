@@ -21,8 +21,8 @@ import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.search.SearchAllActivity;
 import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
-import com.grouplearn.project.models.GLContact;
-import com.grouplearn.project.models.GLUser;
+import com.grouplearn.project.bean.GLContact;
+import com.grouplearn.project.bean.GLUser;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -119,7 +119,7 @@ public class UserSearchFragment extends BaseFragment implements ContactViewInter
                 GLUser userModel = new GLUser();
                 userModel.setUserDisplayName(contactModel.getContactName());
                 userModel.setUserStatus(contactModel.getContactStatus());
-                userModel.setUserId(Long.parseLong(contactModel.getContactUniqueId()));
+                userModel.setUserId(contactModel.getContactUniqueId());
                 userModel.setUserEmail(contactModel.getContactMailId());
                 Intent intent = new Intent(activity, UserProfileActivity.class);
 

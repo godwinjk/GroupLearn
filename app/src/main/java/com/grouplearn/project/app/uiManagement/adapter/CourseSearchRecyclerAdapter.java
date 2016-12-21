@@ -1,5 +1,7 @@
 package com.grouplearn.project.app.uiManagement.adapter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +10,8 @@ import android.view.ViewGroup;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.CourseSearchViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.models.GLCourse;
+import com.grouplearn.project.app.uiManagement.settings.BrowserActivity;
+import com.grouplearn.project.bean.GLCourse;
 
 import java.util.ArrayList;
 
@@ -41,6 +44,18 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
                 }
             }
         });
+        holder.tvSiteAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Context mContext = holder.itemView.getContext();
+                if (mContext != null) {
+                    Intent i = new Intent(mContext, BrowserActivity.class);
+                    i.putExtra("url", course.getUrl());
+                    mContext.startActivity(i);
+                }
+
+            }
+        });
     }
 
     @Override
@@ -62,5 +77,6 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
 
     public void setCourses(ArrayList<GLCourse> courses) {
         this.courses = courses;
+        notifyDataSetChanged();
     }
 }

@@ -12,7 +12,7 @@ import com.grouplearn.project.cloud.message.messageSet.CloudSetMessageRequest;
 import com.grouplearn.project.cloud.message.messageSet.CloudSetMessageResponse;
 import com.grouplearn.project.cloud.networkManagement.CloudAPICallback;
 import com.grouplearn.project.cloud.networkManagement.CloudHttpMethod;
-import com.grouplearn.project.models.GLMessage;
+import com.grouplearn.project.bean.GLMessage;
 import com.grouplearn.project.utilities.ChatUtilities;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 

@@ -11,7 +11,7 @@ import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstan
 import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
 import com.grouplearn.project.app.uiManagement.notification.NotificationManager;
-import com.grouplearn.project.models.GLMessage;
+import com.grouplearn.project.bean.GLMessage;
 import com.grouplearn.project.utilities.ChatUtilities;
 import com.grouplearn.project.utilities.Log;
 

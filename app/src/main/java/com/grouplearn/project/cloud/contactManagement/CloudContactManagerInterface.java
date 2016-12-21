@@ -15,5 +15,6 @@ public interface CloudContactManagerInterface {
     public void getContacts(CloudContactGetRequest request, CloudResponseCallback callback);
 
     public void deleteContact(CloudContactDeleteRequest request, CloudResponseCallback callback);
+
     public void searchContact(CloudUserSearchRequest request, CloudResponseCallback callback);
 }

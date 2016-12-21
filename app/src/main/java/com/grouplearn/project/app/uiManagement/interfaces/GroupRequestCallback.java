@@ -1,6 +1,6 @@
 package com.grouplearn.project.app.uiManagement.interfaces;
 
-import com.grouplearn.project.models.GLRequest;
+import com.grouplearn.project.bean.GLRequest;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 
 import java.util.ArrayList;

@@ -91,6 +91,13 @@ public class StatusActivity extends BaseActivity implements View.OnClickListener
     private void updateStatusToCloud(final String status) {
         CloudStatusRequest request = new CloudStatusRequest();
         request.setToken(mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN));
+        request.setUserDisplayName(mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME));
+        boolean privacy = mPref.getBooleanPrefValue(PreferenceConstants.USER_PRIVACY_STATUS);
+        int i = 0;
+        if (privacy) {
+            i = 1;
+        }
+        request.setPrivacyValue(i);
         request.setStatus(status);
         DisplayInfo.showLoader(mContext, "Setting status...");
         CloudResponseCallback callback = new CloudResponseCallback() {

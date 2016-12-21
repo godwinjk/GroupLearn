@@ -19,7 +19,7 @@ import android.widget.TextView;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.ContactItemHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.models.GLContact;
+import com.grouplearn.project.bean.GLContact;
 
 import java.util.ArrayList;
 
@@ -81,17 +81,14 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             holder = (ContactItemHolder) convertView.getTag();
 
         final GLContact model = (GLContact) getItem(position);
+        if (type == 0 && model.getStatus() == 1) {
+            holder.tvInvite.setVisibility(View.INVISIBLE);
+        } else if (type == 1 && model.getStatus() == 1) {
+            holder.tvInvite.setVisibility(View.VISIBLE);
+        } else if (type == 0 && model.getStatus() == 0) {
+            holder.tvInvite.setVisibility(View.VISIBLE);
+        }
 
-        if (model.getStatus() == 1) {
-            holder.tvInvite.setVisibility(View.INVISIBLE);
-        } else {
-            holder.tvInvite.setVisibility(View.VISIBLE);
-        }
-        if (type == 1) {
-            holder.tvInvite.setVisibility(View.VISIBLE);
-        } else {
-            holder.tvInvite.setVisibility(View.INVISIBLE);
-        }
         holder.tvContactName.setText(model.getContactName());
         holder.tvContactNumber.setText(model.getContactNumber());
         holder.ivIcon.setBackground(getBackgroundDrawable(mContext, position));
@@ -122,7 +119,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
         holder.llContactItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (model.getContactUniqueId() != null) {
+                if (model.getContactUniqueId() > 0) {
                     if (onRecyclerItemClickListener != null) {
                         onRecyclerItemClickListener.onItemClicked(position, model, v);
                     }

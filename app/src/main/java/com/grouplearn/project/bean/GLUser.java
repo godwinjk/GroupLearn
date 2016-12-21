@@ -1,4 +1,4 @@
-package com.grouplearn.project.models;
+package com.grouplearn.project.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -13,6 +13,15 @@ public class GLUser extends BaseModel implements Parcelable {
     String userStatus;
     String userEmail;
     String userDisplayName;
+    private String iconUrl;
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
 
     public long getUserId() {
         return userId;

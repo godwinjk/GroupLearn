@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.contactManagement.contactGet;
 
 import com.grouplearn.project.cloud.CloudConnectResponse;
-import com.grouplearn.project.models.GLContact;
+import com.grouplearn.project.bean.GLContact;
 
 import java.util.ArrayList;
 

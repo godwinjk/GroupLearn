@@ -7,12 +7,13 @@ public class DatabaseConstants {
     public static final String AUTHORITY = "com.grouplearn.project.app.GroupLearn.DataBaseProvider";
 
     public static final String DB_NAME = "GroupLearnApp.db";
-    public static final int DB_VERSION = 35;
+    public static final int DB_VERSION = 37;
     public static final int TABLE_TOPICS = 100;
     public static final int TABLE_GROUPS = 101;
     public static final int TABLE_CHATS = 102;
     public static final int TABLE_CONTACTS = 103;
     public static final int TABLE_SERVER_SYNC_DETAILS = 104;
+    public static final int TABLE_COURSE = 105;
 
     //TABLE INDICES FOR REFERENCE
 }

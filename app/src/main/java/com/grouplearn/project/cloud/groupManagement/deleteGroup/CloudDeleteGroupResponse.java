@@ -8,14 +8,14 @@ import java.util.ArrayList;
  * Created by Godwin Joseph on 19-05-2016 00:13 for Group Learn application.
  */
 public class CloudDeleteGroupResponse extends CloudConnectResponse {
-    ArrayList<String> groupUniqueIdList = new ArrayList<>();
+    ArrayList<Long> groupUniqueIdList = new ArrayList<>();
     private int groupCount;
 
-    public ArrayList<String> getGroupUniqueIdList() {
+    public ArrayList<Long> getGroupUniqueIdList() {
         return groupUniqueIdList;
     }
 
-    public void setGroupUniqueIdList(ArrayList<String> groupUniqueIdList) {
+    public void setGroupUniqueIdList(ArrayList<Long> groupUniqueIdList) {
         this.groupUniqueIdList = groupUniqueIdList;
     }
 

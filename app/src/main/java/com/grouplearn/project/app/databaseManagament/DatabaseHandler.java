@@ -35,7 +35,7 @@ public class DatabaseHandler {
         return cursor;
     }
 
-    public Cursor getSubscribedGroupInfo(String groupUniqueId) {
+    public Cursor getSubscribedGroupInfo(long groupUniqueId) {
         String where = TableSubscribedGroups.GROUP_ID + " = '" + groupUniqueId + "'";
         Cursor cursor = mContentResolver.query(TableSubscribedGroups.CONTENT_URI, null, where, null, null);
         return cursor;

@@ -8,17 +8,17 @@ import java.util.ArrayList;
  * Created by Godwin Joseph on 19-05-2016 00:13 for Group Learn application.
  */
 public class CloudContactDeleteRequest extends CloudConnectRequest {
-    ArrayList<String> groupUniqueIdList = new ArrayList<>();
+    ArrayList<Long> groupUniqueIdList = new ArrayList<>();
 
-    public ArrayList<String> getGroupUniqueIdList() {
+    public ArrayList<Long> getGroupUniqueIdList() {
         return groupUniqueIdList;
     }
 
-    public void setGroupUniqueIdList(ArrayList<String> groupUniqueIdList) {
+    public void setGroupUniqueIdList(ArrayList<Long> groupUniqueIdList) {
         this.groupUniqueIdList = groupUniqueIdList;
     }
 
-    public void setGroupUniqueIdList(String groupId) {
+    public void setGroupUniqueIdList(Long groupId) {
         this.groupUniqueIdList.add(groupId);
     }
 

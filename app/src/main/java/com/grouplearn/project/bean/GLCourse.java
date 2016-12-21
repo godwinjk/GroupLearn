@@ -1,4 +1,4 @@
-package com.grouplearn.project.models;
+package com.grouplearn.project.bean;
 
 /**
  * Created by WiSilica on 03-12-2016 22:17 for GroupLearn application.
@@ -13,9 +13,19 @@ public class GLCourse extends BaseModel {
     private String contactDetails;
     private String url;
     private String groupName;
+    String groupDescription;
+    String groupIconId;
     private long groupId;
     private int courseStatus;
+    private String iconUrl;
 
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
     public int getCourseStatus() {
         return courseStatus;
     }
@@ -95,4 +105,21 @@ public class GLCourse extends BaseModel {
     public void setGroupId(long groupId) {
         this.groupId = groupId;
     }
+
+    public String getGroupDescription() {
+        return groupDescription;
+    }
+
+    public void setGroupDescription(String groupDescription) {
+        this.groupDescription = groupDescription;
+    }
+
+    public String getGroupIconId() {
+        return groupIconId;
+    }
+
+    public void setGroupIconId(String groupIconId) {
+        this.groupIconId = groupIconId;
+    }
+
 }

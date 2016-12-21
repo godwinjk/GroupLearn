@@ -21,7 +21,7 @@ import com.grouplearn.project.cloud.message.messageGet.CloudGetMessageRequest;
 import com.grouplearn.project.cloud.message.messageGet.CloudGetMessageResponse;
 import com.grouplearn.project.cloud.message.messageSet.CloudSetMessageRequest;
 import com.grouplearn.project.cloud.message.messageSet.CloudSetMessageResponse;
-import com.grouplearn.project.models.GLMessage;
+import com.grouplearn.project.bean.GLMessage;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 

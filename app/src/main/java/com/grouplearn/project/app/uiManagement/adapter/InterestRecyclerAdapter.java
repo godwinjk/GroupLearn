@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.InterestViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.models.GLInterest;
+import com.grouplearn.project.bean.GLInterest;
 
 import java.util.ArrayList;
 

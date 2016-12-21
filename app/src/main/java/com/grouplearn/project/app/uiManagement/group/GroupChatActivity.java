@@ -38,8 +38,8 @@ import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
 import com.grouplearn.project.app.uiManagement.notification.NotificationManager;
-import com.grouplearn.project.models.GLGroup;
-import com.grouplearn.project.models.GLMessage;
+import com.grouplearn.project.bean.GLGroup;
+import com.grouplearn.project.bean.GLMessage;
 import com.grouplearn.project.utilities.ChatUtilities;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -58,7 +58,7 @@ import it.moondroid.chatbot.Constants;
 public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnInitListener {
 
     private static final String TAG = "GroupChatActivity";
-    String groupUniqueId;
+    long groupUniqueId;
     Toolbar toolbar;
     ImageView ivSent;
     ImageView ivInputType;
@@ -88,9 +88,9 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
         mContext = this;
         mPref = new AppSharedPreference(mContext);
 
-        groupUniqueId = intent.getStringExtra("groupCloudId");
+        groupUniqueId = intent.getLongExtra("groupCloudId",-1);
 
-        if (Long.parseLong(groupUniqueId) == -11223344) {
+        if (groupUniqueId == -11223344) {
             isGodwinBot = true;
         }
         mGroupModel = new GroupDbHelper(mContext).getGroupInfo(groupUniqueId);
@@ -109,7 +109,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
         NotificationManager.getInstance().cancelNotification();
         updateChatList();
 
-        MessageInteractor.getInstance().getAllMessages(Long.parseLong(groupUniqueId));
+        MessageInteractor.getInstance().getAllMessages(groupUniqueId);
 
         IntentFilter intentFilter = new IntentFilter(Constants.BROADCAST_ACTION_BRAIN_STATUS);
         intentFilter.addAction(Constants.BROADCAST_ACTION_BRAIN_ANSWER);
@@ -395,7 +395,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
 
     private void updateChatList() {
         if (!isGodwinBot) {
-            ArrayList<GLMessage> messageModels = mDbHelper.getMessages(Long.parseLong(groupUniqueId));
+            ArrayList<GLMessage> messageModels = mDbHelper.getMessages(groupUniqueId);
             mChatRecyclerAdapter.setMessageModels(messageModels);
             rvChatList.scrollToPosition(mChatRecyclerAdapter.getItemCount() - 1);
             updateLastActivity();
@@ -431,7 +431,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
             }
             if (intent.getAction().equals("chatRefresh")) {
                 updateChatList();
-                MessageInteractor.getInstance().getAllMessages(Long.parseLong(groupUniqueId));
+                MessageInteractor.getInstance().getAllMessages(groupUniqueId);
             }
             if (intent.getAction().equalsIgnoreCase(Constants.BROADCAST_ACTION_BRAIN_STATUS)) {
                 int status = intent.getIntExtra(Constants.EXTRA_BRAIN_STATUS, 0);
@@ -505,7 +505,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
         model.setMessageBody(message);
         model.setSenderName(userName);
         model.setSenderId(myUserId);
-        model.setReceiverId(Long.parseLong(groupUniqueId));
+        model.setReceiverId(groupUniqueId);
         model.setMessageType(0);
         model.setTimeStamp(new BigDecimal(System.currentTimeMillis()).toPlainString());
         model.setTempId(getRandomTempId());

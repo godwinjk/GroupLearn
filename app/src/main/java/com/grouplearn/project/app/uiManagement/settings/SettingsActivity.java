@@ -9,13 +9,19 @@ import android.widget.TextView;
 
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
+import com.grouplearn.project.app.uiManagement.SplashScreenActivity;
+import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
+import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
 import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
+import com.grouplearn.project.utilities.views.DisplayInfo;
 
 public class SettingsActivity extends BaseActivity implements View.OnClickListener {
     Context mContext;
     TextView tvUserSettings;
     TextView tvNotificationSettings;
     TextView tvChatSettings;
+    TextView tvAbout;
+    TextView tvSignOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,8 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         tvUserSettings = (TextView) findViewById(R.id.tv_user_settings);
         tvNotificationSettings = (TextView) findViewById(R.id.tv_notification_settings);
         tvChatSettings = (TextView) findViewById(R.id.tv_chat_settings);
+        tvAbout = (TextView) findViewById(R.id.tv_about);
+        tvSignOut = (TextView) findViewById(R.id.tv_logout);
     }
 
     @Override
@@ -41,6 +49,8 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         tvUserSettings.setOnClickListener(this);
         tvNotificationSettings.setOnClickListener(this);
         tvChatSettings.setOnClickListener(this);
+        tvAbout.setOnClickListener(this);
+        tvSignOut.setOnClickListener(this);
     }
 
     @Override
@@ -54,6 +64,36 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 break;
             case R.id.tv_chat_settings:
                 startActivity(new Intent(mContext, ChatSettings.class));
+                break;
+            case R.id.tv_about:
+                startActivity(new Intent(mContext, AboutActivity.class));
+                break;
+            case R.id.tv_logout:
+                new SignOutInteractor(mContext).doSignOut(new SignOutListener() {
+                    @Override
+                    public void onSignOutSuccessful() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent intent = new Intent(mContext, SplashScreenActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                DisplayInfo.showToast(mContext, "Sign out successfully.");
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onSignOutFailed() {
+
+                    }
+
+                    @Override
+                    public void onSignOutCanceled() {
+
+                    }
+                });
                 break;
         }
     }

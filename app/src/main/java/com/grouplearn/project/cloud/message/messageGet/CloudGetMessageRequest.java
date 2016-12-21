@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.message.messageGet;
 
 import com.grouplearn.project.cloud.CloudConnectRequest;
-import com.grouplearn.project.models.GLMessage;
+import com.grouplearn.project.bean.GLMessage;
 
 import java.util.ArrayList;
 

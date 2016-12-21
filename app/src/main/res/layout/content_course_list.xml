@@ -42,7 +42,8 @@
         android:drawablePadding="10dp"
         android:gravity="center"
         android:padding="20dp"
-        android:text="Click to search courses." />
+        android:text="Click to search courses."
+        android:visibility="invisible" />
 
 
 </RelativeLayout>

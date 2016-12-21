@@ -18,6 +18,8 @@ import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.group.GroupListActivity;
+import com.grouplearn.project.app.uiManagement.group.GroupListNewActivity;
+import com.grouplearn.project.app.uiManagement.group.InvitationActivity;
 import com.grouplearn.project.app.uiManagement.group.RequestAcceptingActivity;
 
 /**
@@ -66,16 +68,17 @@ public class NotificationManager {
 
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         int resId = R.drawable.grouplearn_notification_white;
-        Intent groupIntentIntent = new Intent(mContext, GroupListActivity.class);
+        Intent groupIntentIntent = new Intent(mContext, GroupListNewActivity.class);
         if (notificationType == TYPE_NEW_GROUP_REQUEST) {
             resId = R.drawable.group_request_white_32;
             groupIntentIntent = new Intent(mContext, RequestAcceptingActivity.class);
         } else if (notificationType == TYPE_NEW_GROUP_INVITATION) {
             resId = R.drawable.invitation_white_32;
-            groupIntentIntent = new Intent(mContext, GroupListActivity.class);
+            groupIntentIntent = new Intent(mContext, InvitationActivity.class);
         }
         groupIntentIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         groupIntentIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        groupIntentIntent.putExtra("fromNotification", 1);
 
         int uniqueInt = (int) (System.currentTimeMillis() & 0xfffffff);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, uniqueInt, groupIntentIntent, PendingIntent.FLAG_UPDATE_CURRENT);

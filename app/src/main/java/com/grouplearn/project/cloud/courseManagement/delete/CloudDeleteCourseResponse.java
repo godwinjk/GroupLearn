@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.courseManagement.delete;
 
 import com.grouplearn.project.cloud.CloudConnectResponse;
-import com.grouplearn.project.models.GLCourse;
+import com.grouplearn.project.bean.GLCourse;
 
 import java.util.ArrayList;
 

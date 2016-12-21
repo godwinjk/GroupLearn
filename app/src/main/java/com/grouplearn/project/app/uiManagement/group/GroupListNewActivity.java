@@ -16,22 +16,20 @@ import android.widget.Toast;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.SplashScreenActivity;
-import com.grouplearn.project.app.uiManagement.StatusActivity;
 import com.grouplearn.project.app.uiManagement.adapter.GroupSectionPagerAdapter;
-import com.grouplearn.project.app.uiManagement.contact.ContactListActivity;
 import com.grouplearn.project.app.uiManagement.controllers.NavigationMenuController;
-import com.grouplearn.project.app.uiManagement.course.CourseAddingActivity;
-import com.grouplearn.project.app.uiManagement.course.CourseSearchActivity;
+import com.grouplearn.project.app.uiManagement.course.CourseMenuActivity;
 import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
-import com.grouplearn.project.app.uiManagement.search.SearchGroupsActivity;
 import com.grouplearn.project.app.uiManagement.search.SearchUserActivity;
-import com.grouplearn.project.app.uiManagement.settings.AboutActivity;
 import com.grouplearn.project.app.uiManagement.settings.SettingsActivity;
+import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
+import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
 public class GroupListNewActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = "GroupListNewActivity";
     Context mContext;
     TabLayout tlGroups;
     ViewPager vpGroups;
@@ -53,19 +51,34 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
         initializeWidgets();
         registerListeners();
         makeGodwinBot();
+        processFroNotification();
+//        ThumbNailLoader loader = new ThumbNailLoader(mContext);
+//        loader.execute();
+//        startActivity(new Intent(this, BrowserActivity.class));
+    }
+
+    public void processFroNotification() {
+        int i = getIntent().getIntExtra("fromNotification", -1);
+        Log.i(TAG, "NOTIFICAATIOIN NOTIFICATION CAME  || HA HA HA ");
+        if (vpGroups != null) {
+            vpGroups.setCurrentItem(1);
+        }
+
     }
 
     private void createNavigationView() {
-        if (mNavController != null) {
-            mNavigationView.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mNavController.refreshMenu();
-                }
-            }, 100);
-        } else {
-            mNavController = new NavigationMenuController(mContext, mNavigationView);
-        }
+        /**
+         * Navigation view initialization
+         */
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+
+        mNavigationView.setNavigationItemSelectedListener(this);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
+        mNavController = new NavigationMenuController(mContext, mNavigationView);
+
         mNavigationView = mNavController.createNavigationMenu();
     }
 
@@ -78,18 +91,10 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
         mSectionPagerAdapter = new GroupSectionPagerAdapter(getSupportFragmentManager());
         vpGroups.setAdapter(mSectionPagerAdapter);
 
-        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-
     }
 
     @Override
     public void registerListeners() {
-        mNavigationView.setNavigationItemSelectedListener(this);
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
-
         vpGroups.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -119,28 +124,18 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (id == R.id.nav_my_groups) {
-            startActivity(new Intent(mContext, GroupListActivity.class));
-        } else if (id == R.id.nav_add_group) {
-            startActivity(new Intent(mContext, AddGroupActivity.class));
-        } else if (id == R.id.nav_search_group) {
-            startActivity(new Intent(mContext, SearchGroupsActivity.class));
-        } else if (id == R.id.nav_add_course) {
-            startActivity(new Intent(mContext, CourseAddingActivity.class));
-        } else if (id == R.id.nav_search_course) {
-            startActivity(new Intent(mContext, CourseSearchActivity.class));
-        } else if (id == R.id.nav_status) {
-            startActivity(new Intent(mContext, StatusActivity.class));
-        } else if (id == R.id.nav_contacts_list) {
-            startActivity(new Intent(mContext, ContactListActivity.class));
-        } else if (id == R.id.nav_contacts_search) {
+        if (id == R.id.nav_profile) {
+            startActivity(new Intent(mContext, UserProfileActivity.class));
+        } else if (id == R.id.nav_group) {
+            startActivity(new Intent(mContext, GroupMenuActivity.class));
+        } else if (id == R.id.nav_course) {
+            startActivity(new Intent(mContext, CourseMenuActivity.class));
+        } else if (id == R.id.nav_users) {
             startActivity(new Intent(mContext, SearchUserActivity.class));
-        } else if (id == R.id.nav_about) {
-            startActivity(new Intent(mContext, AboutActivity.class));
-        } else if (id == R.id.nav_settings) {
-            startActivity(new Intent(mContext, SettingsActivity.class));
         } else if (id == R.id.nav_request) {
             startActivity(new Intent(mContext, RequestAcceptingActivity.class));
+        } else if (id == R.id.nav_settings) {
+            startActivity(new Intent(mContext, SettingsActivity.class));
         } else if (id == R.id.nav_invitations) {
             startActivity(new Intent(mContext, InvitationActivity.class));
         } else if (id == R.id.nav_signout) {
@@ -214,5 +209,5 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
                 isBackPressed = false;
             }
         }, 2 * 1000);
-    }   
+    }
 }

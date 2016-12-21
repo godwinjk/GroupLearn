@@ -6,7 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.grouplearn.project.app.databaseManagament.tables.TableChat;
-import com.grouplearn.project.models.GLMessage;
+import com.grouplearn.project.bean.GLMessage;
 import com.grouplearn.project.utilities.ChatUtilities;
 
 import java.math.BigDecimal;

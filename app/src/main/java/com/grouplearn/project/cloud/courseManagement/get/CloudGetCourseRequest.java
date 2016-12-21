@@ -8,6 +8,15 @@ import com.grouplearn.project.cloud.CloudConnectRequest;
 
 public class CloudGetCourseRequest extends CloudConnectRequest {
     String key;
+    long userId = 0;
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
 
     public String getKey() {
         return key;

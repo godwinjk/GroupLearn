@@ -1,7 +1,7 @@
 package com.grouplearn.project.cloud.groupManagement.getGroupSubscribersList;
 
 import com.grouplearn.project.cloud.CloudConnectResponse;
-import com.grouplearn.project.models.GLUser;
+import com.grouplearn.project.bean.GLUser;
 
 import java.util.ArrayList;
 

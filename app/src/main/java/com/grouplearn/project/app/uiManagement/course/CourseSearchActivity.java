@@ -20,8 +20,8 @@ import com.grouplearn.project.app.uiManagement.cloudHelper.CloudGroupManagement;
 import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.CourseViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.models.GLCourse;
-import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.bean.GLCourse;
+import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -174,8 +174,11 @@ public class CourseSearchActivity extends BaseActivity {
 
     private void requestToAdd(GLCourse course) {
         GLGroup group = new GLGroup();
-        group.setGroupUniqueId("" + course.getGroupId());
+        group.setGroupUniqueId( course.getGroupId());
         group.setGroupName("" + course.getGroupName());
+        group.setGroupIconId("" + course.getGroupIconId());
+        group.setGroupDescription("" + course.getDefinition());
+        group.setGroupAdminId("" + course.getCourseUserId());
         CloudGroupManagement groupManagement = new CloudGroupManagement(mContext);
         groupManagement.addSubscribedGroup(group, new CloudOperationCallback() {
             @Override

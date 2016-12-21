@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.TopicCardViewHolder;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
-import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.utilities.views.AppAlertDialog;
 
 import java.util.ArrayList;

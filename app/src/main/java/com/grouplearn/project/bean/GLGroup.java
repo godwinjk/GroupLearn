@@ -1,4 +1,4 @@
-package com.grouplearn.project.models;
+package com.grouplearn.project.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by Godwin Joseph on 18-05-2016 23:40 for Group Learn application.
  */
 public class GLGroup extends BaseModel implements Parcelable {
-    String groupUniqueId;
+    long groupUniqueId;
     String groupName;
     String groupDescription;
     String groupIconId;
@@ -18,7 +18,15 @@ public class GLGroup extends BaseModel implements Parcelable {
     int newMessage = 0;
     String lastMessage = null;
     GLMessage model;
+    private String iconUrl;
 
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
     public int getNewMessage() {
         return newMessage;
     }
@@ -35,11 +43,11 @@ public class GLGroup extends BaseModel implements Parcelable {
         this.lastMessage = lastMessage;
     }
 
-    public String getGroupUniqueId() {
+    public long getGroupUniqueId() {
         return groupUniqueId;
     }
 
-    public void setGroupUniqueId(String groupUniqueId) {
+    public void setGroupUniqueId(long groupUniqueId) {
         this.groupUniqueId = groupUniqueId;
     }
 
@@ -109,7 +117,7 @@ public class GLGroup extends BaseModel implements Parcelable {
 
     protected GLGroup(Parcel in) {
         super(in);
-        groupUniqueId = in.readString();
+        groupUniqueId = in.readLong();
         groupName = in.readString();
         groupDescription = in.readString();
         groupIconId = in.readString();
@@ -135,7 +143,7 @@ public class GLGroup extends BaseModel implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeString(groupUniqueId);
+        dest.writeLong(groupUniqueId);
         dest.writeString(groupName);
         dest.writeString(groupDescription);
         dest.writeString(groupIconId);

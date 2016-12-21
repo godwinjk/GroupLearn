@@ -9,6 +9,10 @@ import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.networkManagement.CloudAPICallback;
 import com.grouplearn.project.cloud.networkManagement.CloudHttpMethod;
+import com.grouplearn.project.cloud.userManagement.changePin.CloudChangePinRequest;
+import com.grouplearn.project.cloud.userManagement.changePin.CloudChangePinResponse;
+import com.grouplearn.project.cloud.userManagement.forgotPasswordRequest.CloudForgotPasswordRequest;
+import com.grouplearn.project.cloud.userManagement.forgotPasswordRequest.CloudForgotPasswordResponse;
 import com.grouplearn.project.cloud.userManagement.signIn.CloudSignInRequest;
 import com.grouplearn.project.cloud.userManagement.signIn.CloudSignInResponse;
 import com.grouplearn.project.cloud.userManagement.signOut.CloudSignOutRequest;
@@ -16,6 +20,9 @@ import com.grouplearn.project.cloud.userManagement.signUp.CloudSignUpRequest;
 import com.grouplearn.project.cloud.userManagement.signUp.CloudSignUpResponse;
 import com.grouplearn.project.cloud.userManagement.status.CloudStatusRequest;
 import com.grouplearn.project.cloud.userManagement.status.CloudStatusResponse;
+import com.grouplearn.project.cloud.userManagement.upload.CloudUploadProfileRequest;
+import com.grouplearn.project.cloud.userManagement.upload.CloudUploadProfileResponse;
+import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Helper;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 
@@ -272,7 +279,13 @@ public class CloudUserManager extends BaseManager implements CloudUserManagerInt
                         }
                         if (dataObject != null) {
                             String userStatus = dataObject.optString("userStatus");
+                            String userDisplayName = dataObject.optString("userDisplayName");
+                            int privacy = dataObject.optInt("privacy");
+
                             ((CloudStatusResponse) response).setStatus(userStatus);
+                            ((CloudStatusResponse) response).setDisplayName(userDisplayName);
+                            ((CloudStatusResponse) response).setPrivacy(privacy);
+
                             if (responseCallback != null) {
                                 responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_DATA_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_DATA_FROM_CLOUD));
                             }
@@ -331,7 +344,12 @@ public class CloudUserManager extends BaseManager implements CloudUserManagerInt
                         }
                         if (dataObject != null) {
                             String userStatus = dataObject.optString("userStatus");
+                            String userDisplayName = dataObject.optString("userDisplayName");
+                            int privacy = dataObject.optInt("privacy");
+
                             ((CloudStatusResponse) response).setStatus(userStatus);
+                            ((CloudStatusResponse) response).setDisplayName(userDisplayName);
+                            ((CloudStatusResponse) response).setPrivacy(privacy);
                             if (responseCallback != null) {
                                 responseCallback.onSuccess(cloudRequest, response);
                             }
@@ -366,10 +384,204 @@ public class CloudUserManager extends BaseManager implements CloudUserManagerInt
         try {
             entity.put("userStatus", cloudRequest.getStatus());
             entity.put("privacy", cloudRequest.getPrivacyValue());
+            entity.put("userDisplayName", cloudRequest.getUserDisplayName());
         } catch (JSONException e) {
             e.printStackTrace();
         }
         httpMethod.setHeaderMap(headerMap);
+        httpMethod.setEntityString(entity.toString());
+        httpMethod.execute();
+    }
+
+    @Override
+    public void forgotPassword(final CloudForgotPasswordRequest cloudRequest, final CloudResponseCallback responseCallback) {
+        if (cloudRequest == null || responseCallback == null)
+            throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
+
+        CloudAPICallback listener = new CloudAPICallback() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                CloudForgotPasswordResponse response = new CloudForgotPasswordResponse();
+                if (jsonObject != null) {
+                    jsonObject = jsonObject.optJSONObject(RESPONSE);
+                    if (jsonObject != null) {
+                        JSONObject statusObject = jsonObject.optJSONObject(STATUS);
+
+                        if (statusObject != null) {
+                            response = (CloudForgotPasswordResponse) getUpdatedResponse(statusObject, response);
+                            if (response.getResponseStatus() == 20001) {
+                                if (responseCallback != null) {
+                                    responseCallback.onSuccess(cloudRequest, response);
+                                }
+                            } else {
+                                if (responseCallback != null) {
+                                    responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                                }
+                            }
+                        } else {
+                            if (responseCallback != null) {
+                                responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                            }
+                        }
+                    } else {
+                        if (responseCallback != null) {
+                            responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                        }
+                    }
+                } else {
+                    if (responseCallback != null) {
+                        responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(CloudError cloudError) {
+
+            }
+        };
+        CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
+        httpMethod.setRequestType(CloudHttpMethod.POST_METHOD);
+        httpMethod.setUrl(baseUrl + "forgot");
+        HashMap<String, String> headerMap = new HashMap<>();
+//        headerMap.put("token", "" + cloudRequest.getToken());
+        JSONObject entity = new JSONObject();
+        try {
+            entity.put("userName", cloudRequest.getUserName());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        httpMethod.setHeaderMap(headerMap);
+        httpMethod.setEntityString(entity.toString());
+        httpMethod.execute();
+    }
+
+    @Override
+    public void changePin(final CloudChangePinRequest cloudRequest, final CloudResponseCallback responseCallback) {
+        if (cloudRequest == null || responseCallback == null)
+            throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
+
+        CloudAPICallback listener = new CloudAPICallback() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                CloudChangePinResponse response = new CloudChangePinResponse();
+                if (jsonObject != null) {
+                    jsonObject = jsonObject.optJSONObject(RESPONSE);
+                    if (jsonObject != null) {
+                        JSONObject statusObject = jsonObject.optJSONObject(STATUS);
+
+                        if (statusObject != null) {
+                            response = (CloudChangePinResponse) getUpdatedResponse(statusObject, response);
+                            if (response.getResponseStatus() == 20001) {
+                                if (responseCallback != null) {
+                                    responseCallback.onSuccess(cloudRequest, response);
+                                }
+                            } else {
+                                if (responseCallback != null) {
+                                    responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                                }
+                            }
+                        } else {
+                            if (responseCallback != null) {
+                                responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                            }
+                        }
+                    } else {
+                        if (responseCallback != null) {
+                            responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                        }
+                    }
+                } else {
+                    if (responseCallback != null) {
+                        responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(CloudError cloudError) {
+
+            }
+        };
+        CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
+        httpMethod.setRequestType(CloudHttpMethod.PUT_METHOD);
+        httpMethod.setUrl(baseUrl + "forgot/1");
+        HashMap<String, String> headerMap = new HashMap<>();
+//        headerMap.put("token", "" + cloudRequest.getToken());
+        JSONObject entity = new JSONObject();
+        try {
+            entity.put("userName", cloudRequest.getUserName());
+            entity.put("requestId", cloudRequest.getOtp());
+            entity.put("password", AppUtility.hashString(cloudRequest.getPassword()));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        httpMethod.setHeaderMap(headerMap);
+        httpMethod.setEntityString(entity.toString());
+        httpMethod.execute();
+    }
+
+    @Override
+    public void uploadImage(final CloudUploadProfileRequest cloudRequest, final CloudResponseCallback responseCallback) {
+        if (cloudRequest == null || responseCallback == null)
+            throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
+        CloudAPICallback listener = new CloudAPICallback() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                CloudUploadProfileResponse response = new CloudUploadProfileResponse();
+                if (jsonObject != null) {
+                    jsonObject = jsonObject.optJSONObject(RESPONSE);
+                    if (jsonObject != null) {
+                        JSONObject statusObject = jsonObject.optJSONObject(STATUS);
+                        if (statusObject != null) {
+                            response = (CloudUploadProfileResponse) getUpdatedResponse(statusObject, response);
+                            response.setIconUrl(statusObject.optString("url"));
+                            if (responseCallback != null) {
+                                responseCallback.onSuccess(cloudRequest, response);
+                            }
+                        } else {
+                            if (responseCallback != null) {
+                                responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                            }
+                        }
+                    } else {
+                        if (responseCallback != null) {
+                            responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                        }
+                    }
+                } else {
+                    if (responseCallback != null) {
+                        responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(CloudError cloudError) {
+                if (responseCallback != null) {
+                    responseCallback.onFailure(cloudRequest, cloudError);
+                }
+            }
+        };
+        CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
+        httpMethod.setRequestType(CloudHttpMethod.POST_METHOD);
+        httpMethod.setUrl(baseUrl + "profile-upload");
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("token", cloudRequest.getToken());
+
+        httpMethod.setHeaderMap(hashMap);
+
+        JSONObject entity = new JSONObject();
+        try {
+//            entity.put("groupId", cloudRequest.getGroupId());
+            entity.put("image", cloudRequest.getImageBase64());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         httpMethod.setEntityString(entity.toString());
         httpMethod.execute();
     }

@@ -9,8 +9,8 @@ import android.net.Uri;
 import com.grouplearn.project.app.databaseManagament.DatabaseHandler;
 import com.grouplearn.project.app.databaseManagament.tables.TableGroups;
 import com.grouplearn.project.app.databaseManagament.tables.TableSubscribedGroups;
-import com.grouplearn.project.models.GLGroup;
-import com.grouplearn.project.models.GLMessage;
+import com.grouplearn.project.bean.GLGroup;
+import com.grouplearn.project.bean.GLMessage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +55,7 @@ public class GroupDbHelper extends DataBaseHelper {
         return groupModels;
     }
 
-    public GLGroup getGroupInfo(String groupUniqueId) {
+    public GLGroup getGroupInfo(long groupUniqueId) {
         Cursor cursor = dbHandler.getSubscribedGroupInfo(groupUniqueId);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -67,7 +67,7 @@ public class GroupDbHelper extends DataBaseHelper {
     private GLGroup makeGroupModelFromCursor(Cursor cursor) {
         String groupName = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.GROUP_NAME));
         String groupIconId = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.GROUP_ICON_ID));
-        String groupUniqueId = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.GROUP_ID));
+        long groupUniqueId = cursor.getLong(cursor.getColumnIndex(TableSubscribedGroups.GROUP_ID));
         String groupCreatedTime = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.CREATED_TIME));
         String groupUpdatedTime = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.UPDATED_TIME));
         String groupDescription = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.UPDATED_TIME));
@@ -81,8 +81,8 @@ public class GroupDbHelper extends DataBaseHelper {
         model.setGroupUpdatedTime(groupUpdatedTime);
 
         ChatDbHelper chatDbHelper = new ChatDbHelper(mContext);
-        long numberOfNewMessage = chatDbHelper.getNumberOfNewMessage(Long.parseLong(groupUniqueId));
-        GLMessage lastMessage = chatDbHelper.getLastMessages(Long.parseLong(groupUniqueId));
+        long numberOfNewMessage = chatDbHelper.getNumberOfNewMessage(groupUniqueId);
+        GLMessage lastMessage = chatDbHelper.getLastMessages(groupUniqueId);
         model.setMessageModel(lastMessage);
         if (lastMessage != null) {
             String message = lastMessage.getSenderName() + " : " + lastMessage.getMessageBody();
@@ -170,8 +170,8 @@ public class GroupDbHelper extends DataBaseHelper {
         return getGodwinBot();
     }
 
-    public int deleteSubscribedGroup(String model) {
-        String where = TableSubscribedGroups.GROUP_ID + "='" + model + "'";
+    public int deleteSubscribedGroup(long groupId) {
+        String where = TableSubscribedGroups.GROUP_ID + "='" + groupId + "'";
         return mContentResolver.delete(TableSubscribedGroups.CONTENT_URI, where, null);
     }
 }

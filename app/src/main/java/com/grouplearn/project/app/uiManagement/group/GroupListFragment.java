@@ -38,11 +38,10 @@ import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
 import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.GroupViewInterface;
-import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
 import com.grouplearn.project.app.uiManagement.search.SearchGroupsActivity;
 import com.grouplearn.project.app.uiManagement.search.SearchUserActivity;
-import com.grouplearn.project.models.GLGroup;
+import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
@@ -83,6 +82,12 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
         super.onViewCreated(view, savedInstanceState);
         initializeWidgets(view);
         registerListeners();
+        registerForContextMenu(lvGroupListView);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 
     @Override
@@ -108,24 +113,19 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
     @Override
     protected void registerListeners() {
         mFab.setOnClickListener(this);
-        mGroupListAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
+
+        lvGroupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model, View v) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Intent chatIntent = new Intent(getActivity(), GroupChatActivity.class);
-                String groupUniqueId = ((GLGroup) mGroupListAdapter.getItem(position)).getGroupUniqueId();
+                long groupUniqueId = ((GLGroup) mGroupListAdapter.getItem(position)).getGroupUniqueId();
 
                 chatIntent.putExtra("groupCloudId", groupUniqueId);
 
-                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), v, "transition_group_icon");
-                startActivity(chatIntent, options.toBundle());
-            }
-
-            @Override
-            public void onItemLongClicked(int position, Object model, View v) {
-
+                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), view, "transition_group_icon");
+                startActivity(chatIntent/*, options.toBundle()*/);
             }
         });
-
         lvGroupListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -156,7 +156,6 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
 
         getGroupData();
         getMessages();
-
     }
 
     @Override
@@ -168,7 +167,6 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
                 revealHide(0);
             }
         }
-
     }
 
     @Override
@@ -329,7 +327,7 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         int position = info.position;
         GLGroup model = mGroupListAdapter.getGroupListData().get(position);
-        if (!model.getGroupUniqueId().equals("-11223344")) {
+        if (model.getGroupUniqueId()!=-11223344) {
             menu.add(1, 1, 1, "Mark as read");
             menu.add(1, 2, 1, "Group info");
             menu.add(1, 3, 1, "Exit group");
@@ -345,7 +343,7 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
         final GroupListInteractor interactor = GroupListInteractor.getInstance(getActivity());
         switch (item.getItemId()) {
             case 1:
-                new ChatDbHelper(getActivity()).updateAllRead(Long.parseLong(mGroupListAdapter.getGroupListData().get(position).getGroupUniqueId()));
+                new ChatDbHelper(getActivity()).updateAllRead(mGroupListAdapter.getGroupListData().get(position).getGroupUniqueId());
                 getGroupData();
                 break;
             case 2:

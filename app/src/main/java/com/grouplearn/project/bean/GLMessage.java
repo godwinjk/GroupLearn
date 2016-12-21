@@ -1,4 +1,4 @@
-package com.grouplearn.project.models;
+package com.grouplearn.project.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
+import com.grouplearn.project.app.uiManagement.databaseHelper.CourseDbHelper;
 import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.CourseViewInterface;
 import com.grouplearn.project.cloud.CloudConnectManager;
@@ -15,7 +16,7 @@ import com.grouplearn.project.cloud.courseManagement.add.CloudAddCourseRequest;
 import com.grouplearn.project.cloud.courseManagement.add.CloudAddCourseResponse;
 import com.grouplearn.project.cloud.courseManagement.get.CloudGetCourseRequest;
 import com.grouplearn.project.cloud.courseManagement.get.CloudGetCourseResponse;
-import com.grouplearn.project.models.GLCourse;
+import com.grouplearn.project.bean.GLCourse;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 
 /**
@@ -34,8 +35,14 @@ public class CloudCourseManager {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 CloudAddCourseResponse response = (CloudAddCourseResponse) cloudResponse;
-                if (callback != null) {
-                    callback.onCloudOperationSuccess();
+                if (response.getGlCourses().get(0).getStatus() == 1) {
+                    if (callback != null) {
+                        callback.onCloudOperationSuccess();
+                    }
+                } else {
+                    if (callback != null) {
+                        callback.onCloudOperationFailed(new AppError(000, "Course name exist"));
+                    }
                 }
             }
 
@@ -72,6 +79,7 @@ public class CloudCourseManager {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 CloudGetCourseResponse response = (CloudGetCourseResponse) cloudResponse;
+
                 if (courseViewInterface != null) {
                     courseViewInterface.onCourseGetSucces(response.getGlCourses());
                 }
@@ -88,6 +96,34 @@ public class CloudCourseManager {
         String token = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN);
         request.setToken(token);
         request.setKey(key);
+        CloudConnectManager.getInstance(mContext).getCloudCourseManager(mContext).getCourses(request, cloudResponseCallback);
+    }
+
+    public void getCourse(final CourseViewInterface courseViewInterface) {
+        CloudResponseCallback cloudResponseCallback = new CloudResponseCallback() {
+            @Override
+            public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
+                CloudGetCourseResponse response = (CloudGetCourseResponse) cloudResponse;
+                CourseDbHelper helper = new CourseDbHelper(mContext);
+                for (GLCourse course : response.getGlCourses()) {
+                    helper.updateCourse(course);
+                }
+                if (courseViewInterface != null) {
+                    courseViewInterface.onCourseGetSucces(response.getGlCourses());
+                }
+            }
+
+            @Override
+            public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
+                if (courseViewInterface != null) {
+                    courseViewInterface.onCourseGetFailed(new AppError(cloudError));
+                }
+            }
+        };
+        CloudGetCourseRequest request = new CloudGetCourseRequest();
+        String token = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN);
+        request.setToken(token);
+        request.setUserId(new AppSharedPreference(mContext).getLongPrefValue(PreferenceConstants.USER_ID));
         CloudConnectManager.getInstance(mContext).getCloudCourseManager(mContext).getCourses(request, cloudResponseCallback);
     }
 }
