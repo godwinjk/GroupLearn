@@ -20,8 +20,6 @@ import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 
-import java.io.File;
-
 /**
  * Created by Godwin Joseph on 01-06-2016 11:08 for Group Learn application.
  */
@@ -64,12 +62,9 @@ public class NavigationMenuController {
         mDisplayName.setText(mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME));
         mUserName.setText(mPref.getStringPrefValue(PreferenceConstants.USER_NAME));
 
-//        mNavigationView.addHeaderView(headerView);
-
         String imagePath = mPref.getStringPrefValue(PreferenceConstants.DP_PATH);
-//        ivProfile.setImageURI(Uri.parse(imagePath));
         if (imagePath != null) {
-            Glide.with(mContext).load(new File(imagePath)).asBitmap().centerCrop().into(new BitmapImageViewTarget(ivProfile) {
+            Glide.with(mContext).load(imagePath).asBitmap().centerCrop().into(new BitmapImageViewTarget(ivProfile) {
                 @Override
                 protected void setResource(Bitmap resource) {
                     RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);

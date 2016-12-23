@@ -2,12 +2,12 @@ package com.grouplearn.project.utilities;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.webkit.URLUtil;
 import android.widget.EditText;
 
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,6 +38,8 @@ public class InputValidator {
     }
 
     public static boolean isURI(String str) {
+        return URLUtil.isValidUrl(str);
+        /*
         int colon = str.indexOf(':');
         if (colon < 3) return false;
         String proto = str.substring(0, colon).toLowerCase();
@@ -65,7 +67,7 @@ public class InputValidator {
         } catch (Exception ex) {
         }
 
-        return false;
+        return false;*/
     }
 
     public int validateUserName(EditText et_userName) {

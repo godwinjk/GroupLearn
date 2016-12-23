@@ -12,7 +12,6 @@ import android.provider.MediaStore;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ContactDbHelper;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.bean.GLContact;
-import com.grouplearn.project.utilities.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,13 +56,13 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
                 if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
                     GLContact contactModel = new GLContact();
                     contactModel.setContactName(name);
-                    System.out.println(count + "\t\t    name : " + name + ", ID : " + id);
+//                    System.out.println(count + "\t\t    name : " + name + ", ID : " + id);
 
                     Cursor pCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
                     while (pCur.moveToNext()) {
                         phone = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                         contactModel.setContactNumber(formatPhoneNumber(phone));
-                        System.out.println("phone" + phone);
+//                        System.out.println("phone" + phone);
                         contactModel.setContactId(id);
                         contactModel.setContactImage(getContactImage(imageUri));
                     }
@@ -91,13 +90,12 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
     private Bitmap getContactImage(String imageUri) {
         Bitmap bitmap = null;
         if (imageUri != null) {
-            System.out.println(Uri.parse(imageUri));
+//            System.out.println(Uri.parse(imageUri));
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), Uri.parse(imageUri));
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
         return bitmap;
     }
@@ -112,7 +110,7 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
                 phoneNumber = phoneNumber.substring(phoneNumber.length() - 10);
             }
         }
-        Log.d(TAG, phoneNumber);
+//        Log.d(TAG, phoneNumber);
         return phoneNumber;
     }
 

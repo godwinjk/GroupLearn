@@ -2,6 +2,7 @@ package com.grouplearn.project.app.uiManagement.course;
 
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -22,6 +23,7 @@ import com.grouplearn.project.app.uiManagement.databaseHelper.CourseDbHelper;
 import com.grouplearn.project.app.uiManagement.group.GroupListNewActivity;
 import com.grouplearn.project.app.uiManagement.interfaces.CourseViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
+import com.grouplearn.project.app.uiManagement.settings.BrowserActivity;
 import com.grouplearn.project.bean.GLCourse;
 import com.grouplearn.project.cloud.CloudConnectManager;
 import com.grouplearn.project.cloud.CloudConnectRequest;
@@ -110,8 +112,15 @@ public class MyCourseFragment extends BaseFragment {
             @Override
             public void onItemClicked(int position, Object model, View v) {
                 course = (GLCourse) model;
-                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                setup(course);
+                if (v instanceof TextView) {
+                    String uri = course.getUrl();
+                    Intent i = new Intent(mContext, BrowserActivity.class);
+                    i.putExtra("uri", uri);
+                    startActivity(i);
+                } else {
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    setup(course);
+                }
             }
 
             @Override
@@ -175,7 +184,6 @@ public class MyCourseFragment extends BaseFragment {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
             if (mContext != null) {
-                getCourses();
                 DisplayInfo.dismissLoader(mContext);
             }
         } else {

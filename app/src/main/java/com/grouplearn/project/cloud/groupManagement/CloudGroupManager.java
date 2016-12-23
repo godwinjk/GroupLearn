@@ -1,6 +1,7 @@
 package com.grouplearn.project.cloud.groupManagement;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.bean.GLRequest;
@@ -44,6 +45,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -368,7 +371,17 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                 groupModel.setGroupName(modelObject.optString("subscribedGroupName"));
                                 groupModel.setGroupIconId(modelObject.optString("subscribedGroupIconId"));
                                 groupModel.setGroupAdminId(modelObject.optString("subscribedGroupUserId"));
-
+//                                groupModel.setIconUrl(modelObject.optString("subscribedGroupIconUrl"));
+                                String url = modelObject.optString("subscribedGroupIconUrl");
+                                if (!TextUtils.isEmpty(url)) {
+                                    try {
+                                        url = URLDecoder.decode(url, "UTF-8");
+                                        url = CloudConstants.getProfileBaseUrl() + url;
+                                        groupModel.setIconUrl(url);
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 groupModelArrayList.add(groupModel);
                             }
                             ((CloudGetSubscribedGroupsResponse) response).setGroupModelArrayList(groupModelArrayList);
@@ -385,9 +398,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                             responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
                         }
                     }
-                } else
-
-                {
+                } else {
                     if (responseCallback != null) {
                         responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
                     }
@@ -415,7 +426,8 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
     }
 
     @Override
-    public void getAllSubscribeGroupRequest(final CloudGetSubscribeRequest cloudRequest, final CloudResponseCallback responseCallback) {
+    public void getAllSubscribeGroupRequest(final CloudGetSubscribeRequest cloudRequest,
+                                            final CloudResponseCallback responseCallback) {
         if (cloudRequest == null || responseCallback == null)
             throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
         CloudAPICallback listener = new CloudAPICallback() {
@@ -452,6 +464,16 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                 groupModel.setUserName(modelObject.optString("requestedUserName"));
                                 groupModel.setIconUrl(modelObject.optString("requestedGroupIconUrl"));
 
+                                String url = modelObject.optString("requestedGroupIconUrl");
+                                if (!TextUtils.isEmpty(url)) {
+                                    try {
+                                        url = URLDecoder.decode(url, "UTF-8");
+                                        url = CloudConstants.getProfileBaseUrl() + url;
+                                        groupModel.setIconUrl(url);
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 groupModelArrayList.add(groupModel);
                             }
                             response.setRequestModels(groupModelArrayList);
@@ -498,7 +520,8 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
     }
 
     @Override
-    public void exitFromGroup(final CloudExitGroupRequest cloudRequest, final CloudResponseCallback responseCallback) {
+    public void exitFromGroup(final CloudExitGroupRequest cloudRequest,
+                              final CloudResponseCallback responseCallback) {
         if (cloudRequest == null || responseCallback == null)
             throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
         CloudAPICallback listener = new CloudAPICallback() {
@@ -578,7 +601,8 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
     }
 
     @Override
-    public void getAllGroups(final CloudGetGroupsRequest cloudRequest, final CloudResponseCallback responseCallback) {
+    public void getAllGroups(final CloudGetGroupsRequest cloudRequest,
+                             final CloudResponseCallback responseCallback) {
         if (cloudRequest == null || responseCallback == null)
             throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
         CloudAPICallback listener = new CloudAPICallback() {
@@ -648,7 +672,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
         };
         CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
         httpMethod.setRequestType(CloudHttpMethod.GET_METHOD);
-        httpMethod.setUrl(mBaseurl + "group/1");
+        httpMethod.setUrl(mBaseurl + "group/1?start=" + cloudRequest.getStartTime() + "&limit=" + cloudRequest.getLimit());
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("token", cloudRequest.getToken());
@@ -662,7 +686,8 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
     }
 
     @Override
-    public void getAllSubscribers(final GetGroupSubscribersRequest cloudRequest, final CloudResponseCallback responseCallback) {
+    public void getAllSubscribers(final GetGroupSubscribersRequest cloudRequest,
+                                  final CloudResponseCallback responseCallback) {
         if (cloudRequest == null || responseCallback == null)
             throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
         CloudAPICallback listener = new CloudAPICallback() {
@@ -690,7 +715,17 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                     userModel.setUserStatus(modelObject.optString("userStatus"));
                                     userModel.setUserEmail(modelObject.optString("userEmail"));
                                     userModel.setUserDisplayName(modelObject.optString("userDisplayName"));
-                                    userModel.setIconUrl(modelObject.optString("userIconUrl"));
+
+                                    String url = modelObject.optString("userIconUrl");
+                                    if (!TextUtils.isEmpty(url)) {
+                                        try {
+                                            url = URLDecoder.decode(url, "UTF-8");
+                                            url = CloudConstants.getProfileBaseUrl() + url;
+                                            userModel.setIconUrl(url);
+                                        } catch (UnsupportedEncodingException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
 
                                     userModels.add(userModel);
                                 }
@@ -742,7 +777,8 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
     }
 
     @Override
-    public void getAllInvitations(final CloudGetGroupInvitationRequest cloudRequest, final CloudResponseCallback responseCallback) {
+    public void getAllInvitations(final CloudGetGroupInvitationRequest cloudRequest,
+                                  final CloudResponseCallback responseCallback) {
         if (cloudRequest == null || responseCallback == null)
             throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
         CloudAPICallback listener = new CloudAPICallback() {
@@ -773,6 +809,17 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                     groupModel.setUserId(modelObject.optLong("invitedUserId"));
                                     groupModel.setUserName(modelObject.optString("invitedGroupUserName"));
                                     groupModel.setDefinition(modelObject.optString("definition"));
+
+                                    String url = modelObject.optString("invitedGroupIconUrl");
+                                    if (!TextUtils.isEmpty(url)) {
+                                        try {
+                                            url = URLDecoder.decode(url, "UTF-8");
+                                            url = CloudConstants.getProfileBaseUrl() + url;
+                                            groupModel.setIconUrl(url);
+                                        } catch (UnsupportedEncodingException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
 
                                     groupModelArrayList.add(groupModel);
                                 }
@@ -824,7 +871,8 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
     }
 
     @Override
-    public void inviteToGroup(final CloudGroupInvitationRequest cloudRequest, final CloudResponseCallback responseCallback) {
+    public void inviteToGroup(final CloudGroupInvitationRequest cloudRequest,
+                              final CloudResponseCallback responseCallback) {
         if (cloudRequest == null || responseCallback == null)
             throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
         CloudAPICallback listener = new CloudAPICallback() {
@@ -915,7 +963,8 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
     }
 
     @Override
-    public void updateInvitation(final CloudUpdateGroupInvitationRequest cloudRequest, final CloudResponseCallback responseCallback) {
+    public void updateInvitation(final CloudUpdateGroupInvitationRequest cloudRequest,
+                                 final CloudResponseCallback responseCallback) {
         if (cloudRequest == null || responseCallback == null)
             throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
         CloudAPICallback listener = new CloudAPICallback() {
@@ -1004,7 +1053,8 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
     }
 
     @Override
-    public void deleteGroup(final CloudContactDeleteRequest cloudRequest, final CloudResponseCallback responseCallback) {
+    public void deleteGroup(final CloudContactDeleteRequest cloudRequest,
+                            final CloudResponseCallback responseCallback) {
         if (cloudRequest == null || responseCallback == null)
             throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
         CloudAPICallback listener = new CloudAPICallback() {
@@ -1086,22 +1136,39 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
     }
 
     @Override
-    public void uploadImage(final CloudUploadGroupImageRequest cloudRequest, final CloudResponseCallback responseCallback) {
+    public void uploadImage(final CloudUploadGroupImageRequest cloudRequest,
+                            final CloudResponseCallback responseCallback) {
         if (cloudRequest == null || responseCallback == null)
             throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
         CloudAPICallback listener = new CloudAPICallback() {
             @Override
             public void onSuccess(JSONObject jsonObject) {
-                CloudUploadGroupImageResponse response =new CloudUploadGroupImageResponse();
+                CloudUploadGroupImageResponse response = new CloudUploadGroupImageResponse();
                 if (jsonObject != null) {
                     jsonObject = jsonObject.optJSONObject(RESPONSE);
                     if (jsonObject != null) {
                         JSONObject statusObject = jsonObject.optJSONObject(STATUS);
                         if (statusObject != null) {
                             response = (CloudUploadGroupImageResponse) getUpdatedResponse(statusObject, response);
-                            response.setIconUrl(statusObject.optString("url"));
-                            if (responseCallback != null) {
-                                responseCallback.onSuccess(cloudRequest, response);
+                            String url = statusObject.optString("url");
+                            if (!TextUtils.isEmpty(url)) {
+                                try {
+                                    url = URLDecoder.decode(url, "UTF-8");
+                                    url = CloudConstants.getProfileBaseUrl() + url;
+                                    response.setIconUrl(url);
+                                    if (responseCallback != null) {
+                                        responseCallback.onSuccess(cloudRequest, response);
+                                    }
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                    if (responseCallback != null) {
+                                        responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                                    }
+                                }
+                            } else {
+                                if (responseCallback != null) {
+                                    responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                                }
                             }
                         } else {
                             if (responseCallback != null) {
@@ -1129,7 +1196,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
         };
         CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
         httpMethod.setRequestType(CloudHttpMethod.POST_METHOD);
-        httpMethod.setUrl(mBaseurl+"group-icon");
+        httpMethod.setUrl(mBaseurl + "group-icon");
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("token", cloudRequest.getToken());

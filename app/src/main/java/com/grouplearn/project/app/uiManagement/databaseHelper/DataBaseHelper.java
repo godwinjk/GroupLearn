@@ -9,6 +9,7 @@ import com.grouplearn.project.app.MyApplication;
 import com.grouplearn.project.app.databaseManagament.DatabaseProvider;
 import com.grouplearn.project.app.databaseManagament.tables.TableChat;
 import com.grouplearn.project.app.databaseManagament.tables.TableContacts;
+import com.grouplearn.project.app.databaseManagament.tables.TableCourse;
 import com.grouplearn.project.app.databaseManagament.tables.TableGroups;
 import com.grouplearn.project.app.databaseManagament.tables.TableServerSyncDetails;
 import com.grouplearn.project.app.databaseManagament.tables.TableSubscribedGroups;
@@ -30,6 +31,7 @@ public class DataBaseHelper {
         mResolver.delete(TableContacts.CONTENT_URI, null, null);
         mResolver.delete(TableGroups.CONTENT_URI, null, null);
         mResolver.delete(TableServerSyncDetails.CONTENT_URI, null, null);
+        mResolver.delete(TableCourse.CONTENT_URI, null, null);
 
     }
 

@@ -43,7 +43,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     EditText etPassword;
     Button btnSignIn, btnSignUp;
     AppSharedPreference mPref;
-    TextView tvTitle,btnForgotPassword;
+    TextView tvTitle, btnForgotPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,6 +171,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 String userName = response.getUserName();
                 String userDisplayName = response.getUserDisplayName();
                 String userEmail = response.getUserEmail();
+                String url = response.getIconUrl();
                 long userId = response.getUserId();
                 boolean userPrivacy = (response.getUserPrivacy() == 0) ? false : true;
                 String userStatus = response.getUserStatus();
@@ -192,6 +193,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
                     mPref.setBooleanPrefValue(PreferenceConstants.IS_ENTER_KEY_SEND_MESSAGE, true);
                     mPref.setBooleanPrefValue(PreferenceConstants.IS_SPEAK_ENABLED, false);
+                    mPref.setStringPrefValue(PreferenceConstants.DP_PATH, url);
 
                     Intent intent = new Intent(mContext, GroupListNewActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

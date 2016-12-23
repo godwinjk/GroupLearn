@@ -71,10 +71,8 @@
                     android:clickable="true"
                     android:drawableLeft="@drawable/ic_menu_about"
                     android:drawablePadding="10dp"
-                    android:drawableTint="@color/colorPrimaryTextDark"
                     android:padding="20dp"
                     android:text="About"
-                    android:textColor="@color/colorPrimaryTextDark"
                     android:textSize="16dp" />
             </LinearLayout>
         </android.support.v7.widget.CardView>

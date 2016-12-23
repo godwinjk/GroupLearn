@@ -2,11 +2,16 @@ package com.grouplearn.project.app.uiManagement.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.CourseSearchViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
@@ -50,12 +55,32 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
                 Context mContext = holder.itemView.getContext();
                 if (mContext != null) {
                     Intent i = new Intent(mContext, BrowserActivity.class);
-                    i.putExtra("url", course.getUrl());
+                    i.putExtra("uri", course.getUrl());
                     mContext.startActivity(i);
                 }
-
             }
         });
+
+        final Context mContext = holder.itemView.getContext();
+
+        String imageUri = course.getIconUrl();
+        if (imageUri != null) {
+            Glide.with(mContext)
+                    .load(imageUri)
+                    .asBitmap()
+                    .centerCrop()
+//                    .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+                    .into(new BitmapImageViewTarget(holder.ivCourseIcon) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            holder.ivCourseIcon.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+        } else {
+            holder.ivCourseIcon.setImageResource(R.drawable.course_128);
+        }
     }
 
     @Override

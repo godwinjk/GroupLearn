@@ -147,10 +147,10 @@
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
+            android:id="@+id/cv_user_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardUseCompatPadding="true"
-            android:id="@+id/cv_user_details"
             app:contentPadding="10dp">
 
             <LinearLayout
@@ -162,15 +162,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="My groups"
-                    android:textColor="@color/colorPrimaryTextDark" />
+                    android:textColor="@color/colorPrimaryTextDark"
+                    android:visibility="gone" />
 
                 <TextView
-                    android:padding="10dp"
                     android:id="@+id/tv_subscribed_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Your subscribed groups"/>
-
+                    android:padding="10dp"
+                    android:text="Your subscribed groups"
+                    android:visibility="gone" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -179,14 +180,15 @@
                     android:textColor="@color/colorPrimaryTextDark" />
 
                 <TextView
-                    android:padding="10dp"
                     android:id="@+id/tv_contacts"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Your contacts"/>
+                    android:padding="10dp"
+                    android:text="Your contacts" />
             </LinearLayout>
 
         </android.support.v7.widget.CardView>
+
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

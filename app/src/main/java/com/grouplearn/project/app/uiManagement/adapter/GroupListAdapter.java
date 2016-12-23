@@ -1,12 +1,17 @@
 package com.grouplearn.project.app.uiManagement.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.GroupViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
@@ -72,6 +77,26 @@ public class GroupListAdapter extends BaseAdapter {
         }
         holder.tvMessageCount.setText("" + messageCount);
         String lastMesage = mGroupModel.getLastMessage();
+
+        String imageUri = mGroupModel.getIconUrl();
+        if (imageUri != null) {
+            Glide.with(mContext)
+                    .load(imageUri)
+                    .asBitmap()
+                    .centerCrop()
+//                    .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+                    .into(new BitmapImageViewTarget(holder.ivGroupIcon) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            holder.ivGroupIcon.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+        } else {
+            holder.ivGroupIcon.setImageResource(R.drawable.group_person);
+        }
+
         if (TextUtils.isEmpty(lastMesage)) {
             holder.tvLastMessage.setVisibility(View.GONE);
         } else {

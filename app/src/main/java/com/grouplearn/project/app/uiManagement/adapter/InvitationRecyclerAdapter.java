@@ -1,11 +1,16 @@
 package com.grouplearn.project.app.uiManagement.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.InvitationViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
@@ -33,7 +38,7 @@ public class InvitationRecyclerAdapter extends RecyclerView.Adapter<InvitationVi
     }
 
     @Override
-    public void onBindViewHolder(InvitationViewHolder holder, final int position) {
+    public void onBindViewHolder(final InvitationViewHolder holder, final int position) {
         final GLRequest model = invitationList.get(position);
         holder.tvName.setText(model.getGroupName());
         holder.tvMessage.setText(model.getDefinition());
@@ -54,6 +59,24 @@ public class InvitationRecyclerAdapter extends RecyclerView.Adapter<InvitationVi
                 }
             }
         });
+        String imageUri = model.getIconUrl();
+        if (imageUri != null) {
+            final Context mContext = holder.itemView.getContext();
+            Glide.with(mContext)
+                    .load(imageUri)
+                    .asBitmap()
+                    .centerCrop()
+                    .into(new BitmapImageViewTarget(holder.ivGroupIcon) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            holder.ivGroupIcon.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+        } else {
+            holder.ivGroupIcon.setImageResource(R.drawable.man_prof_128);
+        }
     }
 
     @Override

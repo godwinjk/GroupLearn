@@ -78,7 +78,7 @@ public class CourseAddingActivity extends BaseActivity implements View.OnClickLi
         } else if (TextUtils.isEmpty(etContactDetails.getEditText().getText().toString())) {
             etContactDetails.setError("Contact is mandatory");
             return false;
-        } else if (etContactDetails.getEditText().getText().toString().length() > 10) {
+        } else if (etContactDetails.getEditText().getText().toString().length() < 10) {
             etContactDetails.setError("Contact should be atleast 10 character long");
             return false;
         } else if (TextUtils.isEmpty(etSiteUrl.getEditText().getText().toString())) {
@@ -89,6 +89,7 @@ public class CourseAddingActivity extends BaseActivity implements View.OnClickLi
                 return false;
             }
         }
+
         return true;
     }
 

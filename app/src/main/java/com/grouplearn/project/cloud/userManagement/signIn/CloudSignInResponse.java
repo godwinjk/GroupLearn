@@ -13,6 +13,7 @@ public class CloudSignInResponse extends CloudConnectResponse {
     private long userId;
     private int userPrivacy;
     private String userStatus;
+    private String iconUrl;
 
     public String getUserToken() {
         return userToken;
@@ -68,5 +69,13 @@ public class CloudSignInResponse extends CloudConnectResponse {
 
     public void setUserStatus(String userStatus) {
         this.userStatus = userStatus;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
+
+    public String getIconUrl() {
+        return iconUrl;
     }
 }

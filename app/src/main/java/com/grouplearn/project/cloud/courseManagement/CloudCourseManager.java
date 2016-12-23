@@ -1,6 +1,7 @@
 package com.grouplearn.project.cloud.courseManagement;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.grouplearn.project.cloud.BaseManager;
 import com.grouplearn.project.cloud.CloudConstants;
@@ -20,6 +21,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -343,11 +346,20 @@ public class CloudCourseManager extends BaseManager implements CloudCourseManage
                                     glCourse.setCourseIconId(modelObject.optString("courseIconId"));
                                     glCourse.setContactDetails(modelObject.optString("contact"));
                                     glCourse.setUrl(modelObject.optString("url"));
-                                    glCourse.setIconUrl(modelObject.optString("groupIconUrl"));
+//                                    glCourse.setIconUrl(modelObject.optString("groupIconUrl"));
                                     glCourse.setGroupIconId(modelObject.optString("groupIconId"));
 
+                                    String url = modelObject.optString("groupIconUrl");
+                                    if (!TextUtils.isEmpty(url)) {
+                                        try {
+                                            url = URLDecoder.decode(url, "UTF-8");
+                                            url = CloudConstants.getProfileBaseUrl() + url;
+                                            glCourse.setIconUrl(url);
+                                        } catch (UnsupportedEncodingException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
                                     glCourse.setTimeStamp(modelObject.optString("timestamp"));
-
                                     glCourses.add(glCourse);
                                 }
                                 response.setGlCourses(glCourses);

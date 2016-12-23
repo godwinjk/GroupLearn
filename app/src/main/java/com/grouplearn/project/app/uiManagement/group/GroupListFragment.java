@@ -1,6 +1,5 @@
 package com.grouplearn.project.app.uiManagement.group;
 
-
 import android.animation.Animator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -327,7 +326,7 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         int position = info.position;
         GLGroup model = mGroupListAdapter.getGroupListData().get(position);
-        if (model.getGroupUniqueId()!=-11223344) {
+        if (model.getGroupUniqueId() != -11223344) {
             menu.add(1, 1, 1, "Mark as read");
             menu.add(1, 2, 1, "Group info");
             menu.add(1, 3, 1, "Exit group");
@@ -340,7 +339,6 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int position = info.position;
         final GLGroup model = (GLGroup) mGroupListAdapter.getItem(position);
-        final GroupListInteractor interactor = GroupListInteractor.getInstance(getActivity());
         switch (item.getItemId()) {
             case 1:
                 new ChatDbHelper(getActivity()).updateAllRead(mGroupListAdapter.getGroupListData().get(position).getGroupUniqueId());

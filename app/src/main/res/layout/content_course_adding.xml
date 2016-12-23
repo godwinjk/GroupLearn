@@ -61,7 +61,6 @@
                 android:inputType="textCapSentences"
                 android:maxLength="500"
                 android:maxLines="5"
-                android:scrollHorizontally="true"
                 android:text="" />
         </android.support.design.widget.TextInputLayout>
 

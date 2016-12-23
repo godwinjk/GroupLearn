@@ -1,6 +1,7 @@
 package com.grouplearn.project.app.uiManagement.course;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.widget.CardView;
@@ -20,6 +21,7 @@ import com.grouplearn.project.app.uiManagement.cloudHelper.CloudGroupManagement;
 import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.CourseViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
+import com.grouplearn.project.app.uiManagement.settings.BrowserActivity;
 import com.grouplearn.project.bean.GLCourse;
 import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.utilities.AppUtility;
@@ -37,7 +39,7 @@ public class CourseSearchActivity extends BaseActivity {
     CourseSearchRecyclerAdapter mRecyclerAdapter;
     private BottomSheetBehavior mBottomSheetBehavior;
     View bottomSheet;
-    TextView tvContactDetails, tvDescription, tvRequest, tvCourseName;
+    TextView tvContactDetails, tvDescription, tvRequest, tvCourseName, tvLearn;
     GLCourse course;
 
     @Override
@@ -67,6 +69,7 @@ public class CourseSearchActivity extends BaseActivity {
         tvDescription = (TextView) findViewById(R.id.tv_description);
         tvRequest = (TextView) findViewById(R.id.tv_request);
         tvCourseName = (TextView) findViewById(R.id.tv_course_name);
+        tvLearn = (TextView) findViewById(R.id.tv_learn);
 
         rvSearchList = (RecyclerView) findViewById(R.id.rv_search_list);
         rvSearchList.setLayoutManager(new StaggeredGridLayoutManager(1, 1));
@@ -87,6 +90,14 @@ public class CourseSearchActivity extends BaseActivity {
 
     @Override
     public void registerListeners() {
+        tvLearn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(mContext, BrowserActivity.class);
+                i.putExtra("uri", course.getUrl());
+                startActivity(i);
+            }
+        });
         tvRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -136,6 +147,7 @@ public class CourseSearchActivity extends BaseActivity {
         tvContactDetails.setText(course.getContactDetails());
         tvDescription.setText(course.getDefinition());
         tvCourseName.setText(course.getCourseName());
+//        tvLearn.setText(course.getUrl());
     }
 
     private void searchCourse(String courseName) {
@@ -174,7 +186,7 @@ public class CourseSearchActivity extends BaseActivity {
 
     private void requestToAdd(GLCourse course) {
         GLGroup group = new GLGroup();
-        group.setGroupUniqueId( course.getGroupId());
+        group.setGroupUniqueId(course.getGroupId());
         group.setGroupName("" + course.getGroupName());
         group.setGroupIconId("" + course.getGroupIconId());
         group.setGroupDescription("" + course.getDefinition());

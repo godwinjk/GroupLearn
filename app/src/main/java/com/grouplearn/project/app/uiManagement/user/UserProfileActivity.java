@@ -66,6 +66,7 @@ import com.grouplearn.project.cloud.interest.get.CloudGetInterestRequest;
 import com.grouplearn.project.cloud.interest.get.CloudGetInterestResponse;
 import com.grouplearn.project.cloud.userManagement.status.CloudStatusRequest;
 import com.grouplearn.project.cloud.userManagement.upload.CloudUploadProfileRequest;
+import com.grouplearn.project.cloud.userManagement.upload.CloudUploadProfileResponse;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.views.AppAlertDialog;
@@ -129,22 +130,22 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         String appUserName = mPref.getStringPrefValue(PreferenceConstants.USER_NAME);
         initializeWidgets();
         registerListeners();
+        String imagePath = null;
         if (appUserName.equals(userName)) {
             isOtherUser = false;
             ivAddInterest.setVisibility(View.VISIBLE);
             cvUserSpecificDetails.setVisibility(View.VISIBLE);
-
+            imagePath = mPref.getStringPrefValue(PreferenceConstants.DP_PATH);
         } else {
             isOtherUser = true;
             ivAddInterest.setVisibility(View.GONE);
             cvUserSpecificDetails.setVisibility(View.GONE);
+            imagePath = userModel.getIconUrl();
         }
-
-        String imagePath = mPref.getStringPrefValue(PreferenceConstants.DP_PATH);
-
-        if (!isOtherUser && imagePath != null) {
+        if (imagePath != null) {
             setProfilePic(imagePath);
         }
+
         setUserPreference();
     }
 
@@ -254,7 +255,7 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                     Bitmap bitmap = decodeUri(filePath);
                     if (bitmap != null) {
                         updateImage1(bitmap);
-                        createDirectoryAndSaveFile(bitmap,true);
+//                        createDirectoryAndSaveFile(bitmap, true);
                     } else {
                         DisplayInfo.showToast(mContext, "Unable to find the file from directory. Please check the permission");
                     }
@@ -434,31 +435,35 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         CloudConnectManager.getInstance(mContext).getCloudUserManager(mContext).setStatus(request, callback);
     }
 
-    private Bitmap setProfilePic(final String imageUri) {
-        final Bitmap bitmap = BitmapFactory.decodeFile(imageUri);
+    private void setProfilePic(final String imageUri) {
+//        final Bitmap bitmap = BitmapFactory.decodeFile(imageUri);
         mPref.setStringPrefValue(PreferenceConstants.DP_PATH, imageUri);
-        Glide.with(mContext).load(new File(imageUri)).asBitmap().centerCrop().into(new BitmapImageViewTarget(ivProfile) {
-            @Override
-            protected void setResource(Bitmap resource) {
-                RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
-                circularBitmapDrawable.setCircular(true);
-                ivProfile.setImageDrawable(circularBitmapDrawable);
-                Palette palette = Palette.from(resource).generate();
+        Glide.with(mContext)
+                .load(imageUri)
+                .asBitmap()
+                .centerCrop()
+//                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+                .into(new BitmapImageViewTarget(ivProfile) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
+                        circularBitmapDrawable.setCircular(true);
+                        ivProfile.setImageDrawable(circularBitmapDrawable);
+                        Palette palette = Palette.from(resource).generate();
 
-                Palette.Swatch swatch = palette.getDarkMutedSwatch();
-                if (swatch != null) {
-                    int rgb = swatch.getRgb();
-                    if (collapsingToolbarLayout != null) {
-                        collapsingToolbarLayout.setStatusBarScrimColor(rgb);
-                        collapsingToolbarLayout.setContentScrimColor(rgb);
-                        collapsingToolbarLayout.setBackgroundColor(rgb);
+                        Palette.Swatch swatch = palette.getDarkMutedSwatch();
+                        if (swatch != null) {
+                            int rgb = swatch.getRgb();
+                            if (collapsingToolbarLayout != null) {
+                                collapsingToolbarLayout.setStatusBarScrimColor(rgb);
+                                collapsingToolbarLayout.setContentScrimColor(rgb);
+                                collapsingToolbarLayout.setBackgroundColor(rgb);
+                            }
+                            if (mToolbar != null)
+                                mToolbar.setBackgroundColor(swatch.getRgb());
+                        }
                     }
-                    if (mToolbar != null)
-                        mToolbar.setBackgroundColor(swatch.getRgb());
-                }
-            }
-        });
-        return bitmap;
+                });
     }
 
     private void uploadProPic(final Bitmap bitmap) {
@@ -600,20 +605,27 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void updateImage1(final Bitmap bitmap) {
-        String image = getStringImage(bitmap);
-        CloudUploadProfileRequest request = new CloudUploadProfileRequest();
+        final String image = getStringImage(bitmap);
+        final CloudUploadProfileRequest request = new CloudUploadProfileRequest();
         request.setToken(new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN));
         request.setImageBase64(image);
         CloudResponseCallback callback = new CloudResponseCallback() {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
+                DisplayInfo.dismissLoader(mContext);
                 Log.v(TAG, "SUCCESS || PROFILE UPOAD SUCCESS|| PROFILE UPOAD SUCCESS|| PROFILE UPOAD SUCCESS|| PROFILE UPOAD SUCCESS");
-                createDirectoryAndSaveFile(bitmap, true);
+//                createDirectoryAndSaveFile(bitmap, true);
+                CloudUploadProfileResponse response = (CloudUploadProfileResponse) cloudResponse;
+                String imageUri = response.getIconUrl();
+                Log.d(TAG, imageUri);
+                setProfilePic(imageUri);
             }
 
             @Override
             public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
                 Log.v(TAG, "FAILED || PROFILE UPOAD FAILED|| PROFILE UPOAD FAILED|| PROFILE UPOAD FAILED|| PROFILE UPOAD FAILED");
+                DisplayInfo.dismissLoader(mContext);
+                DisplayInfo.showToast(mContext, "Updating failed");
             }
         };
         if (AppUtility.checkInternetConnection()) {

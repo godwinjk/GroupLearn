@@ -69,6 +69,7 @@ public class CourseDbHelper extends DataBaseHelper {
         cv.put(TableCourse.COURSE_GROUP_NAME, course.getGroupName());
         cv.put(TableCourse.COURSE_GROUP_ICON_ID, course.getGroupIconId());
         cv.put(TableCourse.COURSE_GROUP_ID, course.getGroupId());
+        cv.put(TableCourse.COURSE_ICON_URI, course.getIconUrl());
         return cv;
     }
 
@@ -87,9 +88,16 @@ public class CourseDbHelper extends DataBaseHelper {
             model.setCourseUserId(cursor.getLong(cursor.getColumnIndex(TableCourse.COURSE_USER_ID)));
             model.setCourseStatus(cursor.getInt(cursor.getColumnIndex(TableCourse.COURSE_STATUS)));
             model.setGroupId(cursor.getLong(cursor.getColumnIndex(TableCourse.COURSE_GROUP_ID)));
+            model.setIconUrl(cursor.getString(cursor.getColumnIndex(TableCourse.COURSE_ICON_URI)));
 
             return model;
         }
         return null;
+    }
+    public int updateImageUri(long groupCloudId, String imageUri) {
+        String where = TableCourse.COURSE_GROUP_ID + "=" + groupCloudId;
+        ContentValues cv = new ContentValues();
+        cv.put(TableCourse.COURSE_ICON_URI, imageUri);
+        return mContentResolver.update(TableCourse.CONTENT_URI, cv, where, null);
     }
 }

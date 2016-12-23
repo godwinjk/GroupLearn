@@ -71,6 +71,7 @@ public class GroupDbHelper extends DataBaseHelper {
         String groupCreatedTime = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.CREATED_TIME));
         String groupUpdatedTime = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.UPDATED_TIME));
         String groupDescription = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.UPDATED_TIME));
+        String groupIconUri = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.GROUP_ICON_URI));
 
         GLGroup model = new GLGroup();
         model.setGroupName(groupName);
@@ -79,6 +80,7 @@ public class GroupDbHelper extends DataBaseHelper {
         model.setGroupUniqueId(groupUniqueId);
         model.setGroupCreatedTime(groupCreatedTime);
         model.setGroupUpdatedTime(groupUpdatedTime);
+        model.setIconUrl(groupIconUri);
 
         ChatDbHelper chatDbHelper = new ChatDbHelper(mContext);
         long numberOfNewMessage = chatDbHelper.getNumberOfNewMessage(groupUniqueId);
@@ -86,7 +88,6 @@ public class GroupDbHelper extends DataBaseHelper {
         model.setMessageModel(lastMessage);
         if (lastMessage != null) {
             String message = lastMessage.getSenderName() + " : " + lastMessage.getMessageBody();
-
             model.setLastMessage(message);
         } else {
             model.setLastMessage("");
@@ -101,6 +102,7 @@ public class GroupDbHelper extends DataBaseHelper {
         cv.put(TableSubscribedGroups.GROUP_ICON_ID, model.getGroupIconId());
         cv.put(TableSubscribedGroups.GROUP_NAME, model.getGroupName());
         cv.put(TableSubscribedGroups.GROUP_DESCRIPTION, model.getGroupDescription());
+        cv.put(TableSubscribedGroups.GROUP_ICON_URI, model.getIconUrl());
         String where = TableSubscribedGroups.GROUP_ID + " = " + model.getGroupUniqueId();
         int count = mContentResolver.update(TableSubscribedGroups.CONTENT_URI, getContentValuesForGroup(model), where, null);
         if (count <= 0)
@@ -119,6 +121,7 @@ public class GroupDbHelper extends DataBaseHelper {
         cv.put(TableSubscribedGroups.GROUP_DESCRIPTION, model.getGroupDescription());
         cv.put(TableSubscribedGroups.CREATED_TIME, model.getGroupCreatedTime());
         cv.put(TableSubscribedGroups.UPDATED_TIME, model.getGroupUpdatedTime());
+        cv.put(TableSubscribedGroups.GROUP_ICON_URI, model.getIconUrl());
         return cv;
     }
 
@@ -143,6 +146,14 @@ public class GroupDbHelper extends DataBaseHelper {
         return groupModels;
 //            }
 //        }
+    }
+
+    public int updateImageUri(long groupCloudId, String imageUri) {
+        String where = TableSubscribedGroups.GROUP_ID + "=" + groupCloudId;
+        ContentValues cv = new ContentValues();
+        cv.put(TableSubscribedGroups.GROUP_ICON_URI, imageUri);
+        new CourseDbHelper(mContext).updateImageUri(groupCloudId, imageUri);
+        return mContentResolver.update(TableSubscribedGroups.CONTENT_URI, cv, where, null);
     }
 
     public GLGroup getGodwinBot() {

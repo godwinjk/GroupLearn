@@ -1,10 +1,16 @@
 package com.grouplearn.project.app.uiManagement.adapter;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.RequestViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
@@ -55,6 +61,24 @@ public class RequestRecyclerAdapter extends RecyclerView.Adapter<RequestViewHold
                     }
                 }
             });
+            String imageUri = requestModel.getIconUrl();
+            if (imageUri != null) {
+                final Context mContext = holder.itemView.getContext();
+                Glide.with(mContext)
+                        .load(imageUri)
+                        .asBitmap()
+                        .centerCrop()
+                        .into(new BitmapImageViewTarget(holder.ivProfile) {
+                            @Override
+                            protected void setResource(Bitmap resource) {
+                                RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
+                                circularBitmapDrawable.setCircular(true);
+                                holder.ivProfile.setImageDrawable(circularBitmapDrawable);
+                            }
+                        });
+            } else {
+                holder.ivProfile.setImageResource(R.drawable.man_prof_128);
+            }
         }
     }
 

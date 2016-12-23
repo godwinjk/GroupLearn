@@ -73,6 +73,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                                 contactModel.setContactIconId(modelObject.optString("contactIconId"));
                                 contactModel.setPrivacy(modelObject.optInt("privacy"));
                                 contactModel.setContactStatus(modelObject.optString("userStatus"));
+                                contactModel.setIconUrl(modelObject.optString("url"));
                                 contactModel.setStatus(modelObject.optInt("status"));
                                 contactModel.setMessage(modelObject.optString("message"));
 
@@ -152,7 +153,6 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                             }
                         }
                         if (dataObject != null) {
-
                             JSONArray dataArray = dataObject.optJSONArray("contactDetails");
 
                             ArrayList<GLGroup> groupModelArrayList = new ArrayList<>();
@@ -164,6 +164,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                                 groupModel.setGroupUniqueId(modelObject.optLong("groupId"));
                                 groupModel.setGroupName(modelObject.optString("groupName"));
                                 groupModel.setGroupIconId(modelObject.optString("groupIconId"));
+                                groupModel.setIconUrl(modelObject.optString("groupIconId"));
 
                                 groupModelArrayList.add(groupModel);
                             }

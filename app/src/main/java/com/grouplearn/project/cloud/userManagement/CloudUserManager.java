@@ -1,6 +1,7 @@
 package com.grouplearn.project.cloud.userManagement;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.grouplearn.project.cloud.BaseManager;
 import com.grouplearn.project.cloud.CloudConnectResponse;
@@ -29,6 +30,8 @@ import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 
 /**
@@ -74,6 +77,16 @@ public class CloudUserManager extends BaseManager implements CloudUserManagerInt
                             String userStatus = dataObject.optString("userStatus");
                             int userPrivacy = dataObject.optInt("userPrivacy");
                             long userId = dataObject.optLong("userId");
+                            String url = dataObject.optString("userIconUrl");
+                            if (!TextUtils.isEmpty(url)) {
+                                try {
+                                    url = URLDecoder.decode(url, "UTF-8");
+                                    url = CloudConstants.getProfileBaseUrl() + url;
+                                    response.setIconUrl(url);
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                }
+                            }
 
                             response.setUserToken(token);
                             response.setUserDisplayName(userDisplayName);
@@ -536,9 +549,25 @@ public class CloudUserManager extends BaseManager implements CloudUserManagerInt
                         JSONObject statusObject = jsonObject.optJSONObject(STATUS);
                         if (statusObject != null) {
                             response = (CloudUploadProfileResponse) getUpdatedResponse(statusObject, response);
-                            response.setIconUrl(statusObject.optString("url"));
-                            if (responseCallback != null) {
-                                responseCallback.onSuccess(cloudRequest, response);
+                            String url = statusObject.optString("url");
+                            if (!TextUtils.isEmpty(url)) {
+                                try {
+                                    url = URLDecoder.decode(url, "UTF-8");
+                                    url = CloudConstants.getProfileBaseUrl() + url;
+                                    response.setIconUrl(url);
+                                    if (responseCallback != null) {
+                                        responseCallback.onSuccess(cloudRequest, response);
+                                    }
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                    if (responseCallback != null) {
+                                        responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                                    }
+                                }
+                            } else {
+                                if (responseCallback != null) {
+                                    responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                                }
                             }
                         } else {
                             if (responseCallback != null) {

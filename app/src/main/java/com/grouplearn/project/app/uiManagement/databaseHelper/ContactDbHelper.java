@@ -68,6 +68,7 @@ public class ContactDbHelper extends DataBaseHelper {
         cv.put(TableContacts.CONTACT_STATUS, model.getContactStatus());
         cv.put(TableContacts.CONTACT_NUMBER, model.getContactNumber());
         cv.put(TableContacts.CONTACT_FOUND, model.getStatus());
+        cv.put(TableContacts.CONTACT_ICON_URI, model.getIconUrl());
         return cv;
     }
 
@@ -81,6 +82,7 @@ public class ContactDbHelper extends DataBaseHelper {
             model.setContactStatus(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_STATUS)));
             model.setContactNumber(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_NUMBER)));
             model.setStatus(cursor.getInt(cursor.getColumnIndex(TableContacts.CONTACT_FOUND)));
+            model.setIconUrl(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_ICON_URI)));
 
             return model;
         }

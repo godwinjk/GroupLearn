@@ -6,6 +6,8 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.signature.StringSignature;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.ContactItemHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
@@ -67,7 +72,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        ContactItemHolder holder;
+        final ContactItemHolder holder;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.layout_contact_item, null);
             holder = new ContactItemHolder();
@@ -81,6 +86,23 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             holder = (ContactItemHolder) convertView.getTag();
 
         final GLContact model = (GLContact) getItem(position);
+
+        String imageUri = model.getIconUrl();
+        if (imageUri != null) {
+            Glide.with(mContext)
+                    .load(imageUri)
+                    .asBitmap()
+                    .centerCrop()
+                    .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+                    .into(new BitmapImageViewTarget(holder.ivIcon) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            holder.ivIcon.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+        }
         if (type == 0 && model.getStatus() == 1) {
             holder.tvInvite.setVisibility(View.INVISIBLE);
         } else if (type == 1 && model.getStatus() == 1) {

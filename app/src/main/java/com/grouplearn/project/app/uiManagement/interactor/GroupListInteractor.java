@@ -9,6 +9,8 @@ import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ServerSyncTimes;
 import com.grouplearn.project.app.uiManagement.interfaces.GroupRequestCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.GroupViewInterface;
+import com.grouplearn.project.bean.GLGroup;
+import com.grouplearn.project.bean.GLRequest;
 import com.grouplearn.project.cloud.CloudConnectManager;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
@@ -27,8 +29,6 @@ import com.grouplearn.project.cloud.groupManagement.getInvitations.CloudGetGroup
 import com.grouplearn.project.cloud.groupManagement.getSubscribedGroups.CloudGetSubscribedGroupsRequest;
 import com.grouplearn.project.cloud.groupManagement.getSubscribedGroups.CloudGetSubscribedGroupsResponse;
 import com.grouplearn.project.cloud.groupManagement.inviteGroup.CloudGroupInvitationRequest;
-import com.grouplearn.project.bean.GLGroup;
-import com.grouplearn.project.bean.GLRequest;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.AppAlertDialog;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -82,6 +82,8 @@ public class GroupListInteractor implements CloudResponseCallback {
         CloudGetGroupsRequest request = new CloudGetGroupsRequest();
         request.setToken(token);
         request.setKey(query);
+        request.setStartTime(0);
+        request.setLimit(100);
         DisplayInfo.showLoader(mContext, "Searching...");
         CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).getAllGroups(request, this);
     }

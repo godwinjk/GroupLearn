@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.signature.StringSignature;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
@@ -41,12 +42,12 @@ import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.groupManagement.getGroupSubscribersList.GetGroupSubscribersResponse;
 import com.grouplearn.project.cloud.groupManagement.upload.CloudUploadGroupImageRequest;
+import com.grouplearn.project.cloud.groupManagement.upload.CloudUploadGroupImageResponse;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -85,6 +86,7 @@ public class GroupInfoActivity extends BaseActivity {
         if (imageUri != null) {
             setProfilePic(imageUri);
         }
+        getSubscribers();
     }
 
     @Override
@@ -165,6 +167,9 @@ public class GroupInfoActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    private void getSubscribers() {
         GroupListInteractor interactor = GroupListInteractor.getInstance(mContext);
         CloudResponseCallback callback = new CloudResponseCallback() {
             @Override
@@ -234,27 +239,32 @@ public class GroupInfoActivity extends BaseActivity {
     private Bitmap setProfilePic(final String imageUri) {
         final Bitmap bitmap = BitmapFactory.decodeFile(imageUri);
         mPref.setStringPrefValue(PreferenceConstants.DP_PATH, imageUri);
-        Glide.with(mContext).load(new File(imageUri)).asBitmap().centerCrop().into(new BitmapImageViewTarget(ivGroupImage) {
-            @Override
-            protected void setResource(Bitmap resource) {
-                RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
-                circularBitmapDrawable.setCircular(true);
-                ivGroupImage.setImageDrawable(circularBitmapDrawable);
-                Palette palette = Palette.from(resource).generate();
+        Glide.with(mContext)
+                .load(imageUri)
+                .asBitmap()
+                .centerCrop()
+                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+                .into(new BitmapImageViewTarget(ivGroupImage) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
+                        circularBitmapDrawable.setCircular(true);
+                        ivGroupImage.setImageDrawable(circularBitmapDrawable);
+                        Palette palette = Palette.from(resource).generate();
 
-                Palette.Swatch swatch = palette.getDarkMutedSwatch();
-                if (swatch != null) {
-                    int rgb = swatch.getRgb();
-                    if (collapsingToolbarLayout != null) {
-                        collapsingToolbarLayout.setStatusBarScrimColor(rgb);
-                        collapsingToolbarLayout.setContentScrimColor(rgb);
-                        collapsingToolbarLayout.setBackgroundColor(rgb);
+                        Palette.Swatch swatch = palette.getDarkMutedSwatch();
+                        if (swatch != null) {
+                            int rgb = swatch.getRgb();
+                            if (collapsingToolbarLayout != null) {
+                                collapsingToolbarLayout.setStatusBarScrimColor(rgb);
+                                collapsingToolbarLayout.setContentScrimColor(rgb);
+                                collapsingToolbarLayout.setBackgroundColor(rgb);
+                            }
+                            if (mToolbar != null)
+                                mToolbar.setBackgroundColor(swatch.getRgb());
+                        }
                     }
-                    if (mToolbar != null)
-                        mToolbar.setBackgroundColor(swatch.getRgb());
-                }
-            }
-        });
+                });
         return bitmap;
     }
 
@@ -267,11 +277,18 @@ public class GroupInfoActivity extends BaseActivity {
         CloudResponseCallback callback = new CloudResponseCallback() {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
+                DisplayInfo.dismissLoader(mContext);
                 Log.v(TAG, "SUCCESS || PROFILE UPLOAD SUCCESS|| PROFILE UPLOAD SUCCESS|| PROFILE UPLOAD SUCCESS|| PROFILE UPLOAD SUCCESS");
+                CloudUploadGroupImageResponse response = (CloudUploadGroupImageResponse) cloudResponse;
+                String imageUri = response.getIconUrl();
+                new GroupDbHelper(mContext).updateImageUri(mModel.getGroupUniqueId(), imageUri);
+                setProfilePic(imageUri);
             }
 
             @Override
             public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
+                DisplayInfo.dismissLoader(mContext);
+                DisplayInfo.showToast(mContext, "Updating failed");
                 Log.v(TAG, "FAILED || PROFILE UPOAD FAILED|| PROFILE UPOAD FAILED|| PROFILE UPOAD FAILED|| PROFILE UPOAD FAILED");
             }
         };
