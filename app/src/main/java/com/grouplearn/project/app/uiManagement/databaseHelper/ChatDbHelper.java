@@ -99,6 +99,11 @@ public class ChatDbHelper extends DataBaseHelper {
         return getNumberOfRowsInDatabase(TableChat.TABLE_NAME, where);
     }
 
+    public long isTempIdExist(long tempId) {
+        String where = TableChat.TEMP_ID + "=" + tempId;
+        return getNumberOfRowsInDatabase(TableChat.TABLE_NAME, where);
+    }
+
     private ContentValues getContentValues(GLMessage model) {
         ContentValues cv = new ContentValues();
         cv.put(TableChat.USER_NAME, model.getSenderName());
@@ -113,11 +118,6 @@ public class ChatDbHelper extends DataBaseHelper {
         cv.put(TableChat.TIME_STAMP, model.getTimeStamp());
         cv.put(TableChat.TEMP_ID, model.getTempId());
         return cv;
-    }
-
-    public long isTempIdExist(long tempId) {
-        String where = TableChat.TEMP_ID + "=" + tempId;
-        return getNumberOfRowsInDatabase(TableChat.TABLE_NAME, where);
     }
 
     private GLMessage getMessageFromCursor(Cursor cursor) {

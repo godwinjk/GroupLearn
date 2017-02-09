@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -24,6 +25,7 @@ import com.grouplearn.project.app.uiManagement.group.GroupListNewActivity;
 import com.grouplearn.project.cloud.CloudConnectManager;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
+import com.grouplearn.project.cloud.CloudConstants;
 import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.userManagement.signIn.CloudSignInRequest;
@@ -54,8 +56,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
         initializeWidgets();
         registerListeners();
-
-        checkPermission();
     }
 
     public void registerListeners() {
@@ -72,11 +72,26 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void showCustomUrlDialog() {
+        DisplayInfo.showToast(mContext, "Dev option. Please discard.");
         AppAlertDialog alertDialog = AppAlertDialog.getAlertDialog(mContext);
         alertDialog.setTitle(getString(R.string.title_custom_url));
         View v = LayoutInflater.from(mContext).inflate(R.layout.layout_dialog_custom_url, null);
-        final TextInputLayout etCustomUrl = (TextInputLayout) v.findViewById(R.id.et_url);
 
+        final TextInputLayout etCustomUrl = (TextInputLayout) v.findViewById(R.id.et_url);
+        etCustomUrl.getEditText().setText(CloudConstants.getBaseUrl());
+        alertDialog.setView(v);
+        alertDialog.setTitle("Custom Url");
+        alertDialog.setPositiveButton(getString(R.string.btn_title_Okay), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        }).setPositiveButton(getString(R.string.btn_title_Okay), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
         alertDialog.setNegativeButton(getString(R.string.btn_title_cancel), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -114,10 +129,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         String userName = mPref.getStringPrefValue(PreferenceConstants.USER_NAME);
         if (userName != null) {
             etUserName.setText(userName);
-        }
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
-            btnSignUp.setBackgroundResource(R.color.colorPrimaryTextDark);
-            btnSignIn.setBackgroundResource(R.color.colorPrimary);
         }
     }
 
@@ -195,10 +206,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     mPref.setBooleanPrefValue(PreferenceConstants.IS_SPEAK_ENABLED, false);
                     mPref.setStringPrefValue(PreferenceConstants.DP_PATH, url);
 
-                    Intent intent = new Intent(mContext, GroupListNewActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
+                    if (checkPermission()) {
+                        startMainActivity();
+                    }
                 }
             }
 
@@ -211,25 +221,27 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         CloudConnectManager.getInstance(mContext).getCloudUserManager(mContext).signIn(request, callback);
     }
 
-    private boolean checkPermission() {
-        if (AppUtility.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
-                AppUtility.checkPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED &&
-                AppUtility.checkPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED &&
-                AppUtility.checkPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                AppUtility.checkPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.SEND_SMS,
-                            Manifest.permission.READ_CONTACTS,
-                            Manifest.permission.READ_PHONE_STATE,
-                            Manifest.permission.ACCESS_COARSE_LOCATION,
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.RECORD_AUDIO},
+    private void startMainActivity() {
+        Intent intent = new Intent(mContext, GroupListNewActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
 
+    private boolean checkPermission() {
+        if (AppUtility.checkPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS
+                    },
                     MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
             return false;
         } else
             return true;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        startMainActivity();
+    }
 }

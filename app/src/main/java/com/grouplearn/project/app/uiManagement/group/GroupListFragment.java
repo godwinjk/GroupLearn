@@ -3,6 +3,7 @@ package com.grouplearn.project.app.uiManagement.group;
 import android.animation.Animator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
@@ -12,6 +13,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -19,16 +22,16 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.grouplearn.project.R;
+import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
+import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseFragment;
 import com.grouplearn.project.app.uiManagement.SplashScreenActivity;
-import com.grouplearn.project.app.uiManagement.adapter.GroupListAdapter;
 import com.grouplearn.project.app.uiManagement.cloudHelper.CloudGroupManagement;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
@@ -37,6 +40,7 @@ import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
 import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.GroupViewInterface;
+import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
 import com.grouplearn.project.app.uiManagement.search.SearchGroupsActivity;
 import com.grouplearn.project.app.uiManagement.search.SearchUserActivity;
@@ -44,6 +48,7 @@ import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
+import com.grouplearn.project.utilities.views.AppAlertDialog;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
 import java.util.ArrayList;
@@ -51,23 +56,23 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class GroupListFragment extends BaseFragment implements GroupViewInterface, View.OnClickListener {
+public class GroupListFragment extends BaseFragment implements View.OnClickListener {
 
     private static final String TAG = "GroupListFragment";
-    FloatingActionButton mFab;
+    private FloatingActionButton mFab;
 
-    GroupListAdapter mGroupListAdapter;
-    ListView lvGroupListView;
+    private GroupListFrontAdapter mGroupListAdapter;
+    RecyclerView lvGroupListView;
     TextView tvNoGroups;
     private static final long TRANSLATE_DURATION_MILLIS = 500;
     private boolean mVisible = true;
     View shape;
+    private LinearLayout llLoaading;
     LinearLayout llAddGroup, llSearchGroup, llSearchUser, llAddCourse;
 
     public GroupListFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -81,7 +86,7 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
         super.onViewCreated(view, savedInstanceState);
         initializeWidgets(view);
         registerListeners();
-        registerForContextMenu(lvGroupListView);
+
     }
 
     @Override
@@ -93,67 +98,150 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
     protected void initializeWidgets(View v) {
 
         mFab = (FloatingActionButton) v.findViewById(R.id.fab);
-        lvGroupListView = (ListView) v.findViewById(R.id.lv_group_list);
+        lvGroupListView = (RecyclerView) v.findViewById(R.id.lv_group_list);
         tvNoGroups = (TextView) v.findViewById(R.id.tv_no_groups);
-        mGroupListAdapter = new GroupListAdapter(getActivity());
+        mGroupListAdapter = new GroupListFrontAdapter(getContext());
+        lvGroupListView.setLayoutManager(new StaggeredGridLayoutManager(1, 1));
         lvGroupListView.setAdapter(mGroupListAdapter);
 
         llAddGroup = (LinearLayout) v.findViewById(R.id.ll_add_group);
         llAddCourse = (LinearLayout) v.findViewById(R.id.ll_add_course);
         llSearchUser = (LinearLayout) v.findViewById(R.id.ll_search_group);
         llSearchGroup = (LinearLayout) v.findViewById(R.id.ll_search_user);
+        llLoaading = (LinearLayout) v.findViewById(R.id.ll_loading);
 
         shape = v.findViewById(R.id.reveal_layout);
         llAddCourse.setVisibility(View.GONE);
         mFab.setVisibility(View.GONE);
         revealHide(0);
+        getGroupData();
     }
 
     @Override
     protected void registerListeners() {
         mFab.setOnClickListener(this);
-
-        lvGroupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mGroupListAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            public void onItemClicked(int position, Object model, View v) {
                 Intent chatIntent = new Intent(getActivity(), GroupChatActivity.class);
-                long groupUniqueId = ((GLGroup) mGroupListAdapter.getItem(position)).getGroupUniqueId();
+                GLGroup group = (GLGroup) model;
+                long groupUniqueId = group.getGroupUniqueId();
+                if (group.isMine()) {
+                    chatIntent.putExtra("groupCloudId", groupUniqueId);
 
-                chatIntent.putExtra("groupCloudId", groupUniqueId);
-
-                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), view, "transition_group_icon");
-                startActivity(chatIntent/*, options.toBundle()*/);
-            }
-        });
-        lvGroupListView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (totalItemCount > visibleItemCount && firstVisibleItem > 0) {
-                    if (mVisible)
-                        toggle(false);
-                } else {
-                    if (!mVisible)
-                        toggle(true);
+                    ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), v, "transition_group_icon");
+                    startActivity(chatIntent, options.toBundle());
+                    new ChatDbHelper(getActivity()).updateAllRead(group.getGroupUniqueId());
                 }
-                int lastItem = firstVisibleItem + visibleItemCount;
+                if (v instanceof TextView) {
+                    showAlertToAddGroup(group);
+                }
+            }
+
+            @Override
+            public void onItemLongClicked(int position, Object model, View v) {
+                GLGroup group = (GLGroup) model;
+                if (group.isMine()) {
+                    showContextMenu(group);
+                }
             }
         });
+    }
+
+    private void showAlertToAddGroup(final GLGroup group) {
+        AppAlertDialog dialog = AppAlertDialog.getAlertDialog(getActivity());
+        dialog.setTitle("Confirm")
+                .setMessage("Are you sure want to request to subscribe this group?")
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        CloudGroupManagement groupManagement = new CloudGroupManagement(getContext());
+                        groupManagement.addSubscribedGroup(group, new CloudOperationCallback() {
+                            @Override
+                            public void onCloudOperationSuccess() {
+
+                            }
+
+                            @Override
+                            public void onCloudOperationFailed(AppError error) {
+
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    private void showContextMenu(final GLGroup group) {
+        AppAlertDialog dialog = AppAlertDialog.getAlertDialog(getActivity());
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1);
+        arrayAdapter.add("Mark as read");
+        arrayAdapter.add("Group info");
+
+        long userId = new AppSharedPreference(getContext()).getLongPrefValue(PreferenceConstants.USER_ID);
+        if (userId == group.getGroupAdminId()) {
+            arrayAdapter.add("Delete group");
+        } else {
+            arrayAdapter.add("Exit from group");
+        }
+
+        dialog.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String strName = arrayAdapter.getItem(which);
+                        if (strName.equals("Mark as read")) {
+                            new ChatDbHelper(getActivity()).updateAllRead(group.getGroupUniqueId());
+//                    getGroupsFromDb();
+                        } else if (strName.equals("Group info")) {
+                            Intent i = new Intent(getActivity(), GroupInfoActivity.class);
+                            i.putExtra("groupCloudId", group.getGroupUniqueId());
+                            startActivity(i);
+                        }
+
+                        CloudOperationCallback callback = new CloudOperationCallback() {
+                            @Override
+                            public void onCloudOperationSuccess() {
+                                DisplayInfo.dismissLoader(getActivity());
+                                mGroupListAdapter.removeItem(group);
+                            }
+
+                            @Override
+                            public void onCloudOperationFailed(AppError error) {
+                                DisplayInfo.dismissLoader(getActivity());
+                                DisplayInfo.showToast(getActivity(), "Something went wrong. Please try again later.");
+                            }
+                        };
+
+                        if (AppUtility.checkInternetConnection()) {
+                            if (strName.equals("Exit from group")) {
+                                DisplayInfo.showLoader(getActivity(), getString(R.string.please_wait));
+                                new CloudGroupManagement(getActivity()).exitFromSubscribedGroup(group.getGroupUniqueId(), callback);
+                            } else if (strName.equals("Delete group")) {
+                                DisplayInfo.showLoader(getActivity(), getString(R.string.please_wait));
+                                new CloudGroupManagement(getActivity()).deleteSubscribedGroup(group.getGroupUniqueId(), callback);
+                            }
+                        } else {
+                            DisplayInfo.showToast(getActivity(), getString(R.string.no_network));
+                        }
+                    }
+                }
+        );
+        dialog.show();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-        registerForContextMenu(lvGroupListView);
         getActivity().registerReceiver(chatReceiver, new IntentFilter("chat"));
         getActivity().registerReceiver(chatReceiver, new IntentFilter("chatRefresh"));
-
-        getGroupData();
+        getGroupsFromDb();
         getMessages();
     }
 
@@ -161,6 +249,7 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (getActivity() != null) {
+            getGroupsFromDb();
             if (isVisibleToUser) {
                 hideSoftKeyboard();
                 revealHide(0);
@@ -171,7 +260,7 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
     @Override
     public void onPause() {
         super.onPause();
-        unregisterForContextMenu(lvGroupListView);
+//        unregisterForContextMenu(lvGroupListView);
         getActivity().unregisterReceiver(chatReceiver);
     }
 
@@ -232,53 +321,185 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
         return marginBottom;
     }
 
+    private void getGroupsFromDb() {
+        GroupListInteractor interactor = GroupListInteractor.getInstance(getActivity());
+        interactor.getSubscribedGroupsFromDatabase(new GroupViewInterface() {
+            @Override
+            public void onGroupFetchSuccess(ArrayList<GLGroup> groupModelArrayList) {
+                if (getActivity() == null)
+                    return;
+                tvNoGroups.setVisibility(View.GONE);
+                try {
+                    if (groupModelArrayList != null && groupModelArrayList.size() > 0) {
+                        updateGroupListData(groupModelArrayList);
+                    } else {
+                        if (mGroupListAdapter.getGroupList().size() <= 0) {
+                            tvNoGroups.setVisibility(View.VISIBLE);
+                        }
+                    }
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                    Log.e(TAG, ex.toString());
+                } catch (NullPointerException ex) {
+                    Log.e(TAG, ex.toString());
+                }
+            }
+
+            @Override
+            public void onGroupFetchFailed(AppError error) {
+                if (getActivity() == null)
+                    return;
+                llLoaading.setVisibility(View.GONE);
+                if (mGroupListAdapter.getGroupList().size() <= 0) {
+                    tvNoGroups.setVisibility(View.VISIBLE);
+                }
+                if (error.getErrorCode() == 20021) {
+                    SignOutInteractor interactor = new SignOutInteractor(getActivity());
+                    interactor.doForceSignOut(new SignOutListener() {
+                        @Override
+                        public void onSignOutSuccessful() {
+                            Intent i = new Intent(getActivity(), SplashScreenActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            getActivity().startActivity(i);
+                        }
+
+                        @Override
+                        public void onSignOutFailed() {
+
+                        }
+
+                        @Override
+                        public void onSignOutCanceled() {
+
+                        }
+                    });
+                }
+            }
+        });
+    }
+
     private void getGroupData() {
         GroupListInteractor interactor = GroupListInteractor.getInstance(getActivity());
-        interactor.getSubscribedGroups(this);
+        interactor.getSubscribedGroups(new GroupViewInterface() {
+            @Override
+            public void onGroupFetchSuccess(ArrayList<GLGroup> groupModelArrayList) {
+                if (getActivity() == null)
+                    return;
+                tvNoGroups.setVisibility(View.GONE);
+                try {
+                    if (groupModelArrayList != null && groupModelArrayList.size() > 0) {
+                        updateGroupListData(groupModelArrayList);
+                    } else {
+                        if (mGroupListAdapter.getGroupList().size() <= 0) {
+                            tvNoGroups.setVisibility(View.VISIBLE);
+                        }
+                    }
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                    Log.e(TAG, ex.toString());
+                } catch (NullPointerException ex) {
+                    Log.e(TAG, ex.toString());
+                }
+                getRandomGroupData();
+            }
+
+            @Override
+            public void onGroupFetchFailed(AppError error) {
+                if (getActivity() == null)
+                    return;
+                if (mGroupListAdapter.getGroupList().size() <= 0) {
+                    tvNoGroups.setVisibility(View.VISIBLE);
+                }
+                if (error.getErrorCode() == 20021) {
+                    SignOutInteractor interactor = new SignOutInteractor(getActivity());
+                    interactor.doForceSignOut(new SignOutListener() {
+                        @Override
+                        public void onSignOutSuccessful() {
+                            Intent i = new Intent(getActivity(), SplashScreenActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            getActivity().startActivity(i);
+                        }
+
+                        @Override
+                        public void onSignOutFailed() {
+
+                        }
+
+                        @Override
+                        public void onSignOutCanceled() {
+
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void getRandomGroupData() {
+        if (AppUtility.checkInternetConnection()) {
+            llLoaading.post(new Runnable() {
+                @Override
+                public void run() {
+                    llLoaading.setVisibility(View.VISIBLE);
+                }
+            });
+            GroupListInteractor.getInstance(getContext()).getGroups("852", new GroupViewInterface() {
+                @Override
+                public void onGroupFetchSuccess(ArrayList<GLGroup> groupModelArrayList) {
+                    if (getActivity() == null)
+                        return;
+                    llLoaading.setVisibility(View.GONE);
+                    tvNoGroups.setVisibility(View.GONE);
+                    try {
+                        if (groupModelArrayList != null && groupModelArrayList.size() > 0) {
+                            updateGroupListData(groupModelArrayList);
+                        } else {
+                            if (mGroupListAdapter.getGroupList().size() <= 0) {
+                                tvNoGroups.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    } catch (ArrayIndexOutOfBoundsException ex) {
+                        Log.e(TAG, ex.toString());
+                    } catch (NullPointerException ex) {
+                        Log.e(TAG, ex.toString());
+                    }
+                }
+
+                @Override
+                public void onGroupFetchFailed(AppError error) {
+                    llLoaading.setVisibility(View.GONE);
+                    if (getActivity() == null)
+                        return;
+                    if (mGroupListAdapter.getGroupList().size() <= 0) {
+                        tvNoGroups.setVisibility(View.VISIBLE);
+                    }
+                    if (error.getErrorCode() == 20021) {
+                        SignOutInteractor interactor = new SignOutInteractor(getActivity());
+                        interactor.doForceSignOut(new SignOutListener() {
+                            @Override
+                            public void onSignOutSuccessful() {
+                                Intent i = new Intent(getActivity(), SplashScreenActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                getActivity().startActivity(i);
+                            }
+
+                            @Override
+                            public void onSignOutFailed() {
+
+                            }
+
+                            @Override
+                            public void onSignOutCanceled() {
+
+                            }
+                        });
+                    }
+                }
+            });
+        }
     }
 
     private void getMessages() {
         MessageInteractor.getInstance().getAllMessages();
-    }
-
-    @Override
-    public void onGroupFetchSuccess(ArrayList<GLGroup> groupModelArrayList) {
-        tvNoGroups.setVisibility(View.GONE);
-        if (groupModelArrayList != null && groupModelArrayList.size() > 0) {
-            updateGroupListData(groupModelArrayList);
-        } else {
-            if (mGroupListAdapter.getCount() <= 0) {
-                tvNoGroups.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-
-    @Override
-    public void onGroupFetchFailed(AppError error) {
-        if (mGroupListAdapter.getCount() <= 0) {
-            tvNoGroups.setVisibility(View.VISIBLE);
-        }
-        if (error.getErrorCode() == 20021) {
-            SignOutInteractor interactor = new SignOutInteractor(getActivity());
-            interactor.doForceSignOut(new SignOutListener() {
-                @Override
-                public void onSignOutSuccessful() {
-                    Intent i = new Intent(getActivity(), SplashScreenActivity.class);
-                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    getActivity().startActivity(i);
-                }
-
-                @Override
-                public void onSignOutFailed() {
-
-                }
-
-                @Override
-                public void onSignOutCanceled() {
-
-                }
-            });
-        }
+        getGroupsFromDb();
     }
 
     @Override
@@ -311,13 +532,14 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
     }
 
     private void updateGroupListData(final ArrayList<GLGroup> groupModelList) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mGroupListAdapter.setGroupListData(groupModelList);
-                mGroupListAdapter.notifyDataSetChanged();
-            }
-        });
+        if (getActivity() != null)
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mGroupListAdapter.clearAndInsert();
+                    mGroupListAdapter.setGroupList(groupModelList);
+                }
+            });
     }
 
     @Override
@@ -325,7 +547,9 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         int position = info.position;
-        GLGroup model = mGroupListAdapter.getGroupListData().get(position);
+        GLGroup model = mGroupListAdapter.getGroupList().get(position);
+        if (!model.isMine())
+            return;
         if (model.getGroupUniqueId() != -11223344) {
             menu.add(1, 1, 1, "Mark as read");
             menu.add(1, 2, 1, "Group info");
@@ -338,10 +562,10 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int position = info.position;
-        final GLGroup model = (GLGroup) mGroupListAdapter.getItem(position);
+        final GLGroup model = (GLGroup) mGroupListAdapter.getGroupList().get(position);
         switch (item.getItemId()) {
             case 1:
-                new ChatDbHelper(getActivity()).updateAllRead(mGroupListAdapter.getGroupListData().get(position).getGroupUniqueId());
+                new ChatDbHelper(getActivity()).updateAllRead(model.getGroupUniqueId());
                 getGroupData();
                 break;
             case 2:
@@ -356,7 +580,7 @@ public class GroupListFragment extends BaseFragment implements GroupViewInterfac
                         DisplayInfo.dismissLoader(getActivity());
                         GroupDbHelper helper = new GroupDbHelper(getActivity());
                         helper.deleteSubscribedGroup(model.getGroupUniqueId());
-                        getGroupData();
+                        getGroupsFromDb();
                     }
 
                     @Override

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +42,7 @@ public class InvitationRecyclerAdapter extends RecyclerView.Adapter<InvitationVi
     public void onBindViewHolder(final InvitationViewHolder holder, final int position) {
         final GLRequest model = invitationList.get(position);
         holder.tvName.setText(model.getGroupName());
-        holder.tvMessage.setText(model.getDefinition());
+        holder.tvMessage.setText("Invited by " + model.getUserDisplayName());
 
         holder.tvAccept.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,7 +61,7 @@ public class InvitationRecyclerAdapter extends RecyclerView.Adapter<InvitationVi
             }
         });
         String imageUri = model.getIconUrl();
-        if (imageUri != null) {
+        if (!TextUtils.isEmpty(imageUri)) {
             final Context mContext = holder.itemView.getContext();
             Glide.with(mContext)
                     .load(imageUri)

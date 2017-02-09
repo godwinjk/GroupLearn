@@ -8,11 +8,11 @@ import android.os.Parcelable;
  */
 
 public class GLUser extends BaseModel implements Parcelable {
-    long userId;
-    String userName;
-    String userStatus;
-    String userEmail;
-    String userDisplayName;
+    private long userId;
+    private String userName;
+    private String userStatus;
+    private String userEmail;
+    private String userDisplayName;
     private String iconUrl;
 
     public String getIconUrl() {
@@ -74,6 +74,7 @@ public class GLUser extends BaseModel implements Parcelable {
         userStatus = in.readString();
         userEmail = in.readString();
         userDisplayName = in.readString();
+        iconUrl = in.readString();
     }
 
     @Override
@@ -90,6 +91,7 @@ public class GLUser extends BaseModel implements Parcelable {
         dest.writeString(userStatus);
         dest.writeString(userEmail);
         dest.writeString(userDisplayName);
+        dest.writeString(iconUrl);
     }
 
     @SuppressWarnings("unused")

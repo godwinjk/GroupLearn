@@ -22,10 +22,10 @@ import org.json.JSONObject;
  */
 public class AppRegistrationManager extends BaseManager implements AppRegistrationInterface {
     private static final String TAG = "AppRegistrationManager";
-    Context mContext;
     private String baseUrl;
 
     public AppRegistrationManager(Context mContext) {
+        super(mContext);
         this.mContext = mContext;
         baseUrl = CloudConstants.getBaseUrl();
     }

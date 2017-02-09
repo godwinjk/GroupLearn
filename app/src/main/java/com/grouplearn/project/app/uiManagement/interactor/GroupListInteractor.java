@@ -7,6 +7,7 @@ import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ServerSyncTimes;
+import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.GroupRequestCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.GroupViewInterface;
 import com.grouplearn.project.bean.GLGroup;
@@ -54,15 +55,15 @@ public class GroupListInteractor implements CloudResponseCallback {
 
     public static GroupListInteractor getInstance(Context context) {
         mContext = context;
-        if (mGroupInteractor == null)
-            mGroupInteractor = new GroupListInteractor(context);
+//        if (mGroupInteractor == null)
+        mGroupInteractor = new GroupListInteractor(context);
         return mGroupInteractor;
     }
 
     @NonNull
     public void getSubscribedGroups(GroupViewInterface groupViewInterface) {
         mGroupViewInterface = groupViewInterface;
-        mGroupViewInterface.onGroupFetchSuccess(dbHelper.getSubscribedGroups());
+//        mGroupViewInterface.onGroupFetchSuccess(dbHelper.getSubscribedGroups());
         String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
         CloudGetSubscribedGroupsRequest request = new CloudGetSubscribedGroupsRequest();
         request.setToken(token);
@@ -76,6 +77,12 @@ public class GroupListInteractor implements CloudResponseCallback {
     }
 
     @NonNull
+    public void getMyGroupsFromDatabase(GroupViewInterface groupViewInterface) {
+        mGroupViewInterface = groupViewInterface;
+        mGroupViewInterface.onGroupFetchSuccess(dbHelper.getMyGroups());
+    }
+
+    @NonNull
     public void getGroups(String query, GroupViewInterface groupViewInterface) {
         mGroupViewInterface = groupViewInterface;
         String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
@@ -84,14 +91,11 @@ public class GroupListInteractor implements CloudResponseCallback {
         request.setKey(query);
         request.setStartTime(0);
         request.setLimit(100);
-        DisplayInfo.showLoader(mContext, "Searching...");
         CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).getAllGroups(request, this);
     }
 
     @Override
     public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
-        DisplayInfo.dismissLoader(mContext);
-
         if (cloudRequest instanceof CloudGetGroupsRequest) {
             insertGroupsToDb((CloudGetGroupsResponse) cloudResponse);
 
@@ -102,7 +106,7 @@ public class GroupListInteractor implements CloudResponseCallback {
 
     @Override
     public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
-
+        mGroupViewInterface.onGroupFetchFailed(new AppError(cloudError));
     }
 
     public void getGroupSubscribers(long groupId, CloudResponseCallback callback) {
@@ -121,24 +125,25 @@ public class GroupListInteractor implements CloudResponseCallback {
         mGroupViewInterface.onGroupFetchSuccess(dbHelper.getSubscribedGroups());
     }
 
-    public void addGroup(GLGroup model) {
+    public void addGroup(GLGroup model, final CloudOperationCallback operationCallback) {
         final CloudAddGroupRequest request = new CloudAddGroupRequest();
         request.setGroupModels(model);
         request.setToken(mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN));
-        DisplayInfo.showLoader(mContext, "Adding group...");
         CloudResponseCallback callback = new CloudResponseCallback() {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
-                DisplayInfo.dismissLoader(mContext);
+                operationCallback.onCloudOperationSuccess();
                 GroupDbHelper dbHelper = new GroupDbHelper(mContext);
-                dbHelper.addSubscribedGroup(((CloudAddGroupResponse) cloudResponse).getGroupModelArrayList().get(0));
-                DisplayInfo.showToast(mContext, "Group added successfully");
+                long userId = new AppSharedPreference(mContext).getLongPrefValue(PreferenceConstants.USER_ID);
+                GLGroup group = ((CloudAddGroupResponse) cloudResponse).getGroupModelArrayList().get(0);
+                group.setGroupAdminId(userId);
+
+                dbHelper.addSubscribedGroup(group);
             }
 
             @Override
             public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
-                DisplayInfo.dismissLoader(mContext);
-                AppAlertDialog.getAlertDialog(mContext).showWarningAlert(cloudError.getErrorMessage());
+                operationCallback.onCloudOperationFailed(new AppError(cloudError.getErrorCode(), cloudError.getErrorMessage()));
             }
         };
         CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).addGroup(request, callback);

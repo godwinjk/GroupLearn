@@ -92,7 +92,7 @@ public class ForgotActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 if (step == FORGOT_REQUEST) {
-                    if (new InputValidator(mContext).validateUserName(etUserName.getEditText().getText().toString()) < 0) {
+                    if (new InputValidator(mContext).validateEmail(etUserName.getEditText().getText().toString()) < 0) {
                         etUserName.setError("Enter valid user name");
                     } else {
                         requestForgotPassword();

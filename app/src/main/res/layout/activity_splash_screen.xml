@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/splash_coordinate"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/splash_coordinate"
     android:background="@color/colorPrimary"
     tools:context="com.grouplearn.project.app.uiManagement.SplashScreenActivity">
 
@@ -19,7 +19,7 @@
             android:gravity="center"
             android:text="@string/app_name"
             android:textColor="@color/white"
-            android:textSize="30dp"
+            android:textSize="35dp"
             android:textStyle="bold" />
 
         <LinearLayout
@@ -41,12 +41,6 @@
                 android:textSize="12dp"
                 android:textStyle="italic" />
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:src="@drawable/grouplearn_notification_white" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -65,8 +59,8 @@
             android:layout_below="@+id/tv_title"
             android:layout_centerHorizontal="true"
             android:gravity="center"
-            android:visibility="gone"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tv_dot_1"

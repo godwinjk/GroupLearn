@@ -1,12 +1,17 @@
 package com.grouplearn.project.app.uiManagement.contact;
 
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.telephony.SmsManager;
 import android.view.LayoutInflater;
@@ -14,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -22,9 +28,13 @@ import com.grouplearn.project.app.uiManagement.BaseFragment;
 import com.grouplearn.project.app.uiManagement.adapter.ContactListAdapter;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ContactDbHelper;
 import com.grouplearn.project.app.uiManagement.group.GroupListNewActivity;
+import com.grouplearn.project.app.uiManagement.interactor.ContactListInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
+import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
 import com.grouplearn.project.bean.GLContact;
+import com.grouplearn.project.bean.GLUser;
+import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -37,14 +47,15 @@ import java.util.Comparator;
  * A simple {@link Fragment} subclass.
  */
 public class ContactListFragment extends BaseFragment implements ContactViewInterface {
-    ListView lvContacts;
-    TextView tvNoContacts;
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 101;
+    private ListView lvContacts;
+    private TextView tvNoContacts;
 
-    ContactListAdapter mAdapter;
+    private ContactListAdapter mAdapter;
     private String TAG = "ContactListActivity";
-    ContactDbHelper mDbHelper;
+    private ContactDbHelper mDbHelper;
 
-    GroupListNewActivity mContext;
+    private GroupListNewActivity mContext;
 
     public ContactListFragment() {
         // Required empty public constructor
@@ -66,14 +77,21 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
         registerListeners();
 
         getContactFromDb();
+
     }
 
     private void getContactFromDb() {
         ArrayList<GLContact> contactModels = mDbHelper.getContacts();
         if (contactModels != null && contactModels.size() > 0) {
             updateDataInList(sortUserList(contactModels));
+        } else if (contactModels != null && contactModels.size() <= 0) {
+            getContactFromPhone();
         }
-        if (mAdapter != null && mAdapter.getCount() > 0) {
+//        getContactFromPhone();
+    }
+
+    private void getContactFromPhone() {
+        if (checkPermissionForCotacts()) {
             ContactReadTask readTask = new ContactReadTask(mContext);
             readTask.setContactViewInterface(this);
             readTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -109,24 +127,51 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
             }
         });
         mAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
-            @Override
-            public void onItemClicked(int position, Object model, View v) {
-                GLContact contactModel = (GLContact) model;
-                if (v instanceof TextView) {
-                    sendSms(contactModel.getContactNumber());
-                } else if (v instanceof ImageView) {
-                    openContact(contactModel.getContactId());
-                }
-            }
+                                                    @Override
+                                                    public void onItemClicked(int position, Object model, View v) {
+                                                        GLContact contactModel = (GLContact) model;
+                                                        if (v instanceof TextView) {
+                                                            sendSms(contactModel.getContactNumber());
+                                                        } else if (v instanceof ImageView) {
+                                                            if (contactModel.getStatus() > 0) {
+                                                                openUserDetailsWindow(v, contactModel);
+                                                            } else {
+                                                                openSystemContactWindow(contactModel.getContactId());
+                                                            }
+                                                        } else if (v instanceof LinearLayout) {
+                                                            if (contactModel.getStatus() > 0) {
+                                                                openUserDetailsWindow(v, contactModel);
+                                                            } else {
+                                                                openSystemContactWindow(contactModel.getContactId());
+                                                            }
+                                                        }
+                                                    }
 
-            @Override
-            public void onItemLongClicked(int position, Object model, View v) {
+                                                    @Override
+                                                    public void onItemLongClicked(int position, Object model, View v) {
 
-            }
-        });
+                                                    }
+                                                }
+        );
     }
 
-    private void openContact(String contactId) {
+    private void openUserDetailsWindow(View v, GLContact contactModel) {
+        Intent intent = new Intent(mContext, UserProfileActivity.class);
+        GLUser userModel = new GLUser();
+
+        userModel.setIconUrl(contactModel.getIconUrl());
+        userModel.setUserDisplayName(contactModel.getContactName());
+        userModel.setUserId(contactModel.getContactUniqueId());
+        userModel.setUserEmail(contactModel.getContactMailId());
+        userModel.setUserStatus(contactModel.getContactStatus());
+
+        intent.putExtra("user", userModel);
+
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), v, "transition_group_icon");
+        startActivity(intent, options.toBundle());
+    }
+
+    private void openSystemContactWindow(String contactId) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contactId));
         intent.setData(uri);
@@ -134,13 +179,15 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
     }
 
     private void sendSms(String phoneNumber) {
-        try {
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNumber, null, "Install GroupLearn App to learn new things in new way https://goo.gl/nXaY6l", null, null);
-            DisplayInfo.showToast(mContext, "Invitation sent successfully.");
-        } catch (Exception ex) {
-            Log.e(TAG, "FAILED TO SEND MESSAGE, FAILED TO SEND MESSAGE");
-            ex.printStackTrace();
+        if (checkPermissionForSms()) {
+            try {
+                SmsManager smsManager = SmsManager.getDefault();
+                smsManager.sendTextMessage(phoneNumber, null, "Install GroupLearn App to learn new things in new way https://goo.gl/2GRMMs", null, null);
+                DisplayInfo.showToast(mContext, "Invitation sent successfully.");
+            } catch (Exception ex) {
+                Log.e(TAG, "FAILED TO SEND MESSAGE, FAILED TO SEND MESSAGE");
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -190,6 +237,7 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
 
     @Override
     public void onGetContactsFinished(ArrayList<GLContact> contactModels) {
+        new ContactListInteractor(mContext).addAllContacts(contactModels, this);
         updateDataInList(sortUserList(contactModels));
     }
 
@@ -198,4 +246,40 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
         Log.e(TAG, error.getErrorMessage());
     }
 
+    private boolean checkPermissionForCotacts() {
+        if (AppUtility.checkPermission(getActivity(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.READ_CONTACTS
+                    },
+                    MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
+            return false;
+        } else
+            return true;
+    }
+
+    private boolean checkPermissionForSms() {
+        if (AppUtility.checkPermission(getActivity(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.SEND_SMS
+                    },
+                    MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
+            return false;
+        } else
+            return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        DisplayInfo.showToast(mContext, "Try again");
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && getActivity() != null) {
+            if (mAdapter != null && (mAdapter.getContactsInCloud() == null || mAdapter.getContactsInCloud().size() <= 0))
+                getContactFromPhone();
+        }
+    }
 }

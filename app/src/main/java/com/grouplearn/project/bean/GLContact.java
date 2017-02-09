@@ -11,7 +11,7 @@ public class GLContact extends BaseModel implements Parcelable {
     String contactName;
     long contactUniqueId;
     String contactIconId;
-    String contactStatus;
+    String contactStatus=null;
     String contactNumber;
     String contactMailId;
     int privacy;

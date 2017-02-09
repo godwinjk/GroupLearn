@@ -8,12 +8,12 @@
     tools:context="com.grouplearn.project.app.uiManagement.search.SearchGroupsActivity"
     tools:showIn="@layout/activity_search_groups">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout
         android:id="@+id/content_search_groups"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.grouplearn.project.app.uiManagement.search.SearchGroupsActivity"
         tools:showIn="@layout/activity_search_groups">
@@ -59,6 +59,7 @@
                     android:layout_height="wrap_content"
                     android:queryHint="Enter name to search groups"
                     app:queryHint="Enter name to search groups">
+
                     <requestFocus />
                 </android.support.v7.widget.SearchView>
             </android.support.v7.widget.CardView>
@@ -72,14 +73,15 @@
             android:padding="10dp"></android.support.v7.widget.RecyclerView>
 
         <TextView
-            android:visibility="gone"
             android:id="@+id/tv_no_items"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/ll_search"
             android:layout_centerInParent="true"
             android:drawablePadding="10dp"
             android:gravity="center"
             android:padding="20dp"
-            android:text="Click to search groups." />
+            android:text="Click to search groups."
+            android:visibility="gone" />
     </RelativeLayout>
 </RelativeLayout>

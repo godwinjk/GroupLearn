@@ -1,21 +1,23 @@
 package com.grouplearn.project.app.uiManagement.user;
 
+import android.Manifest;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
@@ -25,24 +27,15 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.view.View;
+import android.view.Window;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.grouplearn.project.R;
-import com.grouplearn.project.app.MyApplication;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
@@ -56,7 +49,6 @@ import com.grouplearn.project.bean.GLUser;
 import com.grouplearn.project.cloud.CloudConnectManager;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
-import com.grouplearn.project.cloud.CloudConstants;
 import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.interest.add.CloudAddInterestRequest;
@@ -73,29 +65,23 @@ import com.grouplearn.project.utilities.views.AppAlertDialog;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 import com.grouplearn.project.utilities.views.SpaceItemDecoration;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Random;
 
 
 public class UserProfileActivity extends BaseActivity implements View.OnClickListener {
     private static final int ACTIVITY_IMAGE_GET_REQUEST_CODE = 101;
     private static final int ACTIVITY_IMAGE_CROP_REQUEST_CODE = 2;
     private static final String TAG = "UserProfileActivity";
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 101;
+
     CollapsingToolbarLayout collapsingToolbarLayout;
     Toolbar mToolbar;
     Context mContext;
     TextView tvName, tvStatus, tvContacts, tvSubscribedGroups;
+
     CheckBox cbVisibility;
     ImageView ivProfile, ivSelect;
 
@@ -145,8 +131,7 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         if (imagePath != null) {
             setProfilePic(imagePath);
         }
-
-        setUserPreference();
+        fetchInterests();
     }
 
     @Override
@@ -174,9 +159,6 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         rvInterests.setAdapter(mInterestRecyclerAdapter);
 
         rvInterests.addItemDecoration(new SpaceItemDecoration(10));
-        /**
-         * Settings for other User
-         */
     }
 
     @Override
@@ -185,7 +167,8 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         if (!isOtherUser) {
 //            setDataToAdapter();
         }
-        fetchInterests();
+        setUserPreference();
+
     }
 
     private void setUserDetails() {
@@ -226,7 +209,7 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         cbVisibility.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setVisibility(cbVisibility.isChecked());
+                setPrivacy(cbVisibility.isChecked());
             }
         });
 
@@ -236,13 +219,67 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                 showFileChooser();
             }
         });
+        ivNameEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showNameAlert();
+            }
+        });
+    }
+
+    private void showNameAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        final EditText etName = new EditText(mContext);
+        etName.setHint("Display name");
+        etName.setPadding(20, 20, 20, 20);
+        builder.setView(etName);
+
+        builder.setMessage("Enter your new display name");
+        builder.setTitle("Display name");
+        AlertDialog dialog = builder.setPositiveButton("change", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String name = etName.getText().toString();
+                if (TextUtils.isEmpty(name)) {
+                    DisplayInfo.showToast(mContext, "Display name is mandatory");
+                    showNameAlert();
+                } else if (name.length() < 3 || name.length() > 32) {
+                    DisplayInfo.showToast(mContext, "Display name should be in between of 3-32");
+                    showNameAlert();
+                } else {
+                    setDisplayName(name);
+                }
+                dialogInterface.dismiss();
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        }).create();
+//        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                String name = etName.getText().toString();
+//                if (TextUtils.isEmpty(name)) {
+//                    DisplayInfo.showToast(mContext, "Display name is mandatory");
+//                } else if (name.length() < 3 || name.length() > 32) {
+//                    DisplayInfo.showToast(mContext, "Display name should be in between of 3-32");
+//                } else {
+//                    setDisplayName(name);
+//                }
+//            }
+//        });
+        dialog.show();
     }
 
     private void showFileChooser() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), ACTIVITY_IMAGE_GET_REQUEST_CODE);
+        if (checkPermission()) {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), ACTIVITY_IMAGE_GET_REQUEST_CODE);
+        }
     }
 
     @Override
@@ -394,7 +431,7 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mInterestRecyclerAdapter.setInterests(interests);
+                        mInterestRecyclerAdapter.setInterests(interests, isOtherUser);
                     }
                 });
             }
@@ -407,7 +444,7 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         CloudConnectManager.getInstance(mContext).getCloudInterestManager(mContext).addInterest(request, callback);
     }
 
-    private void setVisibility(final boolean value) {
+    private void setPrivacy(final boolean value) {
         final String status = mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_STATUS);
         final String displayName = mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME);
 
@@ -415,11 +452,11 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         request.setToken(mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN));
         request.setStatus(status);
         request.setUserDisplayName(displayName);
-        int privacy = 0;
+        int privacy = 1;
         if (value)
-            privacy = 1;
+            privacy = 0;
         request.setPrivacyValue(privacy);
-        DisplayInfo.showLoader(mContext, "Updating privacy...");
+
         CloudResponseCallback callback = new CloudResponseCallback() {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
@@ -432,12 +469,51 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                 DisplayInfo.dismissLoader(mContext);
             }
         };
-        CloudConnectManager.getInstance(mContext).getCloudUserManager(mContext).setStatus(request, callback);
+        if (AppUtility.checkInternetConnection()) {
+            DisplayInfo.showLoader(mContext, "Updating privacy...");
+            CloudConnectManager.getInstance(mContext).getCloudUserManager(mContext).setStatus(request, callback);
+        } else {
+            DisplayInfo.showToast(mContext, getString(R.string.no_network));
+        }
+    }
+
+    private void setDisplayName(final String displayName) {
+        final String status = mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_STATUS);
+
+        CloudStatusRequest request = new CloudStatusRequest();
+        request.setToken(mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN));
+        request.setStatus(status);
+        request.setUserDisplayName(displayName);
+
+        boolean value = mPref.getBooleanPrefValue(PreferenceConstants.USER_PRIVACY_STATUS);
+        int privacy = 0;
+        if (value)
+            privacy = 1;
+        request.setPrivacyValue(privacy);
+
+        CloudResponseCallback callback = new CloudResponseCallback() {
+            @Override
+            public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
+                DisplayInfo.dismissLoader(mContext);
+                tvName.setText(displayName);
+            }
+
+            @Override
+            public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
+                DisplayInfo.dismissLoader(mContext);
+                DisplayInfo.showToast(mContext, "Some thing went wrong. Please try again.");
+            }
+        };
+        if (AppUtility.checkInternetConnection()) {
+            DisplayInfo.showLoader(mContext, "Updating display name");
+            CloudConnectManager.getInstance(mContext).getCloudUserManager(mContext).setStatus(request, callback);
+        } else {
+            DisplayInfo.showToast(mContext, getString(R.string.no_network));
+        }
     }
 
     private void setProfilePic(final String imageUri) {
 //        final Bitmap bitmap = BitmapFactory.decodeFile(imageUri);
-        mPref.setStringPrefValue(PreferenceConstants.DP_PATH, imageUri);
         Glide.with(mContext)
                 .load(imageUri)
                 .asBitmap()
@@ -458,6 +534,12 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                                 collapsingToolbarLayout.setStatusBarScrimColor(rgb);
                                 collapsingToolbarLayout.setContentScrimColor(rgb);
                                 collapsingToolbarLayout.setBackgroundColor(rgb);
+                                Window window = getWindow();
+                                if (window != null) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        window.setStatusBarColor(rgb);
+                                    }
+                                }
                             }
                             if (mToolbar != null)
                                 mToolbar.setBackgroundColor(swatch.getRgb());
@@ -466,47 +548,6 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                 });
     }
 
-    private void uploadProPic(final Bitmap bitmap) {
-        String image = getStringImage(bitmap);
-        final File file1 = new File(new File(Environment.getExternalStorageDirectory() + "/GroupLearn"), "base64Pic.txt");
-
-
-        JSONObject object = new JSONObject();
-        try {
-            FileWriter writer = new FileWriter(file1);
-            writer.append(image);
-            writer.flush();
-            writer.close();
-            object.put("image", image);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, CloudConstants.getBaseUrl() + "profile-upload", object, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.d(TAG, response.toString());
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> mHeaders = new ArrayMap<String, String>();
-                String token = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN);
-                mHeaders.put("token", token);
-                return mHeaders;
-            }
-        };
-        // Adding request to request queue
-        MyApplication.getAppContext().addToRequestQueue(jsonObjReq);
-    }
 
     private Bitmap decodeUri(Uri selectedImage) throws FileNotFoundException {
         BitmapFactory.Options o = new BitmapFactory.Options();
@@ -531,79 +572,6 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         return BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o2);
     }
 
-    private void createDirectoryAndSaveFile(final Bitmap imageToSave, final boolean show) {
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                imageToSave.compress(Bitmap.CompressFormat.PNG, 10, outputStream);
-
-                File directory = new File(Environment.getExternalStorageDirectory() + "/GroupLearn");
-                if (!directory.exists()) {
-                    directory.mkdirs();
-                }
-                int i = new Random().nextInt(5000);
-                final File file = new File(new File(Environment.getExternalStorageDirectory() + "/GroupLearn"), "profilePic" + i + ".png");
-                if (file.exists()) {
-                    file.delete();
-                }
-                try {
-                    FileOutputStream out = new FileOutputStream(file);
-                    imageToSave.compress(Bitmap.CompressFormat.PNG, 100, out);
-                    out.flush();
-                    out.close();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Uri uri = Uri.parse(file.getAbsolutePath());
-                            setProfilePic(uri.toString());
-//                            updateImage1(imageToSave);
-                        }
-                    });
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        t.start();
-    }
-
-    private void uploadImage(final Bitmap bitmap) {
-        //Showing the progress dialog
-        final ProgressDialog loading = ProgressDialog.show(this, "Uploading...", "Please wait...", false, false);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, CloudConstants.getBaseUrl() + "profile-upload",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String s) {
-                        loading.dismiss();
-                        Toast.makeText(mContext, s, Toast.LENGTH_LONG).show();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        loading.dismiss();
-                        Toast.makeText(mContext, "error", Toast.LENGTH_LONG).show();
-                    }
-                }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                String image = getStringImage(bitmap);
-
-                Map<String, String> params = new Hashtable<String, String>();
-                params.put("image", image);
-                return params;
-            }
-        };
-
-        //Creating a Request Queue
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-        //Adding request to the queue
-        requestQueue.add(stringRequest);
-    }
-
     private void updateImage1(final Bitmap bitmap) {
         final String image = getStringImage(bitmap);
         final CloudUploadProfileRequest request = new CloudUploadProfileRequest();
@@ -619,6 +587,7 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                 String imageUri = response.getIconUrl();
                 Log.d(TAG, imageUri);
                 setProfilePic(imageUri);
+                mPref.setStringPrefValue(PreferenceConstants.DP_PATH, imageUri);
             }
 
             @Override
@@ -690,7 +659,24 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         }
     }
 
+    private boolean checkPermission() {
+        if (AppUtility.checkPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE
+                    },
+                    MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
+            return false;
+        } else
+            return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        showFileChooser();
+    }
+
     private void setDataToAdapter(ArrayList<GLInterest> interests) {
-        mInterestRecyclerAdapter.setInterests(interests);
+        mInterestRecyclerAdapter.setInterests(interests, isOtherUser);
     }
 }

@@ -50,10 +50,6 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
         etPassword = (CustomPasswordField) findViewById(R.id.pf_password);
 
         btnSignUp = (Button) findViewById(R.id.btn_sign_up);
-
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
-            btnSignUp.setBackgroundResource(R.color.colorPrimaryDark);
-        }
     }
 
     @Override

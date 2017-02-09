@@ -14,12 +14,13 @@ import com.grouplearn.project.R;
 
 public class CourseSearchViewHolder extends RecyclerView.ViewHolder {
     public ImageView ivCourseIcon;
-    public TextView tvSiteAddress, tvCourseName, tvDescription, tvView;
+    public TextView tvSiteAddress, tvCourseName, tvDescription, tvView,tvBadge;
     public LinearLayout llSearchItem;
 
     public CourseSearchViewHolder(View v) {
         super(v);
         ivCourseIcon = (ImageView) v.findViewById(R.id.iv_item_icon);
+        tvBadge = (TextView) v.findViewById(R.id.tv_badge);
 
         llSearchItem = (LinearLayout) v.findViewById(R.id.ll_search_item);
 

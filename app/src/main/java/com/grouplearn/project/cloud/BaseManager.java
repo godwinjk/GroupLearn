@@ -1,5 +1,7 @@
 package com.grouplearn.project.cloud;
 
+import android.content.Context;
+
 import org.json.JSONObject;
 
 /**
@@ -11,12 +13,17 @@ public class BaseManager {
     public static final String STATUS_CODE = "statusCode";
     public static final String STATUS_MESSAGE = "statusMessage";
     public static final String DATA = "Data";
+    protected Context mContext;
 
-    public CloudConnectResponse getUpdatedResponse(JSONObject statusObject, CloudConnectResponse response) {
+    public BaseManager(Context mContext) {
+        this.mContext = mContext;
+    }
+
+    public CloudConnectResponse getUpdatedResponse( JSONObject statusObject, CloudConnectResponse response) {
         int responseStatus = statusObject.optInt("statusCode");
         String responseMessage = statusObject.optString("statusMessage");
         response.setResponseMessage(responseMessage);
-        response.setResponseStatus(responseStatus);
+        response.setResponseStatus(mContext, responseStatus);
         return response;
     }
 

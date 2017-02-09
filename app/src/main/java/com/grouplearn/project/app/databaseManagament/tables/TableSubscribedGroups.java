@@ -21,11 +21,14 @@ public class TableSubscribedGroups {
     public static final String UPDATED_TIME = "UPDATED_TIME";
 
     public static final String GROUP_ICON_ID = "GROUP_ICON_ID";
+    public static final String GROUP_USER_ID = "GROUP_USER_ID";
 
     public static final Uri CONTENT_URI = Uri.parse("content://" + DatabaseConstants.AUTHORITY + "/" + TABLE_NAME);
     public static final String SQL_CREATE_TABLE = String.format("create table %s"
-                    + "(%s text , %s text, %s text,%s text," +
-                    "%s text ,%s text,%s text, %s text)", TABLE_NAME,
-            GROUP_ID, GROUP_NAME, GROUP_DESCRIPTION, GROUP_ICON_URI,
-            NEW_MSG_CONT, CREATED_TIME, UPDATED_TIME, GROUP_ICON_ID);
+                    + "(%s text , %s text, %s text," +
+                    "%s text,%s text ,%s text," +
+                    "%s text,%s text, %s text)", TABLE_NAME,
+            GROUP_ID, GROUP_NAME, GROUP_DESCRIPTION,
+            GROUP_ICON_URI, NEW_MSG_CONT, CREATED_TIME,
+            GROUP_USER_ID, UPDATED_TIME, GROUP_ICON_ID);
 }

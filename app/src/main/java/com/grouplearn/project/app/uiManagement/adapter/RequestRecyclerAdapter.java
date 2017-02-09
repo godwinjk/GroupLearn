@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +44,7 @@ public class RequestRecyclerAdapter extends RecyclerView.Adapter<RequestViewHold
         if (getItemViewType(position) == 1) {
 
         } else {
-            holder.tvName.setText(requestModel.getUserName());
+            holder.tvName.setText(requestModel.getUserDisplayName());
             holder.tvMessage.setText(requestModel.getGroupName());
             holder.tvAccept.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -62,7 +63,7 @@ public class RequestRecyclerAdapter extends RecyclerView.Adapter<RequestViewHold
                 }
             });
             String imageUri = requestModel.getIconUrl();
-            if (imageUri != null) {
+            if (!TextUtils.isEmpty(imageUri)) {
                 final Context mContext = holder.itemView.getContext();
                 Glide.with(mContext)
                         .load(imageUri)

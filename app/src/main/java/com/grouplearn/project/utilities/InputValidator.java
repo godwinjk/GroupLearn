@@ -72,9 +72,7 @@ public class InputValidator {
 
     public int validateUserName(EditText et_userName) {
         String userName = et_userName.getText().toString().trim();
-
         int status = 0;
-
 
         if (hasSpecialCharactersForUserName(userName)) {
             Log.d(TAG, "Invalid user name||not alpha numeric");
@@ -359,7 +357,7 @@ public class InputValidator {
     }
 
     private boolean hasSpecialCharactersForUserName(String value) {
-        Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+        Pattern p = Pattern.compile("[^a-z0-9@_. ]", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(value);
         boolean b = m.find();
         Log.d(TAG, "Special Character >>>>  :" + b + ":" + value);

@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.text.TextUtils;
 
 import com.grouplearn.project.app.databaseManagament.tables.TableContacts;
 import com.grouplearn.project.bean.GLContact;
@@ -14,8 +15,8 @@ import java.util.ArrayList;
  * Created by Godwin Joseph on 07-06-2016 21:48 for Group Learn application.
  */
 public class ContactDbHelper extends DataBaseHelper {
-    Context mContext;
-    ContentResolver mContentResolver;
+
+    private ContentResolver mContentResolver;
 
     public ContactDbHelper(Context mContext) {
         super(mContext);
@@ -30,10 +31,11 @@ public class ContactDbHelper extends DataBaseHelper {
     }
 
     public void addContact(GLContact model) {
-        ContentValues cv = getContentValuesForContacts(model);
         int count = updateContact(model);
-        if (count <= 0)
+        if (count <= 0) {
+            ContentValues cv = getContentValuesForContacts(model);
             mContentResolver.insert(TableContacts.CONTENT_URI, cv);
+        }
     }
 
     public int updateContact(GLContact model) {
@@ -41,6 +43,9 @@ public class ContactDbHelper extends DataBaseHelper {
         String where = TableContacts.CONTACT_NUMBER + " = '" + model.getContactNumber() + "'";
         cv.put(TableContacts.CONTACT_CLOUD_ID, model.getContactUniqueId());
         cv.put(TableContacts.CONTACT_FOUND, model.getStatus());
+        cv.put(TableContacts.CONTACT_ICON_URI, model.getIconUrl());
+        if (!TextUtils.isEmpty(model.getContactStatus()))
+            cv.put(TableContacts.CONTACT_STATUS, model.getContactStatus());
         return mContentResolver.update(TableContacts.CONTENT_URI, cv, where, null);
     }
 
@@ -85,6 +90,16 @@ public class ContactDbHelper extends DataBaseHelper {
             model.setIconUrl(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_ICON_URI)));
 
             return model;
+        }
+        return null;
+    }
+
+    private GLContact getContact(String contactId) {
+        String where = TableContacts.CONTACT_ID + "='" + contactId + "'";
+        Cursor cursor = mContentResolver.query(TableContacts.CONTENT_URI, null, where, null, null);
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            return getContactFromCursor(cursor);
         }
         return null;
     }

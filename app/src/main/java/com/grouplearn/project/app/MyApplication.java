@@ -1,11 +1,11 @@
 package com.grouplearn.project.app;
 
+import android.app.Application;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.facebook.stetho.Stetho;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.contact.ContactReadTask;
@@ -17,12 +17,10 @@ import com.grouplearn.project.utilities.errorManagement.AppError;
 
 import java.util.ArrayList;
 
-import it.moondroid.chatbot.ChatBotApplication;
-
 /**
  * Created by Godwin Joseph on 24-05-2016 14:06 for Group Learn application.
  */
-public class MyApplication extends ChatBotApplication {
+public class MyApplication extends Application {
     private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 101;
     static MyApplication context;
     private RequestQueue mRequestQueue;
@@ -31,10 +29,22 @@ public class MyApplication extends ChatBotApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        Stetho.initializeWithDefaults(this);
+/*        Stetho.InitializerBuilder initializerBuilder =
+                Stetho.newInitializerBuilder(this);
+
+        initializerBuilder.enableWebKitInspector(
+                Stetho.defaultInspectorModulesProvider(this)
+        );
+
+        initializerBuilder.enableDumpapp(
+                Stetho.defaultDumperPluginsProvider(context)
+        );
+
+        Stetho.Initializer initializer = initializerBuilder.build();
+        Stetho.initialize(initializer);*/
+//        Stetho.initializeWithDefaults(this);
         context = this;
         readContacts();
-
     }
 
     public static MyApplication getAppContext() {
@@ -46,7 +56,7 @@ public class MyApplication extends ChatBotApplication {
         boolean isLogIn = mPref.getBooleanPrefValue(PreferenceConstants.IS_LOGIN);
         if (isLogIn) {
             ContactDbHelper mDbHelper = new ContactDbHelper(this);
-            if (mDbHelper.getContacts().size() <= 0) {
+            if (/*mDbHelper.getContacts().size() <= 0*/true) {
                 ContactReadTask readTask = new ContactReadTask(this);
                 readTask.setContactViewInterface(new ContactViewInterface() {
                     @Override

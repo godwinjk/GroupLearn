@@ -33,9 +33,9 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="User name"
+                android:hint="Email Id"
                 android:imeOptions="actionDone"
-                android:inputType="text"
+                android:inputType="textWebEmailAddress"
                 android:maxLength="32"
                 android:maxLines="1" />
         </android.support.design.widget.TextInputLayout>
@@ -106,8 +106,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="50dp"
-        android:backgroundTint="@color/colorPrimary"
+        android:layout_margin="10dp"
+        android:background="@drawable/round_btn_selector"
         android:text="Submit"
         android:textColor="@color/white" />
 </RelativeLayout>

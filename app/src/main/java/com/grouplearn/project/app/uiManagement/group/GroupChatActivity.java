@@ -1,9 +1,12 @@
 package com.grouplearn.project.app.uiManagement.group;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +14,10 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -29,6 +36,8 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
@@ -40,6 +49,7 @@ import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
 import com.grouplearn.project.app.uiManagement.notification.NotificationManager;
 import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.bean.GLMessage;
+import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.ChatUtilities;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -58,6 +68,7 @@ import it.moondroid.chatbot.Constants;
 public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnInitListener {
 
     private static final String TAG = "GroupChatActivity";
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 101;
     long groupUniqueId;
     Toolbar toolbar;
     ImageView ivSent;
@@ -74,7 +85,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
     boolean isGodwinBot = false;
     boolean isTtsEnabled = false;
     long myUserId;
-
+    ImageView ivGroupIcon;
     TextToSpeech textToSpeech;
     private ArrayList<GLMessage> godwinBotConversation = new ArrayList<>();
     private boolean isZoomAnimation = true;
@@ -88,7 +99,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
         mContext = this;
         mPref = new AppSharedPreference(mContext);
 
-        groupUniqueId = intent.getLongExtra("groupCloudId",-1);
+        groupUniqueId = intent.getLongExtra("groupCloudId", -1);
 
         if (groupUniqueId == -11223344) {
             isGodwinBot = true;
@@ -118,6 +129,10 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
         intentFilter.addAction("chatRefresh");
 
         registerReceiver(chatReceiver, intentFilter);
+
+        mGroupModel = new GroupDbHelper(mContext).getGroupInfo(groupUniqueId);
+        String imageUri = mGroupModel.getIconUrl();
+        setupGroupIcon(imageUri);
     }
 
     @Override
@@ -143,6 +158,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
         ivSent = (ImageView) findViewById(R.id.iv_sent);
         ivInputType = (ImageView) findViewById(R.id.iv_input_type);
 
+        ivGroupIcon = (ImageView) findViewById(R.id.iv_group_icon);
         rvChatList.scrollToPosition(mChatRecyclerAdapter.getItemCount() - 1);
 
         setSentButtonType(1);
@@ -161,6 +177,25 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
             etChatBox.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
             etChatBox.setMaxLines(5);
             etChatBox.setImeOptions(EditorInfo.IME_ACTION_NONE);
+        }
+        String imageUri = mGroupModel.getIconUrl();
+        setupGroupIcon(imageUri);
+    }
+
+    private void setupGroupIcon(String imageUri) {
+        if (!TextUtils.isEmpty(imageUri)) {
+            Glide.with(mContext)
+                    .load(imageUri)
+                    .asBitmap()
+                    .centerCrop()
+                    .into(new BitmapImageViewTarget(ivGroupIcon) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            ivGroupIcon.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
         }
     }
 
@@ -252,93 +287,95 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
     }
 
     private void speechRecognizer() {
-        recognizer = SpeechRecognizer.createSpeechRecognizer(mContext);
+        if (checkPermission()) {
+            recognizer = SpeechRecognizer.createSpeechRecognizer(mContext);
 
-        final StringBuilder builder = new StringBuilder();
-        recognizer.setRecognitionListener(new RecognitionListener() {
-            @Override
-            public void onReadyForSpeech(Bundle params) {
-                Log.e(TAG, "onReadyForSpeech");
-            }
+            final StringBuilder builder = new StringBuilder();
+            recognizer.setRecognitionListener(new RecognitionListener() {
+                @Override
+                public void onReadyForSpeech(Bundle params) {
+                    Log.e(TAG, "onReadyForSpeech");
+                }
 
-            @Override
-            public void onBeginningOfSpeech() {
-                Log.e(TAG, "onBeginningOfSpeech");
-            }
+                @Override
+                public void onBeginningOfSpeech() {
+                    Log.e(TAG, "onBeginningOfSpeech");
+                }
 
-            @Override
-            public void onRmsChanged(float rmsdB) {
-                float value = (float) (10 * Math.pow(10, ((double) rmsdB / (double) 10)));
-                Log.e(TAG, "onRmsChanged \t" + rmsdB + " value \t" + value);
+                @Override
+                public void onRmsChanged(float rmsdB) {
+                    float value = (float) (10 * Math.pow(10, ((double) rmsdB / (double) 10)));
+                    Log.e(TAG, "onRmsChanged \t" + rmsdB + " value \t" + value);
 //                zoomAnimation(rmsdB);
-            }
+                }
 
-            @Override
-            public void onBufferReceived(byte[] buffer) {
-                Log.e(TAG, "onBufferReceived");
-            }
+                @Override
+                public void onBufferReceived(byte[] buffer) {
+                    Log.e(TAG, "onBufferReceived");
+                }
 
-            @Override
-            public void onEndOfSpeech() {
-                Log.e(TAG, "onEndOfSpeech");
-            }
+                @Override
+                public void onEndOfSpeech() {
+                    Log.e(TAG, "onEndOfSpeech");
+                }
 
-            @Override
-            public void onError(int error) {
-                Log.e(TAG, "onError" + error);
-                DisplayInfo.showToast(mContext, getErrorText(error));
-            }
+                @Override
+                public void onError(int error) {
+                    Log.e(TAG, "onError" + error);
+                    DisplayInfo.showToast(mContext, getErrorText(error));
+                }
 
-            @Override
-            public void onResults(Bundle results) {
-                Log.e(TAG, "onResults" + results.toString());
-                final ArrayList<String> texts = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                @Override
+                public void onResults(Bundle results) {
+                    Log.e(TAG, "onResults" + results.toString());
+                    final ArrayList<String> texts = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
 //                builder.append(texts.get(0) + "\t");
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        String finalText = texts.get(0);
-                        etChatBox.setText(finalText);
-                        processResult(finalText);
-                    }
-                });
-            }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String finalText = texts.get(0);
+                            etChatBox.setText(finalText);
+                            processResult(finalText);
+                        }
+                    });
+                }
 
-            @Override
-            public void onPartialResults(Bundle partialResults) {
-                Log.e(TAG, "onPartialResults");
-                ArrayList<String> texts = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                @Override
+                public void onPartialResults(Bundle partialResults) {
+                    Log.e(TAG, "onPartialResults");
+                    ArrayList<String> texts = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 //                for (String word : texts) {
 //                    builder.append(word + "\t");
 //                }
-                builder.append(texts.get(0) + " ");
-                etChatBox.setText(texts.get(0));
-                Log.e(TAG, "onPartialResults" + builder.toString());
-            }
+                    builder.append(texts.get(0) + " ");
+                    etChatBox.setText(texts.get(0));
+                    Log.e(TAG, "onPartialResults" + builder.toString());
+                }
 
-            @Override
-            public void onEvent(int eventType, Bundle params) {
-                Log.e(TAG, "onEvent");
-            }
-        });
-        Intent recognizerIntent;
-        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, this.getPackageName());
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1000);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 3000);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak Now");
+                @Override
+                public void onEvent(int eventType, Bundle params) {
+                    Log.e(TAG, "onEvent");
+                }
+            });
+            Intent recognizerIntent;
+            recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, this.getPackageName());
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1000);
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 3000);
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak Now");
 
-        recognizer.startListening(recognizerIntent);
+            recognizer.startListening(recognizerIntent);
 //        startActivity(recognizerIntent);
-        Log.e(TAG, "START LISTNEING");
+            Log.e(TAG, "START LISTNEING");
 //        DisplayInfo.showToast(mContext, "Say 'SEND' or 'CANCEL/DISMISS' at last to send or dismiss message");
-        DisplayInfo.showToast(mContext, "Say something loud");
+            DisplayInfo.showToast(mContext, "Say something loud");
+        }
     }
 
     private void processResult(String message) {
@@ -408,16 +445,24 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
         if (mChatRecyclerAdapter != null && mChatRecyclerAdapter.getMessageModels().size() > 0) {
             GLMessage model = mChatRecyclerAdapter.getMessageModels().get(mChatRecyclerAdapter.getMessageModels().size() - 1);
             long currentTimeInMillis = System.currentTimeMillis();
-            BigDecimal lastActivity = new BigDecimal(model.getTimeStamp());
-            long difference = (currentTimeInMillis - lastActivity.longValue());
+            if (TextUtils.isEmpty(model.getTimeStamp())) {
+                return;
+            }
+            double timestamp = Double.parseDouble(model.getTimeStamp());
+
+            long lastActivity = (long) Math.abs(timestamp);
+            int numberOfDigit = (int) (Math.log10(lastActivity) + 1);
+            if (numberOfDigit == 10)
+                lastActivity *= 1000;
+            long difference = (currentTimeInMillis - lastActivity);
             String message = "";
             if (difference <= 1000) {
                 message = "a moment ago";
-            } else if (difference < 60000) {
+            } else if (difference < /*59 **/ 60 * 1000) {
                 message = ((int) (difference / (1000 * 60))) + " minutes ago";
             } else {
-                SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy HH:mm");
-                message = format.format(new Date(lastActivity.longValue()));
+                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                message = format.format(new Date(lastActivity));
             }
             toolbar.setSubtitle("last activity : " + message);
         }
@@ -557,12 +602,12 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
     }
 
     private void setSentButtonType(int tag) {
+        if (tag == 1)
+            return;
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
             if (tag == 1) {
                 ivSent.setTag(2);
                 ivSent.setImageResource(R.drawable.mic_128);
-
             } else {
                 ivSent.setTag(1);
                 ivSent.setImageResource(R.drawable.sent);
@@ -605,4 +650,22 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
         super.onDestroy();
     }
 
+    private boolean checkPermission() {
+        if (AppUtility.checkPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.RECORD_AUDIO
+                    },
+                    MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
+            return false;
+        } else
+            return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults != null) {
+            speechRecognizer();
+        }
+    }
 }

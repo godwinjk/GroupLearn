@@ -5,8 +5,11 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import com.grouplearn.project.R;
 import com.grouplearn.project.utilities.GeneralAlert;
@@ -45,9 +48,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onBackPressed();
             }
         });
+        setupToolbarWithBetaTag();
         return mToolbar;
     }
 
@@ -63,7 +67,22 @@ public abstract class BaseActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+        setupToolbarWithBetaTag();
         return mToolbar;
+    }
+
+    private void setupToolbarWithBetaTag() {
+        try {
+            TextView toolbarTitle = (TextView) mToolbar.getChildAt(0);
+            if (toolbarTitle != null) {
+                String s = "GroupLearn  beta";
+                SpannableString ss1 = new SpannableString(s);
+                ss1.setSpan(new RelativeSizeSpan(.5f), 10, s.length(), 0); // set size
+                toolbarTitle.setText(ss1);
+            }
+        } catch (Exception e) {
+
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.grouplearn.project.cloud;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
@@ -24,19 +25,23 @@ import java.net.URL;
  * Created by WiSilica on 11-12-2016 17:31 for GroupLearn application.
  */
 
-public class ThumbNailLoader extends AsyncTask<Void, Void, String> {
+public class ThumbNailLoader extends AsyncTask<String, Void, String> {
     public static final int GET_METHOD = 0;
 
     private static final String TAG = "WiseConnectHttpMethod";
     final String timeOutException = "TIMED_OUT";
-    final String BAD_REQUEST = "Response Code : ";
+    private final String BAD_REQUEST = "Response Code : ";
 
-    Context mContext;
-    String url = "http://google.com/";
-    int TIME_OUT = 60 * 1000;
+    private Context mContext;
+    private String url = "http://stackoverflow.com/";
+    private int TIME_OUT = 60 * 1000;
 
-    public ThumbNailLoader(Context mContext) {
+    private ThumbNailLoaderCallback mCallback;
+
+    public ThumbNailLoader(Context mContext, String url, ThumbNailLoaderCallback callback) {
         this.mContext = mContext;
+        this.mCallback = callback;
+        this.url = url;
     }
 
     @Override
@@ -46,7 +51,8 @@ public class ThumbNailLoader extends AsyncTask<Void, Void, String> {
 
 
     @Override
-    protected String doInBackground(Void... params) {
+    protected String doInBackground(String... params) {
+//        this.url = params[0];
         String response = "";
         try {
             if (!TextUtils.isEmpty(getUrl().toString())) {
@@ -83,13 +89,21 @@ public class ThumbNailLoader extends AsyncTask<Void, Void, String> {
 
             } else {
                 Log.e(TAG, "INVALID URL ||INVALID URL ||INVALID URL ||INVALID URL ");
+                if (mCallback != null)
+                    mCallback.onThumbNailLoadingFailed();
                 return null;
             }
         } catch (ProtocolException e) {
+            if (mCallback != null)
+                mCallback.onThumbNailLoadingFailed();
             e.printStackTrace();
         } catch (IOException e) {
+            if (mCallback != null)
+                mCallback.onThumbNailLoadingFailed();
             e.printStackTrace();
         } catch (IllegalStateException e) {
+            if (mCallback != null)
+                mCallback.onThumbNailLoadingFailed();
             Log.e(TAG, "ALREADY CONNECTED");
         }
         return null;
@@ -97,15 +111,12 @@ public class ThumbNailLoader extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(String doc) {
-        super.onPostExecute(doc);
-
-//        try {
-//            doc = Jsoup.connect("http://stackoverflow.com/").get();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        Document document=Jsoup.parse(doc);
+        if (TextUtils.isEmpty(doc)) {
+            return;
+        }
+        Document document = Jsoup.parse(doc);
         Elements elements = document.select("meta");
+        String title = document.title();
 
         for (Element e : elements) {
             //fetch image url from content attribute of meta tag.
@@ -114,6 +125,9 @@ public class ThumbNailLoader extends AsyncTask<Void, Void, String> {
             //OR more specifically you can check meta property.
             if (e.attr("property").equalsIgnoreCase("og:image")) {
                 imageUrl = e.attr("content");
+                Uri uri = Uri.parse(imageUrl);
+                if (mCallback != null)
+                    mCallback.onThumbNailLoaded(title, uri);
                 break;
             }
         }
@@ -166,6 +180,7 @@ public class ThumbNailLoader extends AsyncTask<Void, Void, String> {
             switch (requestMethod) {
                 case GET_METHOD:
                     urlConnection.setRequestMethod("GET");
+                    urlConnection.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
                     Log.v(TAG, "REQUEST METHOD : GET");
                     break;
             }

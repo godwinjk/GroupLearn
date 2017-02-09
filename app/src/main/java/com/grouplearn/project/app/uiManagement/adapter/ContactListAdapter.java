@@ -8,6 +8,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
-import com.bumptech.glide.signature.StringSignature;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.ContactItemHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
@@ -55,6 +55,12 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
         notifyDataSetChanged();
     }
 
+    private void clear() {
+        mContactModels.clear();
+        filterContacts.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
         return filterContacts.size();
@@ -79,6 +85,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             holder.tvContactName = (TextView) convertView.findViewById(R.id.tv_contact_name);
             holder.tvContactNumber = (TextView) convertView.findViewById(R.id.tv_contact_number);
             holder.tvInvite = (TextView) convertView.findViewById(R.id.tv_invite);
+            holder.tvStatus = (TextView) convertView.findViewById(R.id.tv_contact_status);
             holder.ivIcon = (ImageView) convertView.findViewById(R.id.iv_contact_image);
             holder.llContactItem = (LinearLayout) convertView.findViewById(R.id.ll_contact_item);
             convertView.setTag(holder);
@@ -87,39 +94,22 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
 
         final GLContact model = (GLContact) getItem(position);
 
-        String imageUri = model.getIconUrl();
-        if (imageUri != null) {
-            Glide.with(mContext)
-                    .load(imageUri)
-                    .asBitmap()
-                    .centerCrop()
-                    .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
-                    .into(new BitmapImageViewTarget(holder.ivIcon) {
-                        @Override
-                        protected void setResource(Bitmap resource) {
-                            RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
-                            circularBitmapDrawable.setCircular(true);
-                            holder.ivIcon.setImageDrawable(circularBitmapDrawable);
-                        }
-                    });
-        }
         if (type == 0 && model.getStatus() == 1) {
             holder.tvInvite.setVisibility(View.INVISIBLE);
+            holder.tvStatus.setVisibility(View.VISIBLE);
         } else if (type == 1 && model.getStatus() == 1) {
             holder.tvInvite.setVisibility(View.VISIBLE);
+            holder.tvStatus.setVisibility(View.VISIBLE);
         } else if (type == 0 && model.getStatus() == 0) {
+            holder.tvStatus.setVisibility(View.INVISIBLE);
             holder.tvInvite.setVisibility(View.VISIBLE);
         }
 
         holder.tvContactName.setText(model.getContactName());
+        holder.tvStatus.setText(model.getContactStatus());
         holder.tvContactNumber.setText(model.getContactNumber());
         holder.ivIcon.setBackground(getBackgroundDrawable(mContext, position));
-        if (model.getContactImage() != null) {
-            Bitmap bitmap = model.getContactImage();
-            holder.ivIcon.setImageBitmap(bitmap);
-        } else {
-            holder.ivIcon.setImageResource(R.drawable.contact_white);
-        }
+
         holder.tvInvite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,7 +123,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             public void onClick(View v) {
                 if (model.getContactId() != null) {
                     if (onRecyclerItemClickListener != null) {
-                        onRecyclerItemClickListener.onItemClicked(position, model, v);
+                        onRecyclerItemClickListener.onItemClicked(position, model, holder.ivIcon);
                     }
                 }
             }
@@ -143,11 +133,37 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             public void onClick(View v) {
                 if (model.getContactUniqueId() > 0) {
                     if (onRecyclerItemClickListener != null) {
-                        onRecyclerItemClickListener.onItemClicked(position, model, v);
+                        onRecyclerItemClickListener.onItemClicked(position, model, holder.ivIcon);
                     }
                 }
             }
         });
+        String imageUri = model.getIconUrl();
+        if (model.getStatus() == 1 && !TextUtils.isEmpty(imageUri)) {
+            holder.ivIcon.setPadding(0, 0, 0, 0);
+            Glide.with(mContext)
+                    .load(imageUri)
+                    .asBitmap()
+                    .centerCrop()
+                    .into(new BitmapImageViewTarget(holder.ivIcon) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            holder.ivIcon.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+        } else if (model.getContactImage() != null) {
+            Bitmap bitmap = model.getContactImage();
+            holder.ivIcon.setPadding(0, 0, 0, 0);
+            holder.ivIcon.setImageBitmap(bitmap);
+        } else {
+            float scale = mContext.getResources().getDisplayMetrics().density;
+            int dpAsPixels = (int) (10 * scale + 0.5f);
+            holder.ivIcon.setPadding(dpAsPixels, dpAsPixels, dpAsPixels, dpAsPixels);
+            holder.ivIcon.setImageResource(R.drawable.contact_white);
+        }
+
         return convertView;
     }
 
@@ -210,5 +226,15 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
 
     public void setOnRecyclerItemClickListener(OnRecyclerItemClickListener onRecyclerItemClickListener) {
         this.onRecyclerItemClickListener = onRecyclerItemClickListener;
+    }
+
+    public ArrayList<GLContact> getContactsInCloud() {
+        ArrayList<GLContact> contacts = new ArrayList<>();
+        for (GLContact contact : mContactModels) {
+            if (contact.getStatus() > 0) {
+                contacts.add(contact);
+            }
+        }
+        return contacts;
     }
 }

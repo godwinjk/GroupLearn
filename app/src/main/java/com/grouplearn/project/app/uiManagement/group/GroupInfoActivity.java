@@ -1,12 +1,17 @@
 package com.grouplearn.project.app.uiManagement.group;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.graphics.Palette;
@@ -17,12 +22,12 @@ import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
-import com.bumptech.glide.signature.StringSignature;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
@@ -55,6 +60,7 @@ import java.util.ArrayList;
 public class GroupInfoActivity extends BaseActivity {
     private static final int ACTIVITY_IMAGE_GET_REQUEST_CODE = 101;
     private static final String TAG = "GroupInfoActivity";
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 101;
     CollapsingToolbarLayout collapsingToolbarLayout;
     Toolbar mToolbar;
     Context mContext;
@@ -135,10 +141,12 @@ public class GroupInfoActivity extends BaseActivity {
     }
 
     private void showFileChooser() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), ACTIVITY_IMAGE_GET_REQUEST_CODE);
+        if (checkPermission()) {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), ACTIVITY_IMAGE_GET_REQUEST_CODE);
+        }
     }
 
     @Override
@@ -238,12 +246,11 @@ public class GroupInfoActivity extends BaseActivity {
 
     private Bitmap setProfilePic(final String imageUri) {
         final Bitmap bitmap = BitmapFactory.decodeFile(imageUri);
-        mPref.setStringPrefValue(PreferenceConstants.DP_PATH, imageUri);
+//        mPref.setStringPrefValue(PreferenceConstants.DP_PATH, imageUri);
         Glide.with(mContext)
                 .load(imageUri)
                 .asBitmap()
                 .centerCrop()
-                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
                 .into(new BitmapImageViewTarget(ivGroupImage) {
                     @Override
                     protected void setResource(Bitmap resource) {
@@ -259,6 +266,12 @@ public class GroupInfoActivity extends BaseActivity {
                                 collapsingToolbarLayout.setStatusBarScrimColor(rgb);
                                 collapsingToolbarLayout.setContentScrimColor(rgb);
                                 collapsingToolbarLayout.setBackgroundColor(rgb);
+                                Window window = getWindow();
+                                if (window != null) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        window.setStatusBarColor(rgb);
+                                    }
+                                }
                             }
                             if (mToolbar != null)
                                 mToolbar.setBackgroundColor(swatch.getRgb());
@@ -308,4 +321,20 @@ public class GroupInfoActivity extends BaseActivity {
         return encodedImage;
     }
 
+    private boolean checkPermission() {
+        if (AppUtility.checkPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE
+                    },
+                    MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
+            return false;
+        } else
+            return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        showFileChooser();
+    }
 }

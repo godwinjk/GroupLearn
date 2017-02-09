@@ -10,11 +10,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.grouplearn.project.R;
+import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
+import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
+import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.utilities.AppConstants;
 import com.grouplearn.project.utilities.AppUtility;
+import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
 public class AddGroupActivity extends BaseActivity {
@@ -54,11 +58,28 @@ public class AddGroupActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                etGroupName.setError(null);
                 if (s.length() > 0) {
                     etDescription.setHint("Say something about " + s.toString());
                 } else {
                     etDescription.setHint("Say something...");
                 }
+            }
+        });
+        etDescription.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                etDescription.setError(null);
             }
         });
     }
@@ -75,10 +96,11 @@ public class AddGroupActivity extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.menu_save:
                 if (validate()) {
-                    if (AppUtility.checkInternetConnection())
+                    if (AppUtility.checkInternetConnection()) {
                         saveGroup();
-                } else {
-                    DisplayInfo.showToast(mContext, getString(R.string.no_network));
+                    } else {
+                        DisplayInfo.showToast(mContext, getString(R.string.no_network));
+                    }
                 }
         }
         return super.onOptionsItemSelected(item);
@@ -105,13 +127,31 @@ public class AddGroupActivity extends BaseActivity {
         String groupName = etGroupName.getEditText().getText().toString();
         String description = etDescription.getEditText().getText().toString();
 
-        GLGroup model = new GLGroup();
+        final GLGroup model = new GLGroup();
         model.setGroupCreatedTime("" + System.currentTimeMillis());
         model.setGroupUpdatedTime("" + System.currentTimeMillis());
         model.setGroupName(groupName);
         model.setGroupDescription(description);
+
+        long userId = new AppSharedPreference(mContext).getLongPrefValue(PreferenceConstants.USER_ID);
+        model.setGroupAdminId(userId);
+
         model.setPrivacy(AppConstants.GROUP_VISIBLE_TO_ALL);
-        GroupListInteractor.getInstance(mContext).addGroup(model);
+        DisplayInfo.showLoader(mContext, "Adding group...");
+        GroupListInteractor.getInstance(mContext).addGroup(model, new CloudOperationCallback() {
+            @Override
+            public void onCloudOperationSuccess() {
+                DisplayInfo.dismissLoader(mContext);
+                DisplayInfo.showToast(mContext, "Group added successfully");
+//                new GroupDbHelper(mContext).addSubscribedGroup(model);
+                finish();
+            }
+
+            @Override
+            public void onCloudOperationFailed(AppError error) {
+                DisplayInfo.dismissLoader(mContext);
+            }
+        });
         etDescription.getEditText().setText("");
         etGroupName.getEditText().setText("");
         hideSoftKeyboard();

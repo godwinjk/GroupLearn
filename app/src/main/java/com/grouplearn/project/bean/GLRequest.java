@@ -8,6 +8,7 @@ import android.os.Parcelable;
  */
 public class GLRequest extends BaseModel implements Parcelable {
     String userName;
+    String userDisplayName;
     long userId;
     String userMessage;
     long groupId;
@@ -17,6 +18,14 @@ public class GLRequest extends BaseModel implements Parcelable {
     int action;
     private String iconUrl;
 
+    public String getUserDisplayName() {
+        return userDisplayName;
+    }
+
+    public void setUserDisplayName(String userDisplayName) {
+        this.userDisplayName = userDisplayName;
+    }
+
     public String getIconUrl() {
         return iconUrl;
     }
@@ -24,6 +33,7 @@ public class GLRequest extends BaseModel implements Parcelable {
     public void setIconUrl(String iconUrl) {
         this.iconUrl = iconUrl;
     }
+
     private String definition;
 
     public String getUserName() {

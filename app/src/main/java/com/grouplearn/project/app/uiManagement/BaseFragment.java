@@ -34,4 +34,6 @@ public abstract class BaseFragment extends Fragment {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+
+
 }

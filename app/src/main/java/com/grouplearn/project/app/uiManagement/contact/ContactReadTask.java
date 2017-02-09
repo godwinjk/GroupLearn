@@ -1,17 +1,23 @@
 package com.grouplearn.project.app.uiManagement.contact;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 
 import com.grouplearn.project.app.uiManagement.databaseHelper.ContactDbHelper;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.bean.GLContact;
+import com.grouplearn.project.utilities.AppUtility;
+import com.grouplearn.project.utilities.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +29,7 @@ import java.util.Comparator;
  */
 public class ContactReadTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "ContactReadTask";
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 101;
     Context mContext;
     ArrayList<GLContact> contactList = new ArrayList<>();
     ContactViewInterface contactViewInterface;
@@ -37,7 +44,9 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        contactList = readContacts(contactViewInterface);
+        if (checkPermission()) {
+            contactList = readContacts(contactViewInterface);
+        }
         return null;
     }
 
@@ -129,5 +138,25 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
         if (contactViewInterface != null) {
             contactViewInterface.onGetAllContactsFromDb(contactList);
         }
+    }
+
+    private boolean checkPermission() {
+        if (mContext != null) {
+            try {
+                Activity activity = (Activity) mContext;
+                if (AppUtility.checkPermission(activity, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(activity,
+                            new String[]{Manifest.permission.READ_CONTACTS
+                            },
+                            MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
+                    return false;
+                }
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+                return false;
+            }
+            return true;
+        } else
+            return false;
     }
 }

@@ -22,7 +22,6 @@ public class AppAlertDialog extends AlertDialog.Builder {
     }
 
     public static AppAlertDialog getAlertDialog(Context context) {
-
         mAlertDialog = initializeAlertDialog(context);
         return mAlertDialog;
     }

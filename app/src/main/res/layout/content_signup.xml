@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="40dp"
                 android:gravity="center"
-                android:text="Enter User credentials"
+                android:text="Enter credentials"
                 android:textColor="@color/colorPrimaryTextDark"
                 android:textSize="20dp"
                 android:textStyle="bold" />
@@ -94,8 +94,9 @@
                 android:layout_height="45dp"
                 android:layout_marginBottom="30dp"
                 android:layout_marginTop="30dp"
-                android:backgroundTint="@color/colorPrimaryTextDark"
+                android:background="@drawable/round_btn_selector"
                 android:clickable="true"
+                android:textColor="@color/white"
                 android:text="@string/sign_up"
                 android:textAllCaps="false" />
         </LinearLayout>

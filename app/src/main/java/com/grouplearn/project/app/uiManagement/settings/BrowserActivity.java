@@ -45,8 +45,16 @@ public class BrowserActivity extends BaseActivity {
     @Override
     public void initializeWidgets() {
         wvBrowser = (WebView) findViewById(R.id.wv_browser);
+
         wvBrowser.setWebViewClient(new WebViewClient());
+        wvBrowser.getSettings().setJavaScriptEnabled(true);
+        wvBrowser.getSettings().setLoadWithOverviewMode(true);
+        wvBrowser.getSettings().setUseWideViewPort(true);
+        wvBrowser.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        wvBrowser.getSettings().setAllowFileAccess(true);
+        wvBrowser.getSettings().setDomStorageEnabled(true);
         wvBrowser.loadUrl(uri);
+
     }
 
     @Override

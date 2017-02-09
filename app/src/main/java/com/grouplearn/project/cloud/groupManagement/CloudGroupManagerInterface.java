@@ -3,8 +3,8 @@ package com.grouplearn.project.cloud.groupManagement;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.groupManagement.addGroup.CloudAddGroupRequest;
 import com.grouplearn.project.cloud.groupManagement.addSubscribedGroup.CloudAddSubscribedGroupRequest;
-import com.grouplearn.project.cloud.groupManagement.deleteGroup.CloudContactDeleteRequest;
-import com.grouplearn.project.cloud.groupManagement.exitGroup.CloudExitGroupRequest;
+import com.grouplearn.project.cloud.groupManagement.deleteGroup.CloudDeleteGroupRequest;
+import com.grouplearn.project.cloud.groupManagement.exitGroup.CloudExitGroupGroupRequest;
 import com.grouplearn.project.cloud.groupManagement.getGroupRequest.CloudGetSubscribeRequest;
 import com.grouplearn.project.cloud.groupManagement.getGroupSubscribersList.GetGroupSubscribersRequest;
 import com.grouplearn.project.cloud.groupManagement.getGroups.CloudGetGroupsRequest;
@@ -29,7 +29,7 @@ public interface CloudGroupManagerInterface {
 
     public void getAllSubscribeGroupRequest(CloudGetSubscribeRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
 
-    public void exitFromGroup(CloudExitGroupRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
+    public void exitFromGroup(CloudExitGroupGroupRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
 
     public void getAllGroups(CloudGetGroupsRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
 
@@ -41,7 +41,7 @@ public interface CloudGroupManagerInterface {
 
     public void updateInvitation(CloudUpdateGroupInvitationRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
 
-    public void deleteGroup(CloudContactDeleteRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
+    public void deleteGroup(CloudDeleteGroupRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
 
     public void uploadImage(CloudUploadGroupImageRequest cloudRequest, CloudResponseCallback cloudResponseCallback);
 

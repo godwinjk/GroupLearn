@@ -16,11 +16,10 @@ import java.util.TimerTask;
 /**
  * Utility class to display loaders for UI delay procedures.
  *
- * @author Riyas.
+ * @author Godwin J kurinjikattu.
  * @since 09 Sep 2015.
  */
 public class DisplayInfo {
-
     final static String TAG = "DisplayInfo";
     public static ProgressDialog pd_progress;
     public static Toast mToast;

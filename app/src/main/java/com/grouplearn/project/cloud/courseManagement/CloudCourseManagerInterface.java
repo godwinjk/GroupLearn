@@ -17,4 +17,6 @@ public interface CloudCourseManagerInterface {
     public void deleteCourses(CloudDeleteCourseRequest request, CloudResponseCallback callback);
 
     public void getCourses(CloudGetCourseRequest request, CloudResponseCallback callback);
+
+    public void getSubscribedCourses(CloudGetCourseRequest request, CloudResponseCallback callback);
 }

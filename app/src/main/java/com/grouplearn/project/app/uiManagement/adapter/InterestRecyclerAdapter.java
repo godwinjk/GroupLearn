@@ -19,6 +19,7 @@ import java.util.ArrayList;
 public class InterestRecyclerAdapter extends RecyclerView.Adapter<InterestViewHolder> {
     ArrayList<GLInterest> interests = new ArrayList<>();
     OnRecyclerItemClickListener onRecyclerItemClickListener;
+    private boolean type = false;
 
     @Override
     public InterestViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -29,6 +30,7 @@ public class InterestRecyclerAdapter extends RecyclerView.Adapter<InterestViewHo
     @Override
     public void onBindViewHolder(final InterestViewHolder holder, final int position) {
         final GLInterest interest = interests.get(position);
+        holder.ivClose.setVisibility(type ? View.GONE : View.VISIBLE);
         holder.tvInterest.setText(interest.getInterestName());
         holder.ivClose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,7 +51,8 @@ public class InterestRecyclerAdapter extends RecyclerView.Adapter<InterestViewHo
         return interests;
     }
 
-    public void setInterests(ArrayList<GLInterest> interests) {
+    public void setInterests(ArrayList<GLInterest> interests, boolean type) {
+        this.type = type;
         this.interests = interests;
         notifyDataSetChanged();
     }

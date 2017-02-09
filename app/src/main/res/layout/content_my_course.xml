@@ -12,8 +12,30 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_search_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/cv_search"></android.support.v7.widget.RecyclerView>
+
+    <LinearLayout
+        android:id="@+id/ll_loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rv_search_list"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:visibility="visible">
+
+        <android.support.v4.widget.ContentLoadingProgressBar
+            style="@style/Base.Widget.AppCompat.ProgressBar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Loading..." />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_no_items"

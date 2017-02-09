@@ -13,11 +13,31 @@ public class GLCourse extends BaseModel {
     private String contactDetails;
     private String url;
     private String groupName;
-    String groupDescription;
-    String groupIconId;
+    private String groupDescription;
+    private String groupIconId;
     private long groupId;
     private int courseStatus;
     private String iconUrl;
+    private boolean isMine = true;
+    private String courseSiteIconUri;
+    private String courseSiteName;
+    private String courseUserName;
+
+    public String getCourseUserName() {
+        return courseUserName;
+    }
+
+    public void setCourseUserName(String courseUserName) {
+        this.courseUserName = courseUserName;
+    }
+
+    public boolean isMine() {
+        return isMine;
+    }
+
+    public void setMine(boolean mine) {
+        isMine = mine;
+    }
 
     public String getIconUrl() {
         return iconUrl;
@@ -26,6 +46,7 @@ public class GLCourse extends BaseModel {
     public void setIconUrl(String iconUrl) {
         this.iconUrl = iconUrl;
     }
+
     public int getCourseStatus() {
         return courseStatus;
     }
@@ -112,6 +133,22 @@ public class GLCourse extends BaseModel {
 
     public void setGroupDescription(String groupDescription) {
         this.groupDescription = groupDescription;
+    }
+
+    public String getCourseSiteIconUri() {
+        return courseSiteIconUri;
+    }
+
+    public void setCourseSiteIconUri(String courseSiteIconUri) {
+        this.courseSiteIconUri = courseSiteIconUri;
+    }
+
+    public String getCourseSiteName() {
+        return courseSiteName;
+    }
+
+    public void setCourseSiteName(String courseSiteName) {
+        this.courseSiteName = courseSiteName;
     }
 
     public String getGroupIconId() {

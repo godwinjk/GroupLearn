@@ -11,6 +11,7 @@ public class ContactItemHolder {
     public TextView tvContactName;
     public TextView tvContactNumber;
     public TextView tvInvite;
+    public TextView tvStatus;
     public ImageView ivIcon;
     public LinearLayout llContactItem;
 

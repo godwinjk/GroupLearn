@@ -1,10 +1,8 @@
 package com.grouplearn.project.app.uiManagement.group;
 
 import android.animation.Animator;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -69,7 +67,7 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
 
         mFab.setVisibility(View.GONE);
         revealHide(0);
-        makeGodwinBot();
+//        makeGodwinBot();
     }
 
     @Override
@@ -125,12 +123,11 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-
-        GroupListInteractor interactor = GroupListInteractor.getInstance(mContext);
-        interactor.getSubscribedGroups(this);
         registerForContextMenu(lvGroupListView);
-        registerReceiver(chatReceiver, new IntentFilter("chat"));
-        registerReceiver(chatReceiver, new IntentFilter("chatRefresh"));
+        GroupListInteractor interactor = GroupListInteractor.getInstance(mContext);
+        interactor.getMyGroupsFromDatabase(this);
+//        interactor.getSubscribedGroups(this);
+
         MessageInteractor.getInstance().getAllMessages();
     }
 
@@ -139,23 +136,10 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
         super.onPause();
         unregisterForContextMenu(lvGroupListView);
         revealHide(200);
-        unregisterReceiver(chatReceiver);
+
         MessageInteractor.getInstance().stopTimer();
     }
 
-    BroadcastReceiver chatReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("chat")) {
-                GroupListInteractor interactor = GroupListInteractor.getInstance(mContext);
-                interactor.getSubscribedGroupsFromDatabase(GroupListActivity.this);
-                interactor.getSubscribedGroups(GroupListActivity.this);
-            }
-            if (intent.getAction().equals("chatRefresh")) {
-                MessageInteractor.getInstance().getAllMessages();
-            }
-        }
-    };
 
     @Override
     public void initializeWidgets() {
@@ -163,9 +147,8 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         lvGroupListView = (ListView) findViewById(R.id.lv_group_list);
         tvNoGroups = (TextView) findViewById(R.id.tv_no_groups);
-        mGroupListAdapter = new GroupListAdapter(mContext, 1);
+        mGroupListAdapter = new GroupListAdapter(mContext);
         lvGroupListView.setAdapter(mGroupListAdapter);
-
 
         onSearchRequested();
     }
@@ -180,7 +163,7 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
                 long groupUniqueId = ((GLGroup) mGroupListAdapter.getItem(position)).getGroupUniqueId();
 
                 chatIntent.putExtra("groupCloudId", groupUniqueId);
-//                startActivity(chatIntent);
+                startActivity(chatIntent);
 //                }
             }
         });
@@ -283,7 +266,7 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         int position = info.position;
         GLGroup model = mGroupListAdapter.getGroupListData().get(position);
-        if (model.getGroupUniqueId()==-11223344) {
+        if (model.getGroupUniqueId() == -11223344) {
             menu.add(1, 1, 1, "Mark as read");
             menu.add(1, 2, 1, "Group info");
             menu.add(1, 3, 1, "Exit group");

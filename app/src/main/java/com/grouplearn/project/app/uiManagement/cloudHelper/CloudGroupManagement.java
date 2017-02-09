@@ -11,6 +11,8 @@ import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.GroupRequestCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
+import com.grouplearn.project.bean.GLGroup;
+import com.grouplearn.project.bean.GLRequest;
 import com.grouplearn.project.cloud.CloudConnectManager;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
@@ -18,15 +20,14 @@ import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.groupManagement.addGroup.CloudAddGroupRequest;
 import com.grouplearn.project.cloud.groupManagement.addSubscribedGroup.CloudAddSubscribedGroupRequest;
-import com.grouplearn.project.cloud.groupManagement.exitGroup.CloudExitGroupRequest;
+import com.grouplearn.project.cloud.groupManagement.deleteGroup.CloudDeleteGroupResponse;
+import com.grouplearn.project.cloud.groupManagement.exitGroup.CloudExitGroupGroupRequest;
 import com.grouplearn.project.cloud.groupManagement.exitGroup.CloudExitGroupResponse;
 import com.grouplearn.project.cloud.groupManagement.getGroupRequest.CloudGetSubscribeResponse;
 import com.grouplearn.project.cloud.groupManagement.updateGroupRequest.CloudUpdateSubscribeGroupRequest;
 import com.grouplearn.project.cloud.groupManagement.updateGroupRequest.CloudUpdateSubscribeGroupResponse;
 import com.grouplearn.project.cloud.groupManagement.updateInvitation.CloudUpdateGroupInvitationRequest;
 import com.grouplearn.project.cloud.groupManagement.updateInvitation.CloudUpdateGroupInvitationResponse;
-import com.grouplearn.project.bean.GLGroup;
-import com.grouplearn.project.bean.GLRequest;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.AppAlertDialog;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -196,14 +197,14 @@ public class CloudGroupManagement {
 
     public void exitFromSubscribedGroup(long uniqueId, final CloudOperationCallback operationCallback) {
         String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
-        final CloudExitGroupRequest request = new CloudExitGroupRequest();
+        final CloudExitGroupGroupRequest request = new CloudExitGroupGroupRequest();
         request.setToken(token);
-        request.setGroupUniqueIdList(uniqueId);
-        DisplayInfo.showLoader(mContext, "Please wait...");
+        GLGroup group=new GLGroup();
+        group.setGroupUniqueId(uniqueId);
+        request.setGroupUniqueIdList(group);
         CloudResponseCallback callback = new CloudResponseCallback() {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
-                DisplayInfo.dismissLoader(mContext);
                 CloudExitGroupResponse response = (CloudExitGroupResponse) cloudResponse;
                 ArrayList<Long> requestModels = response.getGroupUniqueIdList();
                 if (requestModels.size() > 0) {
@@ -218,9 +219,36 @@ public class CloudGroupManagement {
             @Override
             public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
                 operationCallback.onCloudOperationFailed(new AppError(cloudError.getErrorCode(), cloudError.getErrorMessage()));
-                DisplayInfo.dismissLoader(mContext);
             }
         };
         CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).exitFromGroup(request, callback);
+    }
+    public void deleteSubscribedGroup(long uniqueId,final  CloudOperationCallback operationCallback){
+        String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
+        final CloudExitGroupGroupRequest request = new CloudExitGroupGroupRequest();
+        request.setToken(token);
+        GLGroup group=new GLGroup();
+        group.setGroupUniqueId(uniqueId);
+        request.setGroupUniqueIdList(group);
+        CloudResponseCallback callback = new CloudResponseCallback() {
+            @Override
+            public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
+                CloudDeleteGroupResponse response = (CloudDeleteGroupResponse) cloudResponse;
+                ArrayList<Long> requestModels = response.getGroupUniqueIdList();
+                if (requestModels.size() > 0) {
+                    for (Long model : requestModels) {
+                        operationCallback.onCloudOperationSuccess();
+                        DisplayInfo.showToast(mContext, "Success");
+                        new GroupDbHelper(mContext).deleteSubscribedGroup(model);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
+                operationCallback.onCloudOperationFailed(new AppError(cloudError.getErrorCode(), cloudError.getErrorMessage()));
+            }
+        };
+        CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).deleteGroup(request, callback);
     }
 }

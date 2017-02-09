@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="20dp"
-            android:text="Group Learn"
+            android:text="GroupLearn"
             android:textColor="@color/colorPrimaryTextDark"
             android:textSize="30dp"
             android:textStyle="bold" />
@@ -49,9 +49,9 @@
                         android:layout_height="wrap_content"
                         android:drawableLeft="@drawable/username"
                         android:drawablePadding="10dp"
-                        android:hint="Phone number"
+                        android:hint="Email Id"
                         android:imeOptions="actionNext"
-                        android:inputType="phone"
+                        android:inputType="textWebEmailAddress"
                         android:maxLines="1"
                         android:padding="10dp" />
                 </android.support.design.widget.TextInputLayout>
@@ -99,19 +99,18 @@
                     android:text="New User? SIGN UP"
                     android:textAllCaps="false"
                     android:textColor="@color/colorPrimaryTextDark" />
+
+                <TextView
+                    android:id="@+id/btn_forgot_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:clickable="true"
+                    android:gravity="right"
+                    android:padding="10dp"
+                    android:text="Forgot password?"
+                    android:textAllCaps="false" />
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/btn_forgot_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:clickable="true"
-        android:gravity="center"
-        android:padding="10dp"
-        android:text="Forgot password?"
-        android:textAllCaps="false" />
-
 </LinearLayout>

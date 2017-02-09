@@ -44,19 +44,19 @@
 
     <color name="a1">#FF7079</color>
     <color name="a2">#FF9979</color>
-    <color name="a3">#FFC879</color>
+    <color name="a3">#FF701C</color>
     <color name="a4">#A17EBC</color>
     <color name="a5">#BC7AAB</color>
     <color name="a6">#B9BC7A</color>
     <color name="a7">#998FBC</color>
     <color name="a8">#C6A2D6</color>
-    <color name="a9">#A2D6D1</color>
+    <color name="a9">#A2A6D1</color>
     <color name="a10">#843333</color>
     <color name="a11">#EA5B5B</color>
     <color name="a12">#8AC4EA</color>
     <color name="a13">#EA8AE4</color>
     <color name="a14">#EA8A98</color>
-    <color name="a15">#EAEA8A</color>
+    <color name="a15">#EA5B8A</color>
     <color name="a16">#9FEA8A</color>
     <color name="a17">#628774</color>
     <color name="a18">#628774</color>

@@ -23,12 +23,13 @@
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <ImageView
-                android:transitionName="transition_group_icon"
+                android:id="@+id/iv_group_icon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="end"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/group_person" />
+                android:src="@drawable/group_person"
+                android:transitionName="transition_group_icon" />
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>

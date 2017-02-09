@@ -18,24 +18,19 @@ import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickLis
 import com.grouplearn.project.bean.GLGroup;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by Godwin Joseph on 07-05-2016 14:24 for Group Learn application.
  */
 public class GroupListAdapter extends BaseAdapter {
-    private int mode = 0;
-    Context mContext;
-    LayoutInflater inflater;
+
+    private Context mContext;
+    private LayoutInflater inflater;
     private ArrayList<GLGroup> mGroupList = new ArrayList<>();
-    OnRecyclerItemClickListener onRecyclerItemClickListener;
+    private OnRecyclerItemClickListener onRecyclerItemClickListener;
 
     public GroupListAdapter(Context mContext) {
-        this.mContext = mContext;
-        this.inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    }
-
-    public GroupListAdapter(Context mContext, int mode) {
-        this.mode = 1;
         this.mContext = mContext;
         this.inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -69,17 +64,11 @@ public class GroupListAdapter extends BaseAdapter {
         final GLGroup mGroupModel = mGroupList.get(position);
 
         holder.tvGroupName.setText(mGroupModel.getGroupName());
-        int messageCount = mGroupModel.getNewMessage();
-        if (messageCount == 0) {
-            holder.tvMessageCount.setVisibility(View.GONE);
-        } else {
-            holder.tvMessageCount.setVisibility(View.VISIBLE);
-        }
-        holder.tvMessageCount.setText("" + messageCount);
-        String lastMesage = mGroupModel.getLastMessage();
+
+
 
         String imageUri = mGroupModel.getIconUrl();
-        if (imageUri != null) {
+        if (!TextUtils.isEmpty(imageUri)) {
             Glide.with(mContext)
                     .load(imageUri)
                     .asBitmap()
@@ -96,44 +85,28 @@ public class GroupListAdapter extends BaseAdapter {
         } else {
             holder.ivGroupIcon.setImageResource(R.drawable.group_person);
         }
-
-        if (TextUtils.isEmpty(lastMesage)) {
-            holder.tvLastMessage.setVisibility(View.GONE);
-        } else {
-            String[] splitArray = lastMesage.split(" : ");
-            if (splitArray.length > 1 && splitArray[1].length() > 20) {
-                lastMesage = splitArray[0] + " : " + splitArray[1].substring(0, 20) + "...";
-            }
-            holder.tvLastMessage.setVisibility(View.VISIBLE);
-            holder.tvLastMessage.setText(lastMesage);
-        }
-        if (mode == 1) {
-            holder.tvLastMessage.setVisibility(View.GONE);
-            holder.tvMessageCount.setVisibility(View.GONE);
-        }
-//        holder.llMain.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (onRecyclerItemClickListener != null) {
-//                    onRecyclerItemClickListener.onItemClicked(position, mGroupModel, holder.ivGroupIcon);
-//                }
-//            }
-//        });
-//        holder.llMain.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View view) {
-//                if (onRecyclerItemClickListener != null) {
-//                    onRecyclerItemClickListener.onItemLongClicked(position, mGroupModel, holder.ivGroupIcon);
-//                }
-//                return false;
-//            }
-//
-//        });
         return convertView;
     }
 
     public void setGroupListData(ArrayList<GLGroup> listData) {
-        this.mGroupList = listData;
+        if (this.mGroupList.size() <= 0) {
+            this.mGroupList = (ArrayList<GLGroup>) listData.clone();
+            return;
+        }
+        ArrayList<GLGroup> tempGroupArrayList = new ArrayList<>();
+
+        for (Iterator<GLGroup> iterator = listData.iterator(); iterator.hasNext(); ) {
+            GLGroup tempGroup = iterator.next();
+            for (GLGroup group : mGroupList) {
+                if (tempGroup.getGroupUniqueId() == group.getGroupUniqueId()) {
+                    iterator.remove();
+                } /*else {
+                    tempGroupArrayList.add(tempGroup);
+                }*/
+            }
+        }
+        this.mGroupList.addAll(listData);
+        notifyDataSetChanged();
     }
 
     public ArrayList<GLGroup> getGroupListData() {

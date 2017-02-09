@@ -1,6 +1,7 @@
 package com.grouplearn.project.cloud.contactManagement;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.bean.GLGroup;
@@ -16,15 +17,18 @@ import com.grouplearn.project.cloud.contactManagement.contactGet.CloudContactGet
 import com.grouplearn.project.cloud.contactManagement.search.CloudUserSearchRequest;
 import com.grouplearn.project.cloud.contactManagement.search.CloudUserSearchResponse;
 import com.grouplearn.project.cloud.groupManagement.addGroup.CloudAddGroupResponse;
-import com.grouplearn.project.cloud.groupManagement.deleteGroup.CloudContactDeleteRequest;
+import com.grouplearn.project.cloud.groupManagement.deleteGroup.CloudDeleteGroupRequest;
 import com.grouplearn.project.cloud.networkManagement.CloudAPICallback;
 import com.grouplearn.project.cloud.networkManagement.CloudHttpMethod;
+import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -34,9 +38,10 @@ import java.util.HashMap;
 public class CloudContactManager extends BaseManager implements CloudContactManagerInterface {
     private static final String TAG = "CloudContactManager";
     private String mBaseurl;
-    private Context mContext;
+
 
     public CloudContactManager(Context mContext) {
+        super(mContext);
         this.mContext = mContext;
         this.mBaseurl = CloudConstants.getBaseUrl();
     }
@@ -56,7 +61,6 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                         JSONArray dataArray = jsonObject.optJSONArray(DATA);
                         if (statusObject != null) {
                             response = getUpdatedResponse(statusObject, response);
-
                         } else {
                             if (responseCallback != null) {
                                 responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
@@ -70,12 +74,26 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
 
                                 contactModel.setContactNumber(modelObject.optString("contactName"));
                                 contactModel.setContactUniqueId(modelObject.optLong("contactUserId"));
-                                contactModel.setContactIconId(modelObject.optString("contactIconId"));
-                                contactModel.setPrivacy(modelObject.optInt("privacy"));
+//                                contactModel.setContactIconId(modelObject.optString("contactIconId"));
+//                                contactModel.setPrivacy(modelObject.optInt("privacy"));
                                 contactModel.setContactStatus(modelObject.optString("userStatus"));
-                                contactModel.setIconUrl(modelObject.optString("url"));
+                                if (!TextUtils.isEmpty(modelObject.optString("userStatus"))) {
+                                    Log.d(TAG, contactModel.getContactNumber() + "  :  " + modelObject.optString("userStatus"));
+                                }
+//                                contactModel.setIconUrl(modelObject.optString("contactIconUrl"));
+                                String url = modelObject.optString("contactIconUrl");
+                                if (!TextUtils.isEmpty(url)) {
+                                    try {
+                                        url = URLDecoder.decode(url, "UTF-8");
+                                        url = CloudConstants.getProfileBaseUrl() + url;
+                                        contactModel.setIconUrl(url);
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 contactModel.setStatus(modelObject.optInt("status"));
                                 contactModel.setMessage(modelObject.optString("message"));
+//                                contactModel.setTimeStamp(modelObject.optString("timestamp"));
 
                                 contactModelArrayList.add(contactModel);
                             }
@@ -224,7 +242,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
     }
 
     @Override
-    public void deleteContact(final CloudContactDeleteRequest cloudRequest, final CloudResponseCallback responseCallback) {
+    public void deleteContact(final CloudDeleteGroupRequest cloudRequest, final CloudResponseCallback responseCallback) {
         if (cloudRequest == null || responseCallback == null)
             throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
         CloudAPICallback listener = new CloudAPICallback() {
@@ -295,10 +313,10 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
 
         httpMethod.setHeaderMap(hashMap);
         JSONArray entity = new JSONArray();
-        for (Long string : cloudRequest.getGroupUniqueIdList()) {
+        for (GLGroup string : cloudRequest.getGroupUniqueIdList()) {
             JSONObject modelObject = new JSONObject();
             try {
-                modelObject.put("contactUserId", string);
+                modelObject.put("contactUserId", string.getGroupUniqueId());
                 entity.put(modelObject);
             } catch (JSONException e) {
                 e.printStackTrace();

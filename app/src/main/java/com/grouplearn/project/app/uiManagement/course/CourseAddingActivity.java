@@ -42,7 +42,8 @@ public class CourseAddingActivity extends BaseActivity implements View.OnClickLi
         etCourseDefinition = (TextInputLayout) findViewById(R.id.et_course_description);
         etContactDetails = (TextInputLayout) findViewById(R.id.et_course_contact);
         etSiteUrl = (TextInputLayout) findViewById(R.id.et_course_url);
-
+        String userDisplayName = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME);
+        etContactDetails.getEditText().setText("Created by " + userDisplayName);
     }
 
     @Override

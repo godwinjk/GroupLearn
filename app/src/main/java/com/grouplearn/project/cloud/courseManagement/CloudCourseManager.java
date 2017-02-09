@@ -3,6 +3,7 @@ package com.grouplearn.project.cloud.courseManagement;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.grouplearn.project.bean.GLCourse;
 import com.grouplearn.project.cloud.BaseManager;
 import com.grouplearn.project.cloud.CloudConstants;
 import com.grouplearn.project.cloud.CloudError;
@@ -14,7 +15,6 @@ import com.grouplearn.project.cloud.courseManagement.get.CloudGetCourseRequest;
 import com.grouplearn.project.cloud.courseManagement.get.CloudGetCourseResponse;
 import com.grouplearn.project.cloud.networkManagement.CloudAPICallback;
 import com.grouplearn.project.cloud.networkManagement.CloudHttpMethod;
-import com.grouplearn.project.bean.GLCourse;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 
 import org.json.JSONArray;
@@ -32,10 +32,11 @@ import java.util.HashMap;
 
 public class CloudCourseManager extends BaseManager implements CloudCourseManagerInterface {
     private static final String TAG = "CloudCourseManager";
-    Context mContext;
+
     String mBaseurl;
 
     public CloudCourseManager(Context mContext) {
+        super(mContext);
         this.mContext = mContext;
         mBaseurl = CloudConstants.getBaseUrl();
     }
@@ -346,7 +347,12 @@ public class CloudCourseManager extends BaseManager implements CloudCourseManage
                                     glCourse.setCourseIconId(modelObject.optString("courseIconId"));
                                     glCourse.setContactDetails(modelObject.optString("contact"));
                                     glCourse.setUrl(modelObject.optString("url"));
-//                                    glCourse.setIconUrl(modelObject.optString("groupIconUrl"));
+
+                                    if (TextUtils.isEmpty(cloudRequest.getKey())) {
+                                        glCourse.setMine(true);
+                                    } else {
+                                        glCourse.setMine(false);
+                                    }
                                     glCourse.setGroupIconId(modelObject.optString("groupIconId"));
 
                                     String url = modelObject.optString("groupIconUrl");
@@ -398,6 +404,114 @@ public class CloudCourseManager extends BaseManager implements CloudCourseManage
         CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
         httpMethod.setRequestType(CloudHttpMethod.GET_METHOD);
         httpMethod.setUrl(mBaseurl + "course/1?start=" + cloudRequest.getStartTime() + "&limit=" + cloudRequest.getLimit() + "&key=" + cloudRequest.getKey() + "&userId=" + cloudRequest.getUserId());
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("token", cloudRequest.getToken());
+        hashMap.put("start", "" + cloudRequest.getStartTime());
+        hashMap.put("limit", "" + cloudRequest.getLimit());
+        hashMap.put("key", "" + cloudRequest.getKey());
+
+        httpMethod.setHeaderMap(hashMap);
+        httpMethod.execute();
+    }
+
+    @Override
+    public void getSubscribedCourses(final CloudGetCourseRequest cloudRequest, final CloudResponseCallback responseCallback) {
+        if (cloudRequest == null || responseCallback == null)
+            throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
+        CloudAPICallback listener = new CloudAPICallback() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                CloudGetCourseResponse response = new CloudGetCourseResponse();
+                if (jsonObject != null) {
+                    jsonObject = jsonObject.optJSONObject(RESPONSE);
+                    if (jsonObject != null) {
+                        JSONObject statusObject = jsonObject.optJSONObject(STATUS);
+                        JSONObject dataObject = jsonObject.optJSONObject(DATA);
+                        if (statusObject != null) {
+                            response = (CloudGetCourseResponse) getUpdatedResponse(statusObject, response);
+                            if (dataObject != null) {
+                                int courseCount = dataObject.optInt("subscribedCourseCount", 0);
+                                JSONArray dataArray = dataObject.optJSONArray("subscribedCourseDetails");
+                                response.setCourseCount(courseCount);
+
+                                ArrayList<GLCourse> glCourses = new ArrayList<>();
+                                for (int i = 0; dataArray != null && courseCount > 0 && i < dataArray.length(); i++) {
+                                    JSONObject modelObject = dataArray.optJSONObject(i);
+                                    GLCourse glCourse = new GLCourse();
+
+                                    glCourse.setCourseId(modelObject.optLong("subscribedCourseId"));
+                                    glCourse.setCourseName(modelObject.optString("subscribedCourseName"));
+                                    glCourse.setCourseUserId(modelObject.optLong("subscribedGroupUserId"));
+                                    glCourse.setDefinition(modelObject.optString("definition"));
+
+                                    glCourse.setGroupName(modelObject.optString("subscribedGroupName"));
+                                    glCourse.setGroupId(modelObject.optLong("subscribedGroupId"));
+                                    glCourse.setGroupIconId(modelObject.optString("subscribedGroupIconId"));
+//                                    glCourse.setGroupIconId(modelObject.optString("subscribedGroupIconUrl"));
+                                    glCourse.setGroupDescription(modelObject.optString("definition"));
+                                    glCourse.setCourseUserName(modelObject.optString("subscribedGroupUserName"));
+
+                                    glCourse.setGroupId(modelObject.optLong("subscribedGroupId"));
+                                    glCourse.setContactDetails(modelObject.optString("subscribedCourseContact"));
+                                    glCourse.setUrl(modelObject.optString("subscribedCourseUrl"));
+                                    glCourse.setMine(true);
+                                    if (TextUtils.isEmpty(cloudRequest.getKey())) {
+                                        glCourse.setMine(true);
+                                    } else {
+                                        glCourse.setMine(false);
+                                    }
+                                    glCourse.setGroupIconId(modelObject.optString("groupIconId"));
+
+                                    String url = modelObject.optString("subscribedGroupIconUrl");
+                                    if (!TextUtils.isEmpty(url)) {
+                                        try {
+                                            url = URLDecoder.decode(url, "UTF-8");
+                                            url = CloudConstants.getProfileBaseUrl() + url;
+                                            glCourse.setIconUrl(url);
+                                        } catch (UnsupportedEncodingException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    glCourse.setTimeStamp(modelObject.optString("timestamp"));
+                                    glCourses.add(glCourse);
+                                }
+                                response.setGlCourses(glCourses);
+                                if (responseCallback != null) {
+                                    responseCallback.onSuccess(cloudRequest, response);
+                                }
+                            } else {
+                                if (responseCallback != null) {
+                                    responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_DATA_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_DATA_FROM_CLOUD));
+                                }
+                            }
+                        } else {
+                            if (responseCallback != null) {
+                                responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                            }
+                        }
+                    } else {
+                        if (responseCallback != null) {
+                            responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                        }
+                    }
+                } else {
+                    if (responseCallback != null) {
+                        responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(CloudError cloudError) {
+                if (responseCallback != null) {
+                    responseCallback.onFailure(cloudRequest, cloudError);
+                }
+            }
+        };
+        CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
+        httpMethod.setRequestType(CloudHttpMethod.GET_METHOD);
+        httpMethod.setUrl(mBaseurl + "course-subscription/1?start=" + cloudRequest.getStartTime() + "&limit=" + cloudRequest.getLimit());
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("token", cloudRequest.getToken());

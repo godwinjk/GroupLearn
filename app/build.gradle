@@ -8,8 +8,8 @@ android {
         applicationId "com.grouplearn.project"
         minSdkVersion 19
         targetSdkVersion 23
-        versionCode 14
-        versionName "1.0.14"
+        versionCode 25
+        versionName "1.0.25"
 
         multiDexEnabled true
     }

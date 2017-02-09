@@ -15,9 +15,9 @@ import com.grouplearn.project.cloud.groupManagement.addGroup.CloudAddGroupReques
 import com.grouplearn.project.cloud.groupManagement.addGroup.CloudAddGroupResponse;
 import com.grouplearn.project.cloud.groupManagement.addSubscribedGroup.CloudAddSubscribedGroupRequest;
 import com.grouplearn.project.cloud.groupManagement.addSubscribedGroup.CloudAddSubscribedGroupResponse;
-import com.grouplearn.project.cloud.groupManagement.deleteGroup.CloudContactDeleteRequest;
+import com.grouplearn.project.cloud.groupManagement.deleteGroup.CloudDeleteGroupRequest;
 import com.grouplearn.project.cloud.groupManagement.deleteGroup.CloudDeleteGroupResponse;
-import com.grouplearn.project.cloud.groupManagement.exitGroup.CloudExitGroupRequest;
+import com.grouplearn.project.cloud.groupManagement.exitGroup.CloudExitGroupGroupRequest;
 import com.grouplearn.project.cloud.groupManagement.exitGroup.CloudExitGroupResponse;
 import com.grouplearn.project.cloud.groupManagement.getGroupRequest.CloudGetSubscribeRequest;
 import com.grouplearn.project.cloud.groupManagement.getGroupRequest.CloudGetSubscribeResponse;
@@ -55,10 +55,11 @@ import java.util.HashMap;
  */
 public class CloudGroupManager extends BaseManager implements CloudGroupManagerInterface {
     private static final String TAG = "CloudGroupManager";
-    Context mContext;
+
     String mBaseurl;
 
     public CloudGroupManager(Context mContext) {
+        super(mContext);
         this.mContext = mContext;
         mBaseurl = CloudConstants.getBaseUrl();
     }
@@ -184,7 +185,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                 groupModel.setGroupUniqueId(modelObject.optLong("groupId"));
                                 groupModel.setGroupName(modelObject.optString("groupName"));
                                 groupModel.setGroupDescription(modelObject.optString("definition"));
-                                groupModel.setGroupAdminId(modelObject.optString("groupUserId"));
+                                groupModel.setGroupAdminId(modelObject.optLong("groupUserId"));
                                 groupModel.setGroupIconId(modelObject.optString("groupIconId"));
 
                                 groupModelArrayList.add(groupModel);
@@ -370,7 +371,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                 groupModel.setGroupUniqueId(modelObject.optLong("subscribedGroupId"));
                                 groupModel.setGroupName(modelObject.optString("subscribedGroupName"));
                                 groupModel.setGroupIconId(modelObject.optString("subscribedGroupIconId"));
-                                groupModel.setGroupAdminId(modelObject.optString("subscribedGroupUserId"));
+                                groupModel.setGroupAdminId(modelObject.optLong("subscribedGroupUserId"));
 //                                groupModel.setIconUrl(modelObject.optString("subscribedGroupIconUrl"));
                                 String url = modelObject.optString("subscribedGroupIconUrl");
                                 if (!TextUtils.isEmpty(url)) {
@@ -462,6 +463,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                 groupModel.setGroupIconId(modelObject.optString("requestedGroupIconId"));
                                 groupModel.setUserId(modelObject.optLong("requestedUserId"));
                                 groupModel.setUserName(modelObject.optString("requestedUserName"));
+                                groupModel.setUserDisplayName(modelObject.optString("requestedUserDisplayName"));
                                 groupModel.setIconUrl(modelObject.optString("requestedGroupIconUrl"));
 
                                 String url = modelObject.optString("requestedGroupIconUrl");
@@ -520,7 +522,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
     }
 
     @Override
-    public void exitFromGroup(final CloudExitGroupRequest cloudRequest,
+    public void exitFromGroup(final CloudExitGroupGroupRequest cloudRequest,
                               final CloudResponseCallback responseCallback) {
         if (cloudRequest == null || responseCallback == null)
             throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
@@ -535,9 +537,6 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                         JSONArray dataArray = jsonObject.optJSONArray(DATA);
                         if (statusObject != null) {
                             response = (CloudExitGroupResponse) getUpdatedResponse(statusObject, response);
-                            if (responseCallback != null) {
-                                responseCallback.onFailure(cloudRequest, new CloudError(response.getResponseStatus(), response.getResponseMessage()));
-                            }
                         } else {
                             if (responseCallback != null) {
                                 responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
@@ -587,10 +586,10 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
 
         httpMethod.setHeaderMap(hashMap);
         JSONArray entity = new JSONArray();
-        for (Long uniqueId : cloudRequest.getGroupUniqueIdList()) {
+        for (GLGroup group : cloudRequest.getGroupUniqueIdList()) {
             JSONObject modelObject = new JSONObject();
             try {
-                modelObject.put("groupId", uniqueId);
+                modelObject.put("groupId", group.getGroupUniqueId());
                 entity.put(modelObject);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -629,11 +628,13 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                     groupModel.setGroupUpdatedTime(modelObject.optString("updatedTime"));
                                     groupModel.setGroupUniqueId(modelObject.optLong("groupId"));
                                     groupModel.setGroupName(modelObject.optString("groupName"));
-                                    groupModel.setGroupAdminId(modelObject.optString("groupUserId"));
+                                    groupModel.setGroupAdminId(modelObject.optLong("groupUserId"));
                                     groupModel.setGroupDescription(modelObject.optString("definition"));
                                     groupModel.setGroupIconId(modelObject.optString("groupIconId"));
                                     groupModel.setIconUrl(modelObject.optString("groupIconUrl"));
-
+                                    if (cloudRequest.getKey().equals("852")) {
+                                        groupModel.setMine(false);
+                                    }
                                     groupModelArrayList.add(groupModel);
                                 }
                                 ((CloudGetGroupsResponse) response).setGroupModelArrayList(groupModelArrayList);
@@ -672,7 +673,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
         };
         CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
         httpMethod.setRequestType(CloudHttpMethod.GET_METHOD);
-        httpMethod.setUrl(mBaseurl + "group/1?start=" + cloudRequest.getStartTime() + "&limit=" + cloudRequest.getLimit());
+        httpMethod.setUrl(mBaseurl + "group/1?start=" + cloudRequest.getStartTime() + "&limit=" + cloudRequest.getLimit() + "&key=" + cloudRequest.getKey());
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("token", cloudRequest.getToken());
@@ -808,6 +809,7 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                     groupModel.setGroupIconId(modelObject.optString("invitedGroupIconId"));
                                     groupModel.setUserId(modelObject.optLong("invitedUserId"));
                                     groupModel.setUserName(modelObject.optString("invitedGroupUserName"));
+                                    groupModel.setUserDisplayName(modelObject.optString("invitedGroupUseDisplayrName"));
                                     groupModel.setDefinition(modelObject.optString("definition"));
 
                                     String url = modelObject.optString("invitedGroupIconUrl");
@@ -1053,37 +1055,34 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
     }
 
     @Override
-    public void deleteGroup(final CloudContactDeleteRequest cloudRequest,
+    public void deleteGroup(final CloudDeleteGroupRequest cloudRequest,
                             final CloudResponseCallback responseCallback) {
         if (cloudRequest == null || responseCallback == null)
             throw new IllegalArgumentException(TAG + " : Request Or Response is Null");
         CloudAPICallback listener = new CloudAPICallback() {
             @Override
             public void onSuccess(JSONObject jsonObject) {
-                CloudDeleteGroupResponse response = (CloudDeleteGroupResponse) new CloudConnectResponse();
+                CloudDeleteGroupResponse response = new CloudDeleteGroupResponse();
                 if (jsonObject != null) {
                     jsonObject = jsonObject.optJSONObject(RESPONSE);
                     if (jsonObject != null) {
                         JSONObject statusObject = jsonObject.optJSONObject(STATUS);
-                        JSONObject dataObject = jsonObject.optJSONObject(DATA);
+                        JSONArray dataArray = jsonObject.optJSONArray(DATA);
                         if (statusObject != null) {
                             response = (CloudDeleteGroupResponse) getUpdatedResponse(statusObject, response);
-                            if (responseCallback != null) {
-                                responseCallback.onFailure(cloudRequest, new CloudError(response.getResponseStatus(), response.getResponseMessage()));
-                            }
                         } else {
                             if (responseCallback != null) {
                                 responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
                             }
                         }
-                        if (dataObject != null) {
-                            int groupCount = dataObject.optInt("groupCount", 0);
-                            JSONArray dataArray = dataObject.optJSONArray("groupDetails");
-                            response.setGroupCount(groupCount);
+                        if (dataArray != null) {
+//                            int groupCount = dataObject.optInt("groupCount", 0);
+//                            JSONArray dataArray = dataObject.optJSONArray("groupDetails");
+//                            response.setGroupCount(groupCount);
                             ArrayList<Long> groupUniqueIdList = new ArrayList<>();
-                            for (int i = 0; dataArray != null && groupCount > 0 && i < dataArray.length(); i++) {
+                            for (int i = 0; i < dataArray.length(); i++) {
                                 JSONObject modelObject = dataArray.optJSONObject(i);
-                                groupUniqueIdList.add(modelObject.optLong("groupUniqueId"));
+                                groupUniqueIdList.add(modelObject.optLong("groupId"));
                             }
                             response.setGroupUniqueIdList(groupUniqueIdList);
                             if (responseCallback != null) {
@@ -1115,17 +1114,17 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
         };
         CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
         httpMethod.setRequestType(CloudHttpMethod.POST_METHOD);
-        httpMethod.setUrl("");
+        httpMethod.setUrl(mBaseurl + "groupdelete");
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("token", cloudRequest.getToken());
 
         httpMethod.setHeaderMap(hashMap);
         JSONArray entity = new JSONArray();
-        for (Long uniqueId : cloudRequest.getGroupUniqueIdList()) {
+        for (GLGroup group : cloudRequest.getGroupUniqueIdList()) {
             JSONObject modelObject = new JSONObject();
             try {
-                modelObject.put("groupUniqueId", uniqueId);
+                modelObject.put("groupId", group.getGroupUniqueId());
                 entity.put(modelObject);
             } catch (JSONException e) {
                 e.printStackTrace();

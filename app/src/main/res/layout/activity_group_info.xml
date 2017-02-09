@@ -45,6 +45,7 @@
                     android:layout_gravity="center"
                     android:scaleType="fitCenter"
                     android:src="@drawable/group_person"
+                    android:transitionName="transition_group_icon"
                     app:layout_collapseMode="pin" />
 
                 <ImageView

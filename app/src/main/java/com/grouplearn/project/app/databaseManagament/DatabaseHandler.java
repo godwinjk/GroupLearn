@@ -19,8 +19,8 @@ public class DatabaseHandler {
         this.mContentResolver = mContext.getContentResolver();
     }
 
-    public Cursor getAllSubscribedGroups() {
-        Cursor cursor = mContentResolver.query(TableSubscribedGroups.CONTENT_URI, null, null, null, null);
+    public Cursor getAllSubscribedGroups(String where) {
+        Cursor cursor = mContentResolver.query(TableSubscribedGroups.CONTENT_URI, null, where, null, null);
         return cursor;
     }
 

@@ -67,6 +67,11 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchViewHolder
         notifyDataSetChanged();
     }
 
+    public void clear() {
+        groupList.clear();
+        notifyDataSetChanged();
+    }
+
     public OnRecyclerItemClickListener getItemClickListener() {
         return mItemClickListener;
     }

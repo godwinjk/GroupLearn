@@ -4,16 +4,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
-
 import com.grouplearn.project.cloud.CloudConnectResponse;
 import com.grouplearn.project.cloud.CloudConstants;
 import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.utilities.Log;
-import com.grouplearn.project.utilities.AppConstants;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
-
-import java.io.IOException;
 
 /**
  * Created by Godwin Joseph on 13-05-2016 15:57 for Group Learn application.
@@ -57,7 +53,7 @@ public class GcmRegistration extends AsyncTask<Void, Void, String> {
             mCallBack.onFailure(null, new CloudError(ErrorHandler.GCM_REG_FAILED, ErrorHandler.ErrorMessage.GCM_REG_FAILED));
         else {
             CloudConnectResponse response = new CloudGcmRegistrationResponse();
-            response.setResponseStatus(CloudConstants.SUCCESS_CODE);
+            response.setResponseStatus(mContext,CloudConstants.SUCCESS_CODE);
             response.setResponseMessage(CloudConstants.SUCCESS_MESSAGE);
             response.setTimeStamp(System.currentTimeMillis());
             ((CloudGcmRegistrationResponse) response).setGcmToken(regId);

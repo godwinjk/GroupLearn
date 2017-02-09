@@ -6,19 +6,28 @@ import android.os.Parcelable;
 /**
  * Created by Godwin Joseph on 18-05-2016 23:40 for Group Learn application.
  */
-public class GLGroup extends BaseModel implements Parcelable {
-    long groupUniqueId;
-    String groupName;
-    String groupDescription;
-    String groupIconId;
-    String groupAdminId;
-    int privacy;
-    String groupCreatedTime;
-    String groupUpdatedTime;
-    int newMessage = 0;
-    String lastMessage = null;
-    GLMessage model;
+public class GLGroup extends BaseModel implements Parcelable, Comparable<GLGroup> {
+    private long groupUniqueId;
+    private String groupName;
+    private String groupDescription;
+    private String groupIconId;
+    private long groupAdminId;
+    private int privacy;
+    private String groupCreatedTime;
+    private String groupUpdatedTime;
+    private int newMessage = 0;
+    private String lastMessage = null;
+    private GLMessage model;
     private String iconUrl;
+    private boolean isMine = true;
+
+    public boolean isMine() {
+        return isMine;
+    }
+
+    public void setMine(boolean mine) {
+        isMine = mine;
+    }
 
     public String getIconUrl() {
         return iconUrl;
@@ -27,6 +36,7 @@ public class GLGroup extends BaseModel implements Parcelable {
     public void setIconUrl(String iconUrl) {
         this.iconUrl = iconUrl;
     }
+
     public int getNewMessage() {
         return newMessage;
     }
@@ -91,11 +101,11 @@ public class GLGroup extends BaseModel implements Parcelable {
         this.groupUpdatedTime = groupUpdatedTime;
     }
 
-    public String getGroupAdminId() {
+    public long getGroupAdminId() {
         return groupAdminId;
     }
 
-    public void setGroupAdminId(String groupAdminId) {
+    public void setGroupAdminId(long groupAdminId) {
         this.groupAdminId = groupAdminId;
     }
 
@@ -121,7 +131,7 @@ public class GLGroup extends BaseModel implements Parcelable {
         groupName = in.readString();
         groupDescription = in.readString();
         groupIconId = in.readString();
-        groupAdminId = in.readString();
+        groupAdminId = in.readLong();
         privacy = in.readInt();
         groupCreatedTime = in.readString();
         groupUpdatedTime = in.readString();
@@ -147,7 +157,7 @@ public class GLGroup extends BaseModel implements Parcelable {
         dest.writeString(groupName);
         dest.writeString(groupDescription);
         dest.writeString(groupIconId);
-        dest.writeString(groupAdminId);
+        dest.writeLong(groupAdminId);
         dest.writeInt(privacy);
         dest.writeString(groupCreatedTime);
         dest.writeString(groupUpdatedTime);
@@ -168,4 +178,17 @@ public class GLGroup extends BaseModel implements Parcelable {
             return new GLGroup[size];
         }
     };
+
+    @Override
+    public int compareTo(GLGroup group) {
+        if (this.geMessageModel() != null && this.geMessageModel().getTimeStamp() != null || group.geMessageModel() != null && group.geMessageModel().getTimeStamp() != null) {
+            if (this.geMessageModel() == null)
+                return 1;
+            else if (group.geMessageModel() == null)
+                return -1;
+            else
+                return group.geMessageModel().getTimeStamp().compareTo(this.geMessageModel().getTimeStamp());
+        }
+        return 1;
+    }
 }

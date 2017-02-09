@@ -28,10 +28,11 @@ import java.util.HashMap;
  */
 public class CloudMessageManager extends BaseManager implements CloudMessageManagerInterface {
     private static final String TAG = "CloudMessageManager";
-    private android.content.Context mContext;
+
     String mBaseurl;
 
     public CloudMessageManager(Context mContext) {
+        super(mContext);
         this.mContext = mContext;
         mBaseurl = CloudConstants.getBaseUrl();
     }

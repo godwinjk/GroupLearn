@@ -32,10 +32,10 @@ import java.util.HashMap;
 public class CloudInterestManager extends BaseManager implements CloudInterestManagerInterface {
     private static final String TAG = "CloudInterestManager";
 
-    Context mContext;
     String mBaseUrl;
 
     public CloudInterestManager(Context mContext) {
+        super(mContext);
         this.mContext = mContext;
         mBaseUrl = CloudConstants.getBaseUrl();
     }

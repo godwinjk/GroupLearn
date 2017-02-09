@@ -3,35 +3,49 @@ package com.grouplearn.project.app.uiManagement.course;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseFragment;
 import com.grouplearn.project.app.uiManagement.adapter.CourseSearchRecyclerAdapter;
+import com.grouplearn.project.app.uiManagement.cloudHelper.CloudCourseManager;
+import com.grouplearn.project.app.uiManagement.cloudHelper.CloudGroupManagement;
 import com.grouplearn.project.app.uiManagement.databaseHelper.CourseDbHelper;
 import com.grouplearn.project.app.uiManagement.group.GroupListNewActivity;
+import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.CourseViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.settings.BrowserActivity;
 import com.grouplearn.project.bean.GLCourse;
+import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.cloud.CloudConnectManager;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
 import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
+import com.grouplearn.project.cloud.ThumbNailLoader;
+import com.grouplearn.project.cloud.ThumbNailLoaderCallback;
 import com.grouplearn.project.cloud.courseManagement.delete.CloudDeleteCourseRequest;
 import com.grouplearn.project.utilities.AppUtility;
+import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.AppAlertDialog;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -42,15 +56,19 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 public class MyCourseFragment extends BaseFragment {
-    RecyclerView rvSearchList;
-    TextView tvNoItems;
-    CourseSearchRecyclerAdapter mRecyclerAdapter;
+    private static final String TAG = "MyCourseFragment";
+    private RecyclerView rvSearchList;
+    private TextView tvNoItems;
+    private CourseSearchRecyclerAdapter mRecyclerAdapter;
     private BottomSheetBehavior mBottomSheetBehavior;
-    View bottomSheet;
-    TextView tvContactDetails, tvDescription, tvCourseName, tvCourseDelete;
-    GLCourse course;
-
-    GroupListNewActivity mContext;
+    private View bottomSheet;
+    private TextView tvContactDetails,
+            tvDescription, tvCourseName,
+            tvCourseDelete, tvSiteAddress, tvLearn;
+    private ImageView ivSiteIcon, ivClose;
+    private GLCourse course;
+    private LinearLayout llLoading;
+    private GroupListNewActivity mContext;
 
     public MyCourseFragment() {
         // Required empty public constructor
@@ -67,9 +85,10 @@ public class MyCourseFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mContext = (GroupListNewActivity) getActivity();
+
         initializeWidgets(view);
         registerListeners();
-        getCourses();
+
     }
 
     @Override
@@ -80,14 +99,22 @@ public class MyCourseFragment extends BaseFragment {
 
     @Override
     protected void initializeWidgets(View v) {
-        mRecyclerAdapter = new CourseSearchRecyclerAdapter();
+        mRecyclerAdapter = new CourseSearchRecyclerAdapter(getActivity(), false);
 
         tvNoItems = (TextView) v.findViewById(R.id.tv_no_items);
 
         tvContactDetails = (TextView) v.findViewById(R.id.tv_contact);
         tvDescription = (TextView) v.findViewById(R.id.tv_description);
         tvCourseName = (TextView) v.findViewById(R.id.tv_course_name);
-        tvCourseDelete = (TextView) v.findViewById(R.id.tv_course_delere);
+        tvCourseDelete = (TextView) v.findViewById(R.id.tv_course_delete);
+        tvLearn = (TextView) v.findViewById(R.id.tv_course_learn);
+
+        tvSiteAddress = (TextView) v.findViewById(R.id.tv_course_site);
+        ivSiteIcon = (ImageView) v.findViewById(R.id.iv_course_site_icon);
+        ivClose = (ImageView) v.findViewById(R.id.iv_close);
+
+        tvSiteAddress.setVisibility(View.GONE);
+        ivSiteIcon.setVisibility(View.GONE);
 
         rvSearchList = (RecyclerView) v.findViewById(R.id.rv_search_list);
         rvSearchList.setLayoutManager(new StaggeredGridLayoutManager(1, 1));
@@ -98,27 +125,40 @@ public class MyCourseFragment extends BaseFragment {
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         mBottomSheetBehavior.setPeekHeight(20);
+        llLoading = (LinearLayout) v.findViewById(R.id.ll_loading);
+        llLoading.setVisibility(View.GONE);
     }
 
     @Override
     protected void registerListeners() {
+        ivClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
         tvCourseDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                deleteCourse();
+                if (course != null) {
+                    if (course.isMine()) {
+                        deleteCourse();
+                    } else {
+                        requestCourse();
+                    }
+                }
             }
         });
         mRecyclerAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
             public void onItemClicked(int position, Object model, View v) {
                 course = (GLCourse) model;
-                if (v instanceof TextView) {
+                if (v.getId() == R.id.tv_site) {
                     String uri = course.getUrl();
                     Intent i = new Intent(mContext, BrowserActivity.class);
                     i.putExtra("uri", uri);
                     startActivity(i);
-                } else {
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                } else if (v instanceof LinearLayout) {
                     setup(course);
                 }
             }
@@ -126,6 +166,30 @@ public class MyCourseFragment extends BaseFragment {
             @Override
             public void onItemLongClicked(int position, Object model, View v) {
 
+            }
+        });
+    }
+
+    private void requestCourse() {
+        GLGroup group = new GLGroup();
+        group.setGroupUniqueId(course.getGroupId());
+        group.setGroupName("" + course.getGroupName());
+        group.setGroupIconId("" + course.getGroupIconId());
+        group.setGroupDescription(course.getDefinition());
+        group.setGroupAdminId(course.getCourseUserId());
+        CloudGroupManagement groupManagement = new CloudGroupManagement(mContext);
+        DisplayInfo.showLoader(mContext, getString(R.string.please_wait));
+        groupManagement.addSubscribedGroup(group, new CloudOperationCallback() {
+            @Override
+            public void onCloudOperationSuccess() {
+                DisplayInfo.dismissLoader(mContext);
+                DisplayInfo.showToast(mContext, "Request sent successfully.");
+            }
+
+            @Override
+            public void onCloudOperationFailed(AppError error) {
+                DisplayInfo.dismissLoader(mContext);
+                DisplayInfo.showToast(mContext, "Something went wrong");
             }
         });
     }
@@ -155,12 +219,15 @@ public class MyCourseFragment extends BaseFragment {
         CloudResponseCallback callback = new CloudResponseCallback() {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
+
                 DisplayInfo.dismissLoader(mContext);
-                mRecyclerAdapter.getCourses().remove(course);
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                ArrayList<GLCourse> courses = mRecyclerAdapter.getCourses();
+                courses.remove(course);
+                mRecyclerAdapter.setCourses(courses);
                 CourseDbHelper mDbHelper = new CourseDbHelper(mContext);
                 mDbHelper.deleteCourse(course);
-                mRecyclerAdapter.notifyDataSetChanged();
-                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
             }
 
             @Override
@@ -177,6 +244,7 @@ public class MyCourseFragment extends BaseFragment {
             DisplayInfo.showToast(mContext, getString(R.string.no_network));
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         }
+
     }
 
     @Override
@@ -193,10 +261,93 @@ public class MyCourseFragment extends BaseFragment {
         }
     }
 
-    private void setup(GLCourse course) {
+    private void setup(final GLCourse course) {
         tvContactDetails.setText(course.getContactDetails());
         tvDescription.setText(course.getDefinition());
         tvCourseName.setText(course.getCourseName());
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        long userId = new AppSharedPreference(mContext).getLongPrefValue(PreferenceConstants.USER_ID);
+        if (!course.isMine()) {
+            tvCourseDelete.setText("Join");
+        } else {
+            tvCourseDelete.setText("Delete");
+        }
+        if (course.isMine() && course.getCourseUserId() != userId) {
+            tvCourseDelete.setVisibility(View.GONE);
+        }else {
+            tvCourseDelete.setVisibility(View.VISIBLE);
+        }
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String uri = course.getUrl();
+                Intent i = new Intent(mContext, BrowserActivity.class);
+                i.putExtra("uri", uri);
+                startActivity(i);
+            }
+        };
+        ivSiteIcon.setOnClickListener(clickListener);
+        tvLearn.setOnClickListener(clickListener);
+
+        tvSiteAddress.setVisibility(View.GONE);
+        ivSiteIcon.setVisibility(View.GONE);
+        if (!TextUtils.isEmpty(course.getCourseSiteIconUri())) {
+            tvSiteAddress.setVisibility(View.VISIBLE);
+            ivSiteIcon.setVisibility(View.VISIBLE);
+            String siteName = course.getCourseSiteName();
+            if (siteName.length() > 9) {
+                siteName = siteName.substring(0, 9) + "...";
+            }
+            tvSiteAddress.setText(siteName);
+            Uri uri = Uri.parse(course.getCourseSiteIconUri());
+            Glide.clear(ivSiteIcon);
+            Glide.with(mContext)
+                    .load(uri)
+                    .asBitmap()
+                    .centerCrop()
+                    .into(new BitmapImageViewTarget(ivSiteIcon) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            ivSiteIcon.setImageBitmap(resource);
+                        }
+                    });
+        } else if (!TextUtils.isEmpty(course.getUrl())) {
+            ThumbNailLoader loader = new ThumbNailLoader(mContext, course.getUrl(), new ThumbNailLoaderCallback() {
+                @Override
+                public void onThumbNailLoaded(String siteName, Uri thumbNailLoaded) {
+                    tvSiteAddress.setVisibility(View.VISIBLE);
+                    ivSiteIcon.setVisibility(View.VISIBLE);
+
+                    String tempName = siteName;
+
+                    course.setCourseSiteIconUri(thumbNailLoaded.toString());
+                    course.setCourseSiteName(siteName);
+
+                    new CourseDbHelper(mContext).updateWithSiteDetails(course);
+                    if (siteName.length() > 9) {
+                        tempName = siteName.substring(0, 9) + "...";
+                    }
+                    tvSiteAddress.setText(tempName);
+                    Glide.with(mContext)
+                            .load(thumbNailLoaded)
+                            .asBitmap()
+                            .centerCrop()
+                            .into(new BitmapImageViewTarget(ivSiteIcon) {
+                                @Override
+                                protected void setResource(Bitmap resource) {
+                                    ivSiteIcon.setImageBitmap(resource);
+                                }
+                            });
+                }
+
+                @Override
+                public void onThumbNailLoadingFailed() {
+                    tvSiteAddress.setVisibility(View.GONE);
+                    ivSiteIcon.setVisibility(View.GONE);
+                }
+            });
+            loader.execute();
+        }
     }
 
     private void getCourses() {
@@ -205,7 +356,10 @@ public class MyCourseFragment extends BaseFragment {
         CourseViewInterface courseViewInterface = new CourseViewInterface() {
             @Override
             public void onCourseGetSucces(ArrayList<GLCourse> courses) {
+                if (getActivity() == null)
+                    return;
                 updateData(courses);
+                getRandomCourses();
             }
 
             @Override
@@ -213,17 +367,18 @@ public class MyCourseFragment extends BaseFragment {
                 mContext.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-//                        DisplayInfo.dismissLoader(mContext);
+                        if (getActivity() == null)
+                            return;
                     }
                 });
             }
         };
         if (AppUtility.checkInternetConnection()) {
-            com.grouplearn.project.app.uiManagement.cloudHelper.CloudCourseManager manager = new com.grouplearn.project.app.uiManagement.cloudHelper.CloudCourseManager(mContext);
-            manager.getCourse(courseViewInterface);
-//            DisplayInfo.showLoader(mContext, getString(R.string.please_wait));
+            CloudCourseManager manager = new CloudCourseManager(mContext);
+            manager.getSubscribedCourse(courseViewInterface);
         } else {
-            DisplayInfo.showToast(mContext, getString(R.string.no_network));
+            Log.e(TAG, "NO NETWORK");
+//            DisplayInfo.showToast(mContext, getString(R.string.no_network));
         }
     }
 
@@ -231,11 +386,8 @@ public class MyCourseFragment extends BaseFragment {
         mContext.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                DisplayInfo.dismissLoader(mContext);
                 if (courses != null && courses.size() > 0) {
                     mRecyclerAdapter.setCourses(courses);
-                } else {
-//                    DisplayInfo.showToast(mContext, ".");
                 }
                 if (mRecyclerAdapter.getItemCount() > 0) {
                     tvNoItems.setVisibility(View.GONE);
@@ -246,4 +398,31 @@ public class MyCourseFragment extends BaseFragment {
         });
     }
 
+    private void getRandomCourses() {
+        CourseViewInterface courseViewInterface = new CourseViewInterface() {
+            @Override
+            public void onCourseGetSucces(ArrayList<GLCourse> courses) {
+                if (getActivity() == null)
+                    return;
+                llLoading.setVisibility(View.GONE);
+                updateData(courses);
+            }
+
+            @Override
+            public void onCourseGetFailed(AppError error) {
+                if (getActivity() == null)
+                    return;
+                llLoading.setVisibility(View.GONE);
+            }
+        };
+
+        if (AppUtility.checkInternetConnection()) {
+            llLoading.setVisibility(View.VISIBLE);
+            CloudCourseManager manager = new CloudCourseManager(mContext);
+            manager.getCourse("852", courseViewInterface);
+        } else {
+            Log.e(TAG, "NO NETWORK");
+        }
+
+    }
 }

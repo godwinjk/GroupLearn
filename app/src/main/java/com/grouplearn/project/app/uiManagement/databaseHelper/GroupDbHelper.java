@@ -4,10 +4,10 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 
+import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.DatabaseHandler;
-import com.grouplearn.project.app.databaseManagament.tables.TableGroups;
+import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.databaseManagament.tables.TableSubscribedGroups;
 import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.bean.GLMessage;
@@ -33,7 +33,7 @@ public class GroupDbHelper extends DataBaseHelper {
 
     public ArrayList<GLGroup> getSubscribedGroups() {
         ArrayList<GLGroup> groupModels = new ArrayList<>();
-        Cursor cursor = dbHandler.getAllSubscribedGroups();
+        Cursor cursor = dbHandler.getAllSubscribedGroups(null);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
@@ -41,6 +41,20 @@ public class GroupDbHelper extends DataBaseHelper {
             } while (cursor.moveToNext());
         }
         return getSortedListBasedOnMessage(groupModels);
+    }
+
+    public ArrayList<GLGroup> getMyGroups() {
+        long userId = new AppSharedPreference(mContext).getLongPrefValue(PreferenceConstants.USER_ID);
+        String where = TableSubscribedGroups.GROUP_USER_ID + "=" + userId;
+        Cursor cursor = dbHandler.getAllSubscribedGroups(where);
+        ArrayList<GLGroup> groupModels = new ArrayList<>();
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                groupModels.add(makeGroupModelFromCursor(cursor));
+            } while (cursor.moveToNext());
+        }
+        return groupModels;
     }
 
     public ArrayList<GLGroup> getSubscribedGroupsWithName(String name) {
@@ -68,6 +82,7 @@ public class GroupDbHelper extends DataBaseHelper {
         String groupName = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.GROUP_NAME));
         String groupIconId = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.GROUP_ICON_ID));
         long groupUniqueId = cursor.getLong(cursor.getColumnIndex(TableSubscribedGroups.GROUP_ID));
+        long groupUserId = cursor.getLong(cursor.getColumnIndex(TableSubscribedGroups.GROUP_USER_ID));
         String groupCreatedTime = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.CREATED_TIME));
         String groupUpdatedTime = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.UPDATED_TIME));
         String groupDescription = cursor.getString(cursor.getColumnIndex(TableSubscribedGroups.UPDATED_TIME));
@@ -75,6 +90,7 @@ public class GroupDbHelper extends DataBaseHelper {
 
         GLGroup model = new GLGroup();
         model.setGroupName(groupName);
+        model.setGroupAdminId(groupUserId);
         model.setGroupIconId(groupIconId);
         model.setGroupDescription(groupDescription);
         model.setGroupUniqueId(groupUniqueId);
@@ -97,29 +113,23 @@ public class GroupDbHelper extends DataBaseHelper {
     }
 
     public void addSubscribedGroup(GLGroup model) {
-        ContentValues cv = new ContentValues();
-        cv.put(TableSubscribedGroups.GROUP_ID, model.getGroupUniqueId());
-        cv.put(TableSubscribedGroups.GROUP_ICON_ID, model.getGroupIconId());
-        cv.put(TableSubscribedGroups.GROUP_NAME, model.getGroupName());
-        cv.put(TableSubscribedGroups.GROUP_DESCRIPTION, model.getGroupDescription());
-        cv.put(TableSubscribedGroups.GROUP_ICON_URI, model.getIconUrl());
         String where = TableSubscribedGroups.GROUP_ID + " = " + model.getGroupUniqueId();
-        int count = mContentResolver.update(TableSubscribedGroups.CONTENT_URI, getContentValuesForGroup(model), where, null);
-        if (count <= 0)
-            mContentResolver.insert(TableSubscribedGroups.CONTENT_URI, getContentValuesForGroup(model));
-    }
-
-    public Uri addGroup(GLGroup model) {
-        return mContentResolver.insert(TableGroups.CONTENT_URI, getContentValuesForGroup(model));
+        ContentValues cv = getContentValuesForGroup(model);
+        int count = mContentResolver.update(TableSubscribedGroups.CONTENT_URI, cv, where, null);
+        if (count <= 0) {
+            cv.put(TableSubscribedGroups.CREATED_TIME, model.getGroupCreatedTime());
+            mContentResolver.insert(TableSubscribedGroups.CONTENT_URI, cv);
+        }
     }
 
     private ContentValues getContentValuesForGroup(GLGroup model) {
         ContentValues cv = new ContentValues();
         cv.put(TableSubscribedGroups.GROUP_NAME, model.getGroupName());
         cv.put(TableSubscribedGroups.GROUP_ICON_ID, model.getGroupIconId());
+        cv.put(TableSubscribedGroups.GROUP_USER_ID, model.getGroupAdminId());
         cv.put(TableSubscribedGroups.GROUP_ID, model.getGroupUniqueId());
         cv.put(TableSubscribedGroups.GROUP_DESCRIPTION, model.getGroupDescription());
-        cv.put(TableSubscribedGroups.CREATED_TIME, model.getGroupCreatedTime());
+
         cv.put(TableSubscribedGroups.UPDATED_TIME, model.getGroupUpdatedTime());
         cv.put(TableSubscribedGroups.GROUP_ICON_URI, model.getIconUrl());
         return cv;

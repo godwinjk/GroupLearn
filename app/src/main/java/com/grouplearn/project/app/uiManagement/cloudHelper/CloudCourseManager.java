@@ -126,4 +126,31 @@ public class CloudCourseManager {
         request.setUserId(new AppSharedPreference(mContext).getLongPrefValue(PreferenceConstants.USER_ID));
         CloudConnectManager.getInstance(mContext).getCloudCourseManager(mContext).getCourses(request, cloudResponseCallback);
     }
+    public void getSubscribedCourse(final CourseViewInterface courseViewInterface) {
+        CloudResponseCallback cloudResponseCallback = new CloudResponseCallback() {
+            @Override
+            public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
+                CloudGetCourseResponse response = (CloudGetCourseResponse) cloudResponse;
+                CourseDbHelper helper = new CourseDbHelper(mContext);
+                for (GLCourse course : response.getGlCourses()) {
+                    helper.updateCourse(course);
+                }
+                if (courseViewInterface != null) {
+                    courseViewInterface.onCourseGetSucces(response.getGlCourses());
+                }
+            }
+
+            @Override
+            public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
+                if (courseViewInterface != null) {
+                    courseViewInterface.onCourseGetFailed(new AppError(cloudError));
+                }
+            }
+        };
+        CloudGetCourseRequest request = new CloudGetCourseRequest();
+        String token = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN);
+        request.setToken(token);
+        request.setUserId(new AppSharedPreference(mContext).getLongPrefValue(PreferenceConstants.USER_ID));
+        CloudConnectManager.getInstance(mContext).getCloudCourseManager(mContext).getSubscribedCourses(request, cloudResponseCallback);
+    }
 }

@@ -27,6 +27,7 @@ import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
+import com.grouplearn.project.utilities.views.DisplayInfo;
 
 import java.util.ArrayList;
 
@@ -47,7 +48,7 @@ public class SearchGroupsActivity extends BaseActivity implements View.OnClickLi
         mToolbar = setupToolbar("GroupLearn", true);
         mToolbar.setSubtitle("Search Groups");
 
-        mContext=this;
+        mContext = this;
         initializeWidgets();
         registerListeners();
     }
@@ -92,6 +93,7 @@ public class SearchGroupsActivity extends BaseActivity implements View.OnClickLi
             @Override
             public boolean onQueryTextSubmit(final String query) {
                 if (AppUtility.checkInternetConnection()) {
+                    DisplayInfo.showLoader(mContext, "Searching...");
                     GroupListInteractor.getInstance(mContext).getGroups(query, SearchGroupsActivity.this);
                     hideSoftKeyboard();
                 }
@@ -159,7 +161,6 @@ public class SearchGroupsActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     public void onItemClicked(int position, Object model, View v) {
-
     }
 
     @Override
@@ -169,12 +170,13 @@ public class SearchGroupsActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     public void onGroupFetchSuccess(ArrayList<GLGroup> groupModelArrayList) {
+        DisplayInfo.dismissLoader(mContext);
         updateGroupList(groupModelArrayList);
     }
 
     @Override
     public void onGroupFetchFailed(AppError error) {
-
+        DisplayInfo.dismissLoader(mContext);
     }
 
     private void updateGroupList(final ArrayList<GLGroup> groupModels) {

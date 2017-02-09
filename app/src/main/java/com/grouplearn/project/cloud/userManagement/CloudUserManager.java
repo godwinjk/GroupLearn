@@ -39,10 +39,10 @@ import java.util.HashMap;
  */
 public class CloudUserManager extends BaseManager implements CloudUserManagerInterface {
     private static final String TAG = "CloudUserManager";
-    Context mContext;
     String baseUrl;
 
     public CloudUserManager(Context mContext) {
+        super(mContext);
         this.mContext = mContext;
         baseUrl = CloudConstants.getBaseUrl();
     }
@@ -130,7 +130,7 @@ public class CloudUserManager extends BaseManager implements CloudUserManagerInt
 //        httpMethod.setHeaderMap(headerMap);
         JSONObject entity = new JSONObject();
         try {
-            entity.put("userName", cloudRequest.getUserName());
+            entity.put("userEmail", cloudRequest.getUserName());
             entity.put("userPassword", Helper.hashString(cloudRequest.getPassword()));
             entity.put("appId", cloudRequest.getAppUniqueId());
         } catch (JSONException e) {
@@ -460,7 +460,7 @@ public class CloudUserManager extends BaseManager implements CloudUserManagerInt
 //        headerMap.put("token", "" + cloudRequest.getToken());
         JSONObject entity = new JSONObject();
         try {
-            entity.put("userName", cloudRequest.getUserName());
+            entity.put("userEmail", cloudRequest.getUserName());
         } catch (JSONException e) {
             e.printStackTrace();
         }

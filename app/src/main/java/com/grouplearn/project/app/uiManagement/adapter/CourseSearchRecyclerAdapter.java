@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +14,15 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.grouplearn.project.R;
+import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
+import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.adapter.holder.CourseSearchViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.settings.BrowserActivity;
 import com.grouplearn.project.bean.GLCourse;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by WiSilica on 04-12-2016 10:42 for GroupLearn application.
@@ -27,6 +31,13 @@ import java.util.ArrayList;
 public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSearchViewHolder> {
     OnRecyclerItemClickListener onRecyclerItemClickListener;
     ArrayList<GLCourse> courses = new ArrayList<>();
+    private long myUserId;
+    private boolean showBadge = false;
+
+    public CourseSearchRecyclerAdapter(Context mContext, boolean showBadge) {
+        this.showBadge = showBadge;
+        myUserId = new AppSharedPreference(mContext).getLongPrefValue(PreferenceConstants.USER_ID);
+    }
 
     @Override
     public CourseSearchViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -37,15 +48,32 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
     @Override
     public void onBindViewHolder(final CourseSearchViewHolder holder, final int position) {
         final GLCourse course = courses.get(position);
+        if (course.isMine()) {
+            holder.tvView.setText("Edit");
+        }
+        if (myUserId == course.getCourseUserId()) {
+            holder.tvBadge.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvBadge.setVisibility(View.GONE);
+        }
         holder.tvCourseName.setText(course.getCourseName());
         holder.tvDescription.setText(course.getDefinition());
         holder.tvSiteAddress.setText(course.getUrl());
-        holder.tvView.setVisibility(View.GONE);
+        holder.tvView.setVisibility(View.VISIBLE);
+
         holder.llSearchItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
                     onRecyclerItemClickListener.onItemClicked(position, course, holder.llSearchItem);
+                }
+            }
+        });
+        holder.tvView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (onRecyclerItemClickListener != null) {
+                    onRecyclerItemClickListener.onItemClicked(position, course, holder.tvView);
                 }
             }
         });
@@ -56,7 +84,7 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
                 if (mContext != null) {
                     Intent i = new Intent(mContext, BrowserActivity.class);
                     i.putExtra("uri", course.getUrl());
-                    mContext.startActivity(i);
+//                    mContext.startActivity(i);
                 }
             }
         });
@@ -64,12 +92,13 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
         final Context mContext = holder.itemView.getContext();
 
         String imageUri = course.getIconUrl();
-        if (imageUri != null) {
+        if (!TextUtils.isEmpty(imageUri)) {
             Glide.with(mContext)
                     .load(imageUri)
                     .asBitmap()
                     .centerCrop()
-//                    .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+                    .placeholder(R.drawable.course_128)
+                    .thumbnail(.2f)
                     .into(new BitmapImageViewTarget(holder.ivCourseIcon) {
                         @Override
                         protected void setResource(Bitmap resource) {
@@ -81,6 +110,10 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
         } else {
             holder.ivCourseIcon.setImageResource(R.drawable.course_128);
         }
+        if (showBadge || !course.isMine()) {
+            holder.tvBadge.setVisibility(View.GONE);
+        }
+        holder.tvView.setVisibility(View.GONE);
     }
 
     @Override
@@ -100,8 +133,30 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
         return courses;
     }
 
-    public void setCourses(ArrayList<GLCourse> courses) {
-        this.courses = courses;
+    public void setCourses(ArrayList<GLCourse> listData) {
+        if (this.courses.size() <= 0) {
+            this.courses = (ArrayList<GLCourse>) listData.clone();
+            notifyDataSetChanged();
+            return;
+        }
+
+        for (Iterator<GLCourse> iterator = listData.iterator(); iterator.hasNext(); ) {
+            GLCourse tempGroup = iterator.next();
+            for (GLCourse group : courses) {
+                if (tempGroup.getCourseId() == group.getCourseId()) {
+                    group.setIconUrl(tempGroup.getIconUrl());
+                    iterator.remove();
+                } /*else {
+                    tempGroupArrayList.add(tempGroup);
+                }*/
+            }
+        }
+        this.courses.addAll(listData);
+        notifyDataSetChanged();
+    }
+
+    public void clear() {
+        courses.clear();
         notifyDataSetChanged();
     }
 }
