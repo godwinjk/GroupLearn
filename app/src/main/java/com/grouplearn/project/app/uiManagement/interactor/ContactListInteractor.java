@@ -5,13 +5,13 @@ import android.content.Context;
 import com.grouplearn.project.app.uiManagement.cloudHelper.CloudContactManager;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ContactDbHelper;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
+import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
 import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.contactManagement.contactAddOrEdit.CloudContactAddOrEditResponse;
 import com.grouplearn.project.cloud.contactManagement.search.CloudUserSearchResponse;
-import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 
@@ -41,10 +41,11 @@ public class ContactListInteractor {
                 if (response.getContactModels().size() > 0) {
                     ContactDbHelper dbHelper = new ContactDbHelper(mContext);
                     for (GLContact model : response.getContactModels()) {
-                        dbHelper.addContact(model);
+                        if (model.getStatus() != 0) {
+                            dbHelper.addContact(model);
+                        }
                     }
                     contactViewInterface.onGetAllContacts(response.getContactModels());
-//                    getAllContacts(contactViewInterface);
                 } else
                     contactViewInterface.onGetContactsFailed(new AppError(ErrorHandler.NO_ITEMS, ErrorHandler.ErrorMessage.NO_ITEMS));
             }

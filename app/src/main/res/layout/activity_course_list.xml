@@ -92,20 +92,20 @@
 
                         <TextView
                             android:id="@+id/tv_request"
-                            android:layout_width="70dp"
+                            android:layout_width="80dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="right"
                             android:layout_margin="10dp"
                             android:background="@drawable/back_request_text"
                             android:gravity="center"
                             android:padding="5dp"
-                            android:text="Join"
+                            android:text="Join Group"
                             android:textColor="@color/white"
                             android:textStyle="bold"  />
 
                         <TextView
                             android:id="@+id/tv_learn"
-                            android:layout_width="70dp"
+                            android:layout_width="80dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="right"
                             android:layout_margin="10dp"

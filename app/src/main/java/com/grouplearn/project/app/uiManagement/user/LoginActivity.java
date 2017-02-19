@@ -223,9 +223,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     private void startMainActivity() {
         Intent intent = new Intent(mContext, GroupListNewActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
         finish();
+        startActivity(intent);
+
     }
 
     private boolean checkPermission() {

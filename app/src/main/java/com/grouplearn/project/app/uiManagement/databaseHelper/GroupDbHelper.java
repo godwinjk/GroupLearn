@@ -40,6 +40,7 @@ public class GroupDbHelper extends DataBaseHelper {
                 groupModels.add(makeGroupModelFromCursor(cursor));
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return getSortedListBasedOnMessage(groupModels);
     }
 
@@ -54,6 +55,7 @@ public class GroupDbHelper extends DataBaseHelper {
                 groupModels.add(makeGroupModelFromCursor(cursor));
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return groupModels;
     }
 
@@ -66,16 +68,18 @@ public class GroupDbHelper extends DataBaseHelper {
                 groupModels.add(makeGroupModelFromCursor(cursor));
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return groupModels;
     }
 
     public GLGroup getGroupInfo(long groupUniqueId) {
         Cursor cursor = dbHandler.getSubscribedGroupInfo(groupUniqueId);
+        GLGroup group=null;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
-            return makeGroupModelFromCursor(cursor);
+            group= makeGroupModelFromCursor(cursor);
         }
-        return null;
+        return group;
     }
 
     private GLGroup makeGroupModelFromCursor(Cursor cursor) {

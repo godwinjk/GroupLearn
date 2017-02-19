@@ -180,7 +180,7 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         } else {
             collapsingToolbarLayout.setTitle(mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME));
             tvName.setText(mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME));
-            tvStatus.setText(mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_STATUS));
+            tvStatus.setText(mPref.getStringPrefValue(PreferenceConstants.USER_STATUS));
             cbVisibility.setVisibility(View.VISIBLE);
             cbVisibility.setChecked(mPref.getBooleanPrefValue(PreferenceConstants.USER_PRIVACY_STATUS));
         }

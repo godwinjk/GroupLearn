@@ -66,7 +66,7 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
         registerListeners();
 //        makeGodwinBot();
         processFroNotification();
-
+        getContactFromPhone();
     }
 
     public void processFroNotification() {
@@ -172,7 +172,7 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
     @Override
     protected void onResume() {
         super.onResume();
-        getContactFromPhone();
+//        getContactFromPhone();
         createNavigationView();
     }
 

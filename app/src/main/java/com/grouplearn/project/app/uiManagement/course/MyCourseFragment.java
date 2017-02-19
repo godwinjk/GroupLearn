@@ -222,12 +222,10 @@ public class MyCourseFragment extends BaseFragment {
 
                 DisplayInfo.dismissLoader(mContext);
                 mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                ArrayList<GLCourse> courses = mRecyclerAdapter.getCourses();
-                courses.remove(course);
-                mRecyclerAdapter.setCourses(courses);
+                mRecyclerAdapter.remove(course);
                 CourseDbHelper mDbHelper = new CourseDbHelper(mContext);
                 mDbHelper.deleteCourse(course);
-
+                updateData(mDbHelper.getCourses());
             }
 
             @Override
@@ -268,13 +266,13 @@ public class MyCourseFragment extends BaseFragment {
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         long userId = new AppSharedPreference(mContext).getLongPrefValue(PreferenceConstants.USER_ID);
         if (!course.isMine()) {
-            tvCourseDelete.setText("Join");
+            tvCourseDelete.setText("Join Group");
         } else {
             tvCourseDelete.setText("Delete");
         }
         if (course.isMine() && course.getCourseUserId() != userId) {
             tvCourseDelete.setVisibility(View.GONE);
-        }else {
+        } else {
             tvCourseDelete.setVisibility(View.VISIBLE);
         }
         View.OnClickListener clickListener = new View.OnClickListener() {
@@ -387,6 +385,7 @@ public class MyCourseFragment extends BaseFragment {
             @Override
             public void run() {
                 if (courses != null && courses.size() > 0) {
+                    mRecyclerAdapter.clearAndInsert();
                     mRecyclerAdapter.setCourses(courses);
                 }
                 if (mRecyclerAdapter.getItemCount() > 0) {

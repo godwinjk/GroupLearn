@@ -23,6 +23,7 @@ import com.grouplearn.project.bean.GLCourse;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.ListIterator;
 
 /**
  * Created by WiSilica on 04-12-2016 10:42 for GroupLearn application.
@@ -146,9 +147,7 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
                 if (tempGroup.getCourseId() == group.getCourseId()) {
                     group.setIconUrl(tempGroup.getIconUrl());
                     iterator.remove();
-                } /*else {
-                    tempGroupArrayList.add(tempGroup);
-                }*/
+                }
             }
         }
         this.courses.addAll(listData);
@@ -158,5 +157,29 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
     public void clear() {
         courses.clear();
         notifyDataSetChanged();
+    }
+
+    public void remove(GLCourse course) {
+        for (Iterator<GLCourse> iterator = courses.iterator(); iterator.hasNext(); ) {
+            GLCourse glCourse = iterator.next();
+            if (course.getCourseId() == glCourse.getCourseId()) {
+                iterator.remove();
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+    public void clearAndInsert() {
+        ArrayList<GLCourse> notMineList = new ArrayList<>();
+        ListIterator<GLCourse> groupListIterator = courses.listIterator();
+        for (; groupListIterator.hasNext(); ) {
+            GLCourse course = groupListIterator.next();
+            if (!course.isMine()) {
+                notMineList.add(course);
+                groupListIterator.remove();
+            }
+        }
+        notifyDataSetChanged();
+        setCourses(notMineList);
     }
 }

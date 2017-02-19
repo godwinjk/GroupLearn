@@ -2,6 +2,7 @@ package com.grouplearn.project.cloud.message;
 
 import android.content.Context;
 
+import com.grouplearn.project.bean.GLMessage;
 import com.grouplearn.project.cloud.BaseManager;
 import com.grouplearn.project.cloud.CloudConstants;
 import com.grouplearn.project.cloud.CloudError;
@@ -12,7 +13,7 @@ import com.grouplearn.project.cloud.message.messageSet.CloudSetMessageRequest;
 import com.grouplearn.project.cloud.message.messageSet.CloudSetMessageResponse;
 import com.grouplearn.project.cloud.networkManagement.CloudAPICallback;
 import com.grouplearn.project.cloud.networkManagement.CloudHttpMethod;
-import com.grouplearn.project.bean.GLMessage;
+import com.grouplearn.project.utilities.AesHelper;
 import com.grouplearn.project.utilities.ChatUtilities;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 
@@ -59,7 +60,12 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
                             for (int i = 0; messageArray != null && i < messageArray.length(); i++) {
                                 JSONObject modelObject = messageArray.optJSONObject(i);
                                 GLMessage messageModel = new GLMessage();
-                                messageModel.setMessageBody(modelObject.optString("message"));
+
+                                String encryptedMessage = modelObject.optString("message");
+                                String key = "1234567890123456";
+                                String origMessage = AesHelper.decrypt(key, encryptedMessage);
+                                messageModel.setMessageBody(origMessage);
+
                                 messageModel.setMessageType(modelObject.optInt("messageType"));
                                 messageModel.setReceiverId(modelObject.optLong("groupId"));
                                 messageModel.setSenderName(modelObject.optString("senderName"));
@@ -134,7 +140,13 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
                                 for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
                                     JSONObject modelObject = dataArray.optJSONObject(i);
                                     GLMessage messageModel = new GLMessage();
-                                    messageModel.setMessageBody(modelObject.optString("message"));
+
+                                    String encryptedMessage = modelObject.optString("message");
+                                    String key = "1234567890123456";
+                                    String origMessage = AesHelper.decrypt(key, encryptedMessage);
+
+                                    messageModel.setMessageBody(origMessage);
+
                                     messageModel.setMessageType(modelObject.optInt("messageType"));
                                     messageModel.setReceiverId(modelObject.optLong("groupId"));
                                     messageModel.setSenderName(modelObject.optString("senderName"));
@@ -192,7 +204,12 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
             try {
                 modelObject.put("groupId", model.getReceiverId());
                 modelObject.put("messageType", model.getMessageType());
-                modelObject.put("message", model.getMessageBody());
+
+                String origMessage = model.getMessageBody();
+                String key = "1234567890123456";
+                String encryptedMessage = AesHelper.encrypt(key, origMessage);
+
+                modelObject.put("message", encryptedMessage);
                 modelObject.put("senderName", model.getSenderName());
                 modelObject.put("tempId", model.getTempId());
 

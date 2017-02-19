@@ -47,7 +47,7 @@ public class StatusActivity extends BaseActivity implements View.OnClickListener
         tvRemainingChars = (TextView) findViewById(R.id.tv_num_of_char);
         mPref = new AppSharedPreference(mContext);
 
-        String status = mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_STATUS);
+        String status = mPref.getStringPrefValue(PreferenceConstants.USER_STATUS);
         if (status != null)
             etStatus.setText(status);
     }
@@ -104,7 +104,7 @@ public class StatusActivity extends BaseActivity implements View.OnClickListener
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 DisplayInfo.dismissLoader(mContext);
-                mPref.setStringPrefValue(PreferenceConstants.USER_DISPLAY_STATUS, status);
+                mPref.setStringPrefValue(PreferenceConstants.USER_STATUS, status);
                 finish();
             }
 

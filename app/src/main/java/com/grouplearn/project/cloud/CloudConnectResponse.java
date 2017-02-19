@@ -2,7 +2,8 @@ package com.grouplearn.project.cloud;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+
+import com.grouplearn.project.app.uiManagement.SignoutService;
 
 /**
  * Created by Godwin Joseph on 13-05-2016 12:51 for Group Learn application.
@@ -20,7 +21,8 @@ public class CloudConnectResponse {
         this.responseStatus = responseStatus;
         if (responseStatus == 20021) {
             Intent intent = new Intent("INVALID TOKEN");
-            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            SignoutService service = new SignoutService();
+            service.startService(intent);
         }
     }
 

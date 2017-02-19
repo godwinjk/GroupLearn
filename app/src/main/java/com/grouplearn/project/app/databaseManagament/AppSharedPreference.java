@@ -3,6 +3,8 @@ package com.grouplearn.project.app.databaseManagament;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.grouplearn.project.app.MyApplication;
+
 /**
  * Created by Godwin Joseph on 07-05-2016 13:05 for Group Learn application.
  */
@@ -155,7 +157,7 @@ public class AppSharedPreference {
     }
 
     public void clearPreference() {
-        SharedPreferences pref = mContext.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences pref = MyApplication.getAppContext().getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
 
         editor.clear();

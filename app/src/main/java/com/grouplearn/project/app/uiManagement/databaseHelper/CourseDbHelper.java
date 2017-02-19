@@ -63,6 +63,7 @@ public class CourseDbHelper extends DataBaseHelper {
                 cou.add(getContactFromCursor(cursor));
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return cou;
     }
 
@@ -77,6 +78,7 @@ public class CourseDbHelper extends DataBaseHelper {
                 courses.add(getContactFromCursor(cursor));
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return courses;
     }
 

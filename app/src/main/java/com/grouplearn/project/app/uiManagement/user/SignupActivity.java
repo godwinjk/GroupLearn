@@ -20,12 +20,10 @@ import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.userManagement.signUp.CloudSignUpRequest;
 import com.grouplearn.project.utilities.ConnectionUtilities;
 import com.grouplearn.project.utilities.InputValidator;
-import com.grouplearn.project.utilities.views.CustomPasswordField;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
 public class SignupActivity extends BaseActivity implements View.OnClickListener {
-    EditText etUserName, etDisplayName, etMailId;
-    CustomPasswordField etPassword;
+    EditText etUserName, etDisplayName, etMailId,etPassword;
     Button btnSignUp;
     Context mContext;
     AppSharedPreference mPref;
@@ -47,7 +45,7 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
         etUserName = (EditText) findViewById(R.id.et_user_name);
         etDisplayName = (EditText) findViewById(R.id.et_display_name);
         etMailId = (EditText) findViewById(R.id.et_mail_id);
-        etPassword = (CustomPasswordField) findViewById(R.id.pf_password);
+        etPassword = (EditText) findViewById(R.id.pf_password);
 
         btnSignUp = (Button) findViewById(R.id.btn_sign_up);
     }
@@ -117,7 +115,7 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
         status = validator.validateEmail(etMailId);
         if (status != 0)
             return false;
-        status = validator.validatePassword(etPassword.getEditText());
+        status = validator.validatePassword(etPassword);
         if (status != 0)
             return false;
         return true;

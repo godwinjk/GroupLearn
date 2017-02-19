@@ -121,8 +121,15 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (mAdapter != null && mAdapter.getCount() > 0) {
-                    String firstLetter = ((GLContact) mAdapter.getItem(firstVisibleItem)).getContactName().substring(0, 1);
+                    GLContact contact = (GLContact) mAdapter.getItem(firstVisibleItem);
+                    if (contact != null) {
+                        String contactName = contact.getContactName();
+                        if (contactName != null) {
+                            String firstLetter = contactName.substring(0, 1);
 //                    setFastScrollThumbImage(view, writeOnDrawable(R.drawable.fast_scroll_thumb_512, firstLetter));
+
+                        }
+                    }
                 }
             }
         });

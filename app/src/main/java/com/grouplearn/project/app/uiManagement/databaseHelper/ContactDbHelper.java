@@ -97,11 +97,12 @@ public class ContactDbHelper extends DataBaseHelper {
     private GLContact getContact(String contactId) {
         String where = TableContacts.CONTACT_ID + "='" + contactId + "'";
         Cursor cursor = mContentResolver.query(TableContacts.CONTENT_URI, null, where, null, null);
+        GLContact contact = null;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
-            return getContactFromCursor(cursor);
+            contact = getContactFromCursor(cursor);
         }
-        return null;
+        return contact;
     }
 
     public long isContactFound(String contactNumber) {

@@ -1,10 +1,10 @@
 package com.grouplearn.project.app.uiManagement;
 
-import android.app.IntentService;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Service;
+import android.content.ComponentName;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 
 import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
@@ -15,21 +15,26 @@ import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
  * @Author : Godwin Joseph Kurinjikattu
  */
 
-public class SignoutService extends IntentService {
-    public SignoutService() {
-        super("SignoutService");
-        registerReceiver(receiver, new IntentFilter("INVALID TOKEN"));
+public class SignoutService extends Service {
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    public ComponentName startService(Intent service) {
+
         SignOutInteractor interactor = new SignOutInteractor(this);
         interactor.doForceSignOut(new SignOutListener() {
             @Override
             public void onSignOutSuccessful() {
                 Intent i = new Intent(SignoutService.this, SplashScreenActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 SignoutService.this.startActivity(i);
+                stopSelf();
             }
 
             @Override
@@ -42,14 +47,7 @@ public class SignoutService extends IntentService {
 
             }
         });
+        return null;
     }
 
-    BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("INVALID TOKEN")) {
-                onHandleIntent(intent);
-            }
-        }
-    };
 }

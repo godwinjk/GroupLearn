@@ -83,10 +83,18 @@
                     android:padding="10dp" />
             </android.support.design.widget.TextInputLayout>
 
-            <com.grouplearn.project.utilities.views.CustomPasswordField
-                android:id="@+id/pf_password"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/pf_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:imeOptions="actionDone"
+                    android:inputType="textWebPassword" />
+            </android.support.design.widget.TextInputLayout>
 
             <Button
                 android:id="@+id/btn_sign_up"
@@ -96,9 +104,9 @@
                 android:layout_marginTop="30dp"
                 android:background="@drawable/round_btn_selector"
                 android:clickable="true"
-                android:textColor="@color/white"
                 android:text="@string/sign_up"
-                android:textAllCaps="false" />
+                android:textAllCaps="false"
+                android:textColor="@color/white" />
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>
