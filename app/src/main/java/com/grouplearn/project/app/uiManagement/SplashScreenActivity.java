@@ -24,9 +24,9 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
-import com.grouplearn.project.app.uiManagement.group.GroupListNewActivity;
 import com.grouplearn.project.app.uiManagement.interactor.AppRegistrationTask;
 import com.grouplearn.project.app.uiManagement.user.LoginActivity;
+import com.grouplearn.project.app.uiManagement.user.UserListActivity;
 import com.grouplearn.project.cloud.CloudConnectManager;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
@@ -145,7 +145,7 @@ public class SplashScreenActivity extends BaseActivity {
             }
         } else {
             new AppRegistrationTask(mContext).execute();
-            Intent i = new Intent(mContext, GroupListNewActivity.class);
+            Intent i = new Intent(mContext, UserListActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 

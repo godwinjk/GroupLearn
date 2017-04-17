@@ -2,7 +2,9 @@ package com.grouplearn.project.app.uiManagement;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
@@ -68,6 +70,9 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
         });
         setupToolbarWithBetaTag();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setNavigationBarColor(ContextCompat.getColor(mToolbar.getContext(), R.color.colorPrimaryDark));
+        }
         return mToolbar;
     }
 

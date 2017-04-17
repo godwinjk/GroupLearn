@@ -128,4 +128,6 @@
     <string name="title_activity_profile_menu">ProfileMenuActivity</string>
     <string name="title_activity_forgot">ForgotActivity</string>
     <string name="title_activity_browser">BrowserActivity</string>
+    <string name="title_activity_user_list">UserListActivity</string>
+    <string name="title_activity_contact_request">ContactRequestActivity</string>
 </resources>

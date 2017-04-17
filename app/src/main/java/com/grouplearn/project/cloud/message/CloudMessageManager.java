@@ -57,7 +57,7 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
                             JSONArray messageArray = dataObject.optJSONArray("messageDetails");
 
                             ArrayList<GLMessage> messageModels = new ArrayList<>();
-                            for (int i = 0; messageArray != null && i < messageArray.length(); i++) {
+                            for (int i = 0; messageArray != null && messageCount > 0 && i < messageArray.length(); i++) {
                                 JSONObject modelObject = messageArray.optJSONObject(i);
                                 GLMessage messageModel = new GLMessage();
 

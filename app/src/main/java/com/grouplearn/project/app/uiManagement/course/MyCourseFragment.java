@@ -153,12 +153,7 @@ public class MyCourseFragment extends BaseFragment {
             @Override
             public void onItemClicked(int position, Object model, View v) {
                 course = (GLCourse) model;
-                if (v.getId() == R.id.tv_site) {
-                    String uri = course.getUrl();
-                    Intent i = new Intent(mContext, BrowserActivity.class);
-                    i.putExtra("uri", uri);
-                    startActivity(i);
-                } else if (v instanceof LinearLayout) {
+                if (v instanceof LinearLayout) {
                     setup(course);
                 }
             }

@@ -27,15 +27,14 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/colorPrimary"
                 app:layout_collapseMode="pin"
+                android:background="@color/colorPrimary"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:layout_collapseMode="pin">
+                android:layout_gravity="center">
 
                 <ImageView
                     android:id="@+id/iv_profile"
@@ -43,8 +42,7 @@
                     android:layout_height="120dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/user_admin"
-                    android:transitionName="transition_group_icon"
-                    app:layout_collapseMode="pin" />
+                    android:transitionName="transition_group_icon" />
 
                 <ImageView
                     android:id="@+id/iv_select"

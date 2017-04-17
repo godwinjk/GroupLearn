@@ -1,7 +1,6 @@
 package com.grouplearn.project.app.uiManagement.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
@@ -18,7 +17,6 @@ import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.adapter.holder.CourseSearchViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
-import com.grouplearn.project.app.uiManagement.settings.BrowserActivity;
 import com.grouplearn.project.bean.GLCourse;
 
 import java.util.ArrayList;
@@ -59,7 +57,6 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
         }
         holder.tvCourseName.setText(course.getCourseName());
         holder.tvDescription.setText(course.getDefinition());
-        holder.tvSiteAddress.setText(course.getUrl());
         holder.tvView.setVisibility(View.VISIBLE);
 
         holder.llSearchItem.setOnClickListener(new View.OnClickListener() {
@@ -75,17 +72,6 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
                     onRecyclerItemClickListener.onItemClicked(position, course, holder.tvView);
-                }
-            }
-        });
-        holder.tvSiteAddress.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Context mContext = holder.itemView.getContext();
-                if (mContext != null) {
-                    Intent i = new Intent(mContext, BrowserActivity.class);
-                    i.putExtra("uri", course.getUrl());
-//                    mContext.startActivity(i);
                 }
             }
         });

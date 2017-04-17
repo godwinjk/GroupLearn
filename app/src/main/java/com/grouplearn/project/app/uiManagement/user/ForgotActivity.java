@@ -187,8 +187,8 @@ public class ForgotActivity extends BaseActivity {
                 DisplayInfo.dismissLoader(mContext);
                 CloudChangePinResponse response = (CloudChangePinResponse) cloudResponse;
                 if (response.getResponseStatus() == 20001) {
-                    step = OTP_SUCCESS;
-                    updateUiAccordingToStep(step);
+                    DisplayInfo.showToast(mContext,"Password reset successfully.");
+                    finish();
                 } else {
                     DisplayInfo.showToast(mContext, "Otp mismatch");
                     step = FORGOT_REQUEST;

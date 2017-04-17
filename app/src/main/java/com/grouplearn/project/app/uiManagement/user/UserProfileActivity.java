@@ -28,6 +28,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -42,8 +43,9 @@ import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.StatusActivity;
 import com.grouplearn.project.app.uiManagement.adapter.InterestRecyclerAdapter;
 import com.grouplearn.project.app.uiManagement.contact.ContactListActivity;
-import com.grouplearn.project.app.uiManagement.group.GroupListActivity;
+import com.grouplearn.project.app.uiManagement.interactor.ContactInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
+import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.bean.GLInterest;
 import com.grouplearn.project.bean.GLUser;
 import com.grouplearn.project.cloud.CloudConnectManager;
@@ -77,24 +79,26 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     private static final String TAG = "UserProfileActivity";
     private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 101;
 
-    CollapsingToolbarLayout collapsingToolbarLayout;
-    Toolbar mToolbar;
-    Context mContext;
-    TextView tvName, tvStatus, tvContacts, tvSubscribedGroups;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+    private Toolbar mToolbar;
+    private Context mContext;
+    private TextView tvName, tvStatus;
 
-    CheckBox cbVisibility;
-    ImageView ivProfile, ivSelect;
+    private CheckBox cbVisibility;
+    private ImageView ivProfile, ivSelect;
 
-    RecyclerView rvInterests;
+    private RecyclerView rvInterests, rvSkills;
 
-    InterestRecyclerAdapter mInterestRecyclerAdapter;
-    AppSharedPreference mPref;
-    ImageView ivNameEdit, ivStatusEdit;
-    CardView cvVisibility, cvUserSpecificDetails;
-    boolean isOtherUser;
-    String userName;
-    GLUser userModel;
-    ImageView ivAddInterest;
+    private InterestRecyclerAdapter mInterestRecyclerAdapter;
+    private InterestRecyclerAdapter mSkillRecyclerAdapter;
+    private AppSharedPreference mPref;
+    private ImageView ivNameEdit, ivStatusEdit;
+    private CardView cvVisibility;
+    private boolean isOtherUser;
+    private String userName;
+    private GLUser userModel;
+    private ImageView ivAddInterest, ivAddSkills;
+    private Button btnConnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,13 +124,15 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         if (appUserName.equals(userName)) {
             isOtherUser = false;
             ivAddInterest.setVisibility(View.VISIBLE);
-            cvUserSpecificDetails.setVisibility(View.VISIBLE);
+            ivAddSkills.setVisibility(View.VISIBLE);
             imagePath = mPref.getStringPrefValue(PreferenceConstants.DP_PATH);
+            btnConnect.setVisibility(View.VISIBLE);
         } else {
             isOtherUser = true;
             ivAddInterest.setVisibility(View.GONE);
-            cvUserSpecificDetails.setVisibility(View.GONE);
+            ivAddSkills.setVisibility(View.GONE);
             imagePath = userModel.getIconUrl();
+            btnConnect.setVisibility(View.GONE);
         }
         if (imagePath != null) {
             setProfilePic(imagePath);
@@ -138,27 +144,33 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     public void initializeWidgets() {
         cbVisibility = (CheckBox) findViewById(R.id.cb_visibility);
 
-        cvUserSpecificDetails = (CardView) findViewById(R.id.cv_user_details);
-
         tvName = (TextView) findViewById(R.id.tv_display_name);
 
         tvStatus = (TextView) findViewById(R.id.tv_status);
-        tvContacts = (TextView) findViewById(R.id.tv_contacts);
-        tvSubscribedGroups = (TextView) findViewById(R.id.tv_subscribed_group);
+        btnConnect = (Button) findViewById(R.id.btn_connect);
 
         ivNameEdit = (ImageView) findViewById(R.id.iv_name_edit);
         ivProfile = (ImageView) findViewById(R.id.iv_profile);
         ivSelect = (ImageView) findViewById(R.id.iv_select);
         ivAddInterest = (ImageView) findViewById(R.id.iv_add_interest);
+        ivAddSkills = (ImageView) findViewById(R.id.iv_add_skills);
         ivStatusEdit = (ImageView) findViewById(R.id.iv_status_edit);
         cvVisibility = (CardView) findViewById(R.id.cv_visibility);
 
         rvInterests = (RecyclerView) findViewById(R.id.rv_interests);
+        rvSkills = (RecyclerView) findViewById(R.id.rv_skills);
+
         mInterestRecyclerAdapter = new InterestRecyclerAdapter();
+        mSkillRecyclerAdapter = new InterestRecyclerAdapter();
+
         rvInterests.setLayoutManager(new StaggeredGridLayoutManager(2, 1));
         rvInterests.setAdapter(mInterestRecyclerAdapter);
 
+        rvSkills.setLayoutManager(new StaggeredGridLayoutManager(2, 1));
+        rvSkills.setAdapter(mSkillRecyclerAdapter);
+
         rvInterests.addItemDecoration(new SpaceItemDecoration(10));
+        rvSkills.addItemDecoration(new SpaceItemDecoration(10));
     }
 
     @Override
@@ -190,21 +202,22 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     public void registerListeners() {
         ivStatusEdit.setOnClickListener(this);
         ivAddInterest.setOnClickListener(this);
-        tvContacts.setOnClickListener(this);
-        tvSubscribedGroups.setOnClickListener(this);
-
-        mInterestRecyclerAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
+        ivAddSkills.setOnClickListener(this);
+        btnConnect.setOnClickListener(this);
+        OnRecyclerItemClickListener clickListener = new OnRecyclerItemClickListener() {
             @Override
             public void onItemClicked(int position, Object model, View v) {
                 GLInterest interest = (GLInterest) model;
-                deleteInterest(interest);
+                deleteInterest(interest, interest.isSkill());
             }
 
             @Override
             public void onItemLongClicked(int position, Object model, View v) {
 
             }
-        });
+        };
+        mInterestRecyclerAdapter.setOnRecyclerItemClickListener(clickListener);
+        mSkillRecyclerAdapter.setOnRecyclerItemClickListener(clickListener);
 
         cbVisibility.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -257,19 +270,6 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                 dialogInterface.dismiss();
             }
         }).create();
-//        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String name = etName.getText().toString();
-//                if (TextUtils.isEmpty(name)) {
-//                    DisplayInfo.showToast(mContext, "Display name is mandatory");
-//                } else if (name.length() < 3 || name.length() > 32) {
-//                    DisplayInfo.showToast(mContext, "Display name should be in between of 3-32");
-//                } else {
-//                    setDisplayName(name);
-//                }
-//            }
-//        });
         dialog.show();
     }
 
@@ -316,15 +316,42 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                 startActivity(new Intent(mContext, StatusActivity.class));
                 break;
             case R.id.iv_add_interest:
-                addInterest();
+                addInterest(false);
                 break;
             case R.id.tv_contacts:
                 startActivity(new Intent(mContext, ContactListActivity.class));
                 break;
-            case R.id.tv_subscribed_group:
-                startActivity(new Intent(mContext, GroupListActivity.class));
+            case R.id.iv_add_skills:
+                addInterest(true);
                 break;
+            case R.id.btn_connect:
+                requestContact();
+                break;
+
         }
+    }
+
+    private void requestContact() {
+        GLContact contact = new GLContact();
+        contact.setContactUserId(userModel.getUserId());
+        contact.setContactMailId(userModel.getUserEmail());
+        contact.setContactName(userModel.getUserDisplayName());
+        ContactInteractor interactor = new ContactInteractor(mContext);
+        DisplayInfo.showLoader(mContext, "Please wait");
+        interactor.requestToConnect(contact, new CloudResponseCallback() {
+            @Override
+            public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
+                DisplayInfo.dismissLoader(mContext);
+                btnConnect.setEnabled(false);
+                DisplayInfo.showToast(mContext, "SuccessFully sent request");
+            }
+
+            @Override
+            public void onFailure(CloudConnectRequest cloudRequest, CloudError cloudError) {
+                DisplayInfo.dismissLoader(mContext);
+                DisplayInfo.showToast(mContext, "Failed to sent request");
+            }
+        });
     }
 
     private void cropImage(Uri imageUri) {
@@ -343,21 +370,24 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         startActivityForResult(cropIntent, ACTIVITY_IMAGE_CROP_REQUEST_CODE);
     }
 
-    private void addInterest() {
+    private void addInterest(final boolean isSkill) {
         AlertDialog.Builder alertDialog = AppAlertDialog.getAlertDialog(mContext);
         View v = getLayoutInflater().inflate(R.layout.layout_interest_alert, null);
         final TextInputLayout etTextInput = (TextInputLayout) v.findViewById(R.id.et_interest);
-        alertDialog.setTitle("Interest");
+        String message = "Interest";
+        if (isSkill) message = "Skill";
+        alertDialog.setTitle(message);
         alertDialog.setView(v);
+        final String finalMessage = message;
         final Dialog dialog = alertDialog.setPositiveButton("Create", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 String interestName = etTextInput.getEditText().getText().toString();
                 if (!TextUtils.isEmpty(interestName) && interestName.length() > 3 && interestName.length() < 30) {
-                    addInterest(interestName);
+                    addInterest(interestName, isSkill);
                 } else {
-                    DisplayInfo.showToast(mContext, "Invalid interest name");
-                    addInterest();
+                    DisplayInfo.showToast(mContext, "Invalid " + finalMessage + " name");
+                    addInterest(isSkill);
                 }
             }
         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -369,14 +399,17 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         dialog.show();
     }
 
-    private void deleteInterest(final GLInterest interest) {
+    private void deleteInterest(final GLInterest interest, final boolean isSkill) {
         AppAlertDialog alertDialog = AppAlertDialog.getAlertDialog(mContext);
         alertDialog.setTitle("Warning");
-        alertDialog.setMessage("Are you sure want to remove the interest?");
+        String message = "Are you sure want to remove the interest?";
+        if (interest.getInterestType() == GLInterest.SKILL)
+            message = "Are you sure want to remove the skill?";
+        alertDialog.setMessage(message);
         alertDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                deleteFromCloud(interest);
+                deleteFromCloud(interest, isSkill);
             }
         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -386,17 +419,26 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         }).create().show();
     }
 
-    private void deleteFromCloud(final GLInterest interest) {
+    private void deleteFromCloud(final GLInterest interest, boolean isSkill) {
         CloudDeleteInterestRequest request = new CloudDeleteInterestRequest();
         request.setToken(new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN));
-        request.setInterests(interest);
+        if (isSkill) {
+            request.setSkills(interest);
+        } else {
+            request.setInterests(interest);
+        }
 
         CloudResponseCallback callback = new CloudResponseCallback() {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 DisplayInfo.dismissLoader(mContext);
-                mInterestRecyclerAdapter.getInterests().remove(interest);
-                mInterestRecyclerAdapter.notifyDataSetChanged();
+                if (!interest.isSkill()) {
+                    mInterestRecyclerAdapter.getInterests().remove(interest);
+                    mInterestRecyclerAdapter.notifyDataSetChanged();
+                } else {
+                    mSkillRecyclerAdapter.getInterests().remove(interest);
+                    mSkillRecyclerAdapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -413,13 +455,17 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         }
     }
 
-    private void addInterest(String interestName) {
+    private void addInterest(String interestName, boolean isSkill) {
         CloudAddInterestRequest request = new CloudAddInterestRequest();
         String token = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN);
         request.setToken(token);
         final GLInterest interest = new GLInterest();
         interest.setInterestName(interestName);
-        request.setInterests(interest);
+        if (isSkill) {
+            request.setSkills(interest);
+        } else {
+            request.setInterests(interest);
+        }
 
         CloudResponseCallback callback = new CloudResponseCallback() {
             @Override
@@ -427,13 +473,26 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                 final ArrayList<GLInterest> interests = mInterestRecyclerAdapter.getInterests();
                 CloudAddInterestResponse response = (CloudAddInterestResponse) cloudResponse;
                 ArrayList<GLInterest> interestsFromCloud = response.getInterests();
-                interests.addAll(interestsFromCloud);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mInterestRecyclerAdapter.setInterests(interests, isOtherUser);
-                    }
-                });
+                if (interestsFromCloud != null && interestsFromCloud.size() > 0) {
+                    interests.addAll(interestsFromCloud);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mInterestRecyclerAdapter.setInterests(interests, isOtherUser);
+                        }
+                    });
+                }
+                final ArrayList<GLInterest> skills = mSkillRecyclerAdapter.getInterests();
+                ArrayList<GLInterest> skillsFromCloud = response.getSkills();
+                if (skillsFromCloud != null && skillsFromCloud.size() > 0) {
+                    skills.addAll(skillsFromCloud);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSkillRecyclerAdapter.setInterests(skills, isOtherUser);
+                        }
+                    });
+                }
             }
 
             @Override
@@ -639,6 +698,7 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                 CloudGetInterestResponse response = (CloudGetInterestResponse) cloudResponse;
                 ArrayList<GLInterest> interests = response.getInterests();
                 setDataToAdapter(interests);
+                setDataToSkillAdapter(response.getSkills());
             }
 
             @Override
@@ -678,5 +738,9 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
 
     private void setDataToAdapter(ArrayList<GLInterest> interests) {
         mInterestRecyclerAdapter.setInterests(interests, isOtherUser);
+    }
+
+    private void setDataToSkillAdapter(ArrayList<GLInterest> interests) {
+        mSkillRecyclerAdapter.setInterests(interests, isOtherUser);
     }
 }

@@ -25,7 +25,8 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
- * Created by Godwin Joseph on 14-09-2016 14:51 for Group Learn application.
+ * Created by Godwin on 14-09-2016 14:51 for Group Learn application 20:35 for GroupLearn.
+ * @author : Godwin Joseph Kurinjikattu
  */
 public class ContactReadTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "ContactReadTask";
@@ -70,10 +71,7 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
                     Cursor pCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
                     while (pCur.moveToNext()) {
                         phone = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        contactModel.setContactNumber(formatPhoneNumber(phone));
-//                        System.out.println("phone" + phone);
-                        contactModel.setContactId(id);
-                        contactModel.setContactImage(getContactImage(imageUri));
+//                        Syssem.out.println("phone" + phone);
                     }
 
                     pCur.close();
@@ -91,7 +89,7 @@ public class ContactReadTask extends AsyncTask<Void, Void, Void> {
             }
             cur.close();
             if (contactViewInterface != null)
-                contactViewInterface.onGetContactsFinished(contactList);
+                contactViewInterface.onGetAllContactsFromDb(contactList);
         }
         return contactList;
     }

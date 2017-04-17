@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.adapter.ContactListAdapter;
-import com.grouplearn.project.app.uiManagement.interactor.ContactListInteractor;
+import com.grouplearn.project.app.uiManagement.interactor.ContactInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
@@ -70,8 +70,8 @@ public class SearchUserActivity extends BaseActivity implements ContactViewInter
             @Override
             public boolean onQueryTextSubmit(final String query) {
                 if (AppUtility.checkInternetConnection()) {
-                    ContactListInteractor interactor = new ContactListInteractor(mContext);
-                    interactor.searchAllContacts(query, SearchUserActivity.this);
+                    ContactInteractor interactor = new ContactInteractor(mContext);
+                    interactor.searchUsers(query, SearchUserActivity.this);
                     DisplayInfo.showLoader(mContext, getString(R.string.please_wait));
                 } else {
                     DisplayInfo.showLoader(mContext, getString(R.string.no_network));
@@ -105,7 +105,7 @@ public class SearchUserActivity extends BaseActivity implements ContactViewInter
                 GLUser userModel = new GLUser();
                 userModel.setUserDisplayName(contactModel.getContactName());
                 userModel.setUserStatus(contactModel.getContactStatus());
-                userModel.setUserId(contactModel.getContactUniqueId());
+                userModel.setUserId(contactModel.getContactUserId());
                 userModel.setUserEmail(contactModel.getContactMailId());
                 Intent intent = new Intent(mContext, UserProfileActivity.class);
 
@@ -122,45 +122,26 @@ public class SearchUserActivity extends BaseActivity implements ContactViewInter
     }
 
     @Override
-    public void onGetAllContacts(ArrayList<GLContact> contactModels) {
+    public void onGetAllContactsFromCloud(ArrayList<GLContact> contactModels) {
         DisplayInfo.dismissLoader(mContext);
-        listAdapter.setContactList(contactModels);
-        if (listAdapter.getCount() > 0) {
-            tvNoItems.setVisibility(View.GONE);
-        } else {
-            tvNoItems.setVisibility(View.VISIBLE);
-            tvNoItems.setText("No users with this keyword");
-        }
+        updateList(contactModels);
     }
 
     @Override
     public void onGetAllContactsFromDb(ArrayList<GLContact> contactModels) {
         DisplayInfo.dismissLoader(mContext);
-        listAdapter.setContactList(contactModels);
-        if (listAdapter.getCount() > 0) {
-            tvNoItems.setVisibility(View.GONE);
-        } else {
-            tvNoItems.setVisibility(View.VISIBLE);
-            tvNoItems.setText("No users with this keyword");
-        }
-    }
-
-    @Override
-    public void onGetContactsFinished(ArrayList<GLContact> contactModels) {
-        listAdapter.setContactList(contactModels);
-        DisplayInfo.dismissLoader(mContext);
-        if (listAdapter.getCount() > 0) {
-            tvNoItems.setVisibility(View.GONE);
-        } else {
-            tvNoItems.setVisibility(View.VISIBLE);
-            tvNoItems.setText("No users with this keyword");
-        }
+        updateList(contactModels);
     }
 
     @Override
     public void onGetContactsFailed(AppError error) {
         DisplayInfo.dismissLoader(mContext);
         DisplayInfo.showToast(mContext, "No users found");
+    }
+
+    private void updateList(ArrayList<GLContact> contactModels) {
+        listAdapter.setContactList(contactModels);
+        DisplayInfo.dismissLoader(mContext);
         if (listAdapter.getCount() > 0) {
             tvNoItems.setVisibility(View.GONE);
         } else {

@@ -1,24 +1,32 @@
 package com.grouplearn.project.bean;
 
-import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import java.util.ArrayList;
 
 /**
  * Created by Godwin Joseph on 07-06-2016 16:33 for Group Learn application.
  */
 public class GLContact extends BaseModel implements Parcelable {
-    String contactName;
-    long contactUniqueId;
-    String contactIconId;
-    String contactStatus=null;
-    String contactNumber;
-    String contactMailId;
-    int privacy;
-    int status;
-    Bitmap contactImage;
-    private String contactId;
+    private String contactName;
+    private long contactUserId;
+    private String contactStatus = null;
+    private String contactMailId;
+    private int privacy;
+    private int status;
     private String iconUrl;
+    private int action;
+    private ArrayList<GLInterest> interests = new ArrayList<>();
+    private ArrayList<GLInterest> skills = new ArrayList<>();
+
+    public int getAction() {
+        return action;
+    }
+
+    public void setAction(int action) {
+        this.action = action;
+    }
 
     public String getIconUrl() {
         return iconUrl;
@@ -26,14 +34,6 @@ public class GLContact extends BaseModel implements Parcelable {
 
     public void setIconUrl(String iconUrl) {
         this.iconUrl = iconUrl;
-    }
-
-    public String getContactNumber() {
-        return contactNumber;
-    }
-
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
     }
 
     public String getContactName() {
@@ -44,20 +44,12 @@ public class GLContact extends BaseModel implements Parcelable {
         this.contactName = contactName;
     }
 
-    public long getContactUniqueId() {
-        return contactUniqueId;
+    public long getContactUserId() {
+        return contactUserId;
     }
 
-    public void setContactUniqueId(long contactUniqueId) {
-        this.contactUniqueId = contactUniqueId;
-    }
-
-    public String getContactIconId() {
-        return contactIconId;
-    }
-
-    public void setContactIconId(String contactIconId) {
-        this.contactIconId = contactIconId;
+    public void setContactUserId(long contactUserId) {
+        this.contactUserId = contactUserId;
     }
 
     public String getContactStatus() {
@@ -84,22 +76,6 @@ public class GLContact extends BaseModel implements Parcelable {
         this.status = status;
     }
 
-    public Bitmap getContactImage() {
-        return contactImage;
-    }
-
-    public void setContactImage(Bitmap contactImage) {
-        this.contactImage = contactImage;
-    }
-
-    public String getContactId() {
-        return contactId;
-    }
-
-    public void setContactId(String contactId) {
-        this.contactId = contactId;
-    }
-
     public String getContactMailId() {
         return contactMailId;
     }
@@ -108,44 +84,73 @@ public class GLContact extends BaseModel implements Parcelable {
         this.contactMailId = contactMailId;
     }
 
+    public ArrayList<GLInterest> getInterests() {
+        return interests;
+    }
+
+    public void setInterests(ArrayList<GLInterest> interests) {
+        this.interests = interests;
+    }
+
+    public ArrayList<GLInterest> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(ArrayList<GLInterest> skills) {
+        this.skills = skills;
+    }
+
+    public GLContact() {
+    }
+
     protected GLContact(Parcel in) {
-        super(in);
         contactName = in.readString();
-        contactMailId = in.readString();
-        contactUniqueId = in.readLong();
-        contactIconId = in.readString();
+        contactUserId = in.readLong();
         contactStatus = in.readString();
-        contactNumber = in.readString();
+        contactMailId = in.readString();
         privacy = in.readInt();
         status = in.readInt();
-        contactImage = (Bitmap) in.readValue(Bitmap.class.getClassLoader());
-        contactId = in.readString();
+        iconUrl = in.readString();
+        if (in.readByte() == 0x01) {
+            interests = new ArrayList<GLInterest>();
+            in.readList(interests, GLInterest.class.getClassLoader());
+        } else {
+            interests = null;
+        }
+        if (in.readByte() == 0x01) {
+            skills = new ArrayList<GLInterest>();
+            in.readList(skills, GLInterest.class.getClassLoader());
+        } else {
+            skills = null;
+        }
     }
 
     @Override
     public int describeContents() {
-        super.describeContents();
         return 0;
-    }
-
-    public GLContact() {
-        super();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-
         dest.writeString(contactName);
-        dest.writeString(contactMailId);
-        dest.writeLong(contactUniqueId);
-        dest.writeString(contactIconId);
+        dest.writeLong(contactUserId);
         dest.writeString(contactStatus);
-        dest.writeString(contactNumber);
+        dest.writeString(contactMailId);
         dest.writeInt(privacy);
         dest.writeInt(status);
-        dest.writeValue(contactImage);
-        dest.writeString(contactId);
+        dest.writeString(iconUrl);
+        if (interests == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(interests);
+        }
+        if (skills == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(skills);
+        }
     }
 
     @SuppressWarnings("unused")

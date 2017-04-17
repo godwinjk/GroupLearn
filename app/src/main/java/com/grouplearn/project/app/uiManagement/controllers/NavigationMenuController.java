@@ -28,14 +28,20 @@ public class NavigationMenuController {
     AppSharedPreference mPref;
     NavigationView mNavigationView;
     View mHeaderView;
+    private int mode = 0;
 
-    public NavigationMenuController(Context mContext, NavigationView navigationView) {
+    public NavigationMenuController(Context mContext, NavigationView navigationView, int mode) {
         this.mContext = mContext;
         this.mPref = new AppSharedPreference(mContext);
         this.mNavigationView = navigationView;
+        this.mode = mode;
     }
 
     public NavigationView createNavigationMenu() {
+        if (mode == 0)
+            mNavigationView.getMenu().findItem(R.id.nav_dash_board).setVisible(false);
+        else
+            mNavigationView.getMenu().findItem(R.id.nav_dash_board).setVisible(true);
         return setupNavigationHeader();
     }
 

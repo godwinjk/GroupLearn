@@ -7,16 +7,25 @@ import android.os.Parcelable;
  * Created by Godwin Joseph on 25-09-2016 13:31 for Group Learn application.
  */
 public class GLMessage extends BaseModel implements Parcelable {
-    String messageBody;
-    int messageType;
-    long senderId;
-    long receiverId;
-    String senderName;
-    long messageId;
-    long tempId;
-    int messageStatus;
-    int readStatus = 0;
-    int sentStatus = 0;
+    public static final int MESSAG = 1;
+    public static final int MESSAGE_OTHER = -1;
+    public static final int IMAGE = 2;
+    public static final int MAGE_OTHER = -2;
+    public static final int VIDEO = 3;
+    public static final int VIDEO_OTHER = -3;
+    public static final int DOCUMENT = 4;
+    public static final int DOCUMENT_OTHER = -4;
+
+    private String messageBody;
+    private int messageType;
+    private long senderId;
+    private long receiverId;
+    private String senderName;
+    private long messageId;
+    private long tempId;
+    private int messageStatus;
+    private int readStatus = 0;
+    private int sentStatus = 0;
 
     public int getReadStatus() {
         return readStatus;
@@ -101,6 +110,14 @@ public class GLMessage extends BaseModel implements Parcelable {
         this.tempId = tempId;
     }
 
+    public boolean isMe(long userId) {
+        return senderId == userId;
+    }
+
+    public int getViewType(long userId) {
+        return isMe(userId) ? messageType : messageType * -1;
+    }
+
     protected GLMessage(Parcel in) {
         super(in);
         messageBody = in.readString();
@@ -114,7 +131,6 @@ public class GLMessage extends BaseModel implements Parcelable {
         readStatus = in.readInt();
         sentStatus = in.readInt();
     }
-
 
     @Override
     public int describeContents() {

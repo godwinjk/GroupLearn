@@ -5,7 +5,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
@@ -17,8 +16,6 @@ import android.telephony.SmsManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,7 +25,6 @@ import com.grouplearn.project.app.uiManagement.BaseFragment;
 import com.grouplearn.project.app.uiManagement.adapter.ContactListAdapter;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ContactDbHelper;
 import com.grouplearn.project.app.uiManagement.group.GroupListNewActivity;
-import com.grouplearn.project.app.uiManagement.interactor.ContactListInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
@@ -48,6 +44,7 @@ import java.util.Comparator;
  */
 public class ContactListFragment extends BaseFragment implements ContactViewInterface {
     private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 101;
+
     private ListView lvContacts;
     private TextView tvNoContacts;
 
@@ -84,19 +81,9 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
         ArrayList<GLContact> contactModels = mDbHelper.getContacts();
         if (contactModels != null && contactModels.size() > 0) {
             updateDataInList(sortUserList(contactModels));
-        } else if (contactModels != null && contactModels.size() <= 0) {
-            getContactFromPhone();
         }
-//        getContactFromPhone();
     }
 
-    private void getContactFromPhone() {
-        if (checkPermissionForCotacts()) {
-            ContactReadTask readTask = new ContactReadTask(mContext);
-            readTask.setContactViewInterface(this);
-            readTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
-    }
 
     @Override
     protected void initializeWidgets(View v) {
@@ -112,45 +99,13 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
 
     @Override
     protected void registerListeners() {
-        lvContacts.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
 
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (mAdapter != null && mAdapter.getCount() > 0) {
-                    GLContact contact = (GLContact) mAdapter.getItem(firstVisibleItem);
-                    if (contact != null) {
-                        String contactName = contact.getContactName();
-                        if (contactName != null) {
-                            String firstLetter = contactName.substring(0, 1);
-//                    setFastScrollThumbImage(view, writeOnDrawable(R.drawable.fast_scroll_thumb_512, firstLetter));
-
-                        }
-                    }
-                }
-            }
-        });
         mAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
                                                     @Override
                                                     public void onItemClicked(int position, Object model, View v) {
                                                         GLContact contactModel = (GLContact) model;
-                                                        if (v instanceof TextView) {
-                                                            sendSms(contactModel.getContactNumber());
-                                                        } else if (v instanceof ImageView) {
-                                                            if (contactModel.getStatus() > 0) {
-                                                                openUserDetailsWindow(v, contactModel);
-                                                            } else {
-                                                                openSystemContactWindow(contactModel.getContactId());
-                                                            }
-                                                        } else if (v instanceof LinearLayout) {
-                                                            if (contactModel.getStatus() > 0) {
-                                                                openUserDetailsWindow(v, contactModel);
-                                                            } else {
-                                                                openSystemContactWindow(contactModel.getContactId());
-                                                            }
+                                                        if (v instanceof LinearLayout) {
+                                                            openUserDetailsWindow(v, contactModel);
                                                         }
                                                     }
 
@@ -168,7 +123,7 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
 
         userModel.setIconUrl(contactModel.getIconUrl());
         userModel.setUserDisplayName(contactModel.getContactName());
-        userModel.setUserId(contactModel.getContactUniqueId());
+        userModel.setUserId(contactModel.getContactUserId());
         userModel.setUserEmail(contactModel.getContactMailId());
         userModel.setUserStatus(contactModel.getContactStatus());
 
@@ -233,7 +188,7 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
     }
 
     @Override
-    public void onGetAllContacts(ArrayList<GLContact> contactModels) {
+    public void onGetAllContactsFromCloud(ArrayList<GLContact> contactModels) {
         updateDataInList(sortUserList(new ContactDbHelper(mContext).getContacts()));
     }
 
@@ -243,25 +198,8 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
     }
 
     @Override
-    public void onGetContactsFinished(ArrayList<GLContact> contactModels) {
-        new ContactListInteractor(mContext).addAllContacts(contactModels, this);
-        updateDataInList(sortUserList(contactModels));
-    }
-
-    @Override
     public void onGetContactsFailed(AppError error) {
         Log.e(TAG, error.getErrorMessage());
-    }
-
-    private boolean checkPermissionForCotacts() {
-        if (AppUtility.checkPermission(getActivity(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.READ_CONTACTS
-                    },
-                    MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
-            return false;
-        } else
-            return true;
     }
 
     private boolean checkPermissionForSms() {
@@ -284,9 +222,5 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && getActivity() != null) {
-            if (mAdapter != null && (mAdapter.getContactsInCloud() == null || mAdapter.getContactsInCloud().size() <= 0))
-                getContactFromPhone();
-        }
     }
 }

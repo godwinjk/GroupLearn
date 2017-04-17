@@ -1,16 +1,12 @@
 package com.grouplearn.project.app.uiManagement.group;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -22,24 +18,16 @@ import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.SplashScreenActivity;
 import com.grouplearn.project.app.uiManagement.adapter.GroupSectionPagerAdapter;
-import com.grouplearn.project.app.uiManagement.contact.ContactReadTask;
+import com.grouplearn.project.app.uiManagement.contact.ContactRequestActivity;
 import com.grouplearn.project.app.uiManagement.controllers.NavigationMenuController;
 import com.grouplearn.project.app.uiManagement.course.CourseMenuActivity;
-import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
-import com.grouplearn.project.app.uiManagement.interactor.ContactListInteractor;
 import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
-import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
 import com.grouplearn.project.app.uiManagement.search.SearchUserActivity;
 import com.grouplearn.project.app.uiManagement.settings.SettingsActivity;
 import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
-import com.grouplearn.project.bean.GLContact;
-import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
-import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
-
-import java.util.ArrayList;
 
 public class GroupListNewActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "GroupListNewActivity";
@@ -64,14 +52,12 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
         mContext = this;
         initializeWidgets();
         registerListeners();
-//        makeGodwinBot();
         processFroNotification();
-        getContactFromPhone();
     }
 
     public void processFroNotification() {
         int i = getIntent().getIntExtra("fromNotification", -1);
-        Log.i(TAG, "NOTIFICAATIOIN NOTIFICATION CAME  || HA HA HA ");
+        Log.i(TAG, "NOTIFICATION NOTIFICATION CAME  || HA HA HA ");
         if (vpGroups != null) {
             vpGroups.setCurrentItem(1);
         }
@@ -88,8 +74,8 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
         mNavigationView.setNavigationItemSelectedListener(this);
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
-        mNavController = new NavigationMenuController(mContext, mNavigationView);
-
+        mNavController = new NavigationMenuController(mContext, mNavigationView, 0);
+        mNavigationView.setNavigationItemSelectedListener(this);
         mNavigationView = mNavController.createNavigationMenu();
     }
 
@@ -106,61 +92,7 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
 
     @Override
     public void registerListeners() {
-        vpGroups.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-    }
-
-    private void getContactFromPhone() {
-        if (checkPermissionForCotacts()) {
-            ContactReadTask readTask = new ContactReadTask(mContext);
-            readTask.setContactViewInterface(new ContactViewInterface() {
-                @Override
-                public void onGetAllContacts(ArrayList<GLContact> contactModels) {
-
-                }
-
-                @Override
-                public void onGetAllContactsFromDb(ArrayList<GLContact> contactModels) {
-
-                }
-
-                @Override
-                public void onGetContactsFinished(ArrayList<GLContact> contactModels) {
-                    new ContactListInteractor(mContext).addAllContacts(contactModels, this);
-                }
-
-                @Override
-                public void onGetContactsFailed(AppError error) {
-
-                }
-            });
-            readTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
-    }
-
-    private boolean checkPermissionForCotacts() {
-        if (AppUtility.checkPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_CONTACTS
-                    },
-                    MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
-            return false;
-        } else
-            return true;
     }
 
     @Override
@@ -172,7 +104,6 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
     @Override
     protected void onResume() {
         super.onResume();
-//        getContactFromPhone();
         createNavigationView();
     }
 
@@ -193,6 +124,8 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
             startActivity(new Intent(mContext, RequestAcceptingActivity.class));
         } else if (id == R.id.nav_settings) {
             startActivity(new Intent(mContext, SettingsActivity.class));
+        } else if (id == R.id.nav_request_contact) {
+            startActivity(new Intent(mContext, ContactRequestActivity.class));
         } else if (id == R.id.nav_invitations) {
             startActivity(new Intent(mContext, InvitationActivity.class));
         } else if (id == R.id.nav_signout) {
@@ -227,11 +160,6 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    private void makeGodwinBot() {
-        GroupDbHelper mDbHelper = new GroupDbHelper(mContext);
-        mDbHelper.getGodwinBot();
     }
 
     boolean isBackPressed;

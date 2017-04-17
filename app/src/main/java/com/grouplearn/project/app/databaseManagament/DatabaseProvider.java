@@ -17,6 +17,7 @@ import com.grouplearn.project.app.databaseManagament.tables.TableChat;
 import com.grouplearn.project.app.databaseManagament.tables.TableContacts;
 import com.grouplearn.project.app.databaseManagament.tables.TableCourse;
 import com.grouplearn.project.app.databaseManagament.tables.TableGroups;
+import com.grouplearn.project.app.databaseManagament.tables.TableInterests;
 import com.grouplearn.project.app.databaseManagament.tables.TableServerSyncDetails;
 import com.grouplearn.project.app.databaseManagament.tables.TableSubscribedGroups;
 
@@ -40,6 +41,8 @@ public class DatabaseProvider extends ContentProvider {
                 TableContacts.TABLE_INDEX);
         uriMatcher.addURI(DatabaseConstants.AUTHORITY, TableCourse.TABLE_NAME,
                 TableCourse.TABLE_INDEX);
+        uriMatcher.addURI(DatabaseConstants.AUTHORITY, TableInterests.TABLE_NAME,
+                TableInterests.TABLE_INDEX);
     }
 
     private DbHelper mDbHelper;
@@ -72,6 +75,10 @@ public class DatabaseProvider extends ContentProvider {
                 count = mSqldb.delete(databasetable, selection, selectionArgs);
                 break;
             case TableCourse.TABLE_INDEX:
+                databasetable = uri.getPathSegments().get(0);
+                count = mSqldb.delete(databasetable, selection, selectionArgs);
+                break;
+            case TableInterests.TABLE_INDEX:
                 databasetable = uri.getPathSegments().get(0);
                 count = mSqldb.delete(databasetable, selection, selectionArgs);
                 break;
@@ -151,6 +158,16 @@ public class DatabaseProvider extends ContentProvider {
                     return retUri;
                 }
                 throw new SQLException("Failed to insert row into " + uri);
+            case TableInterests.TABLE_INDEX:
+                rowID = mSqldb.insert(TableInterests.TABLE_NAME, "", values);
+                // ---if added successfully---
+                if (rowID > 0) {
+                    retUri = ContentUris.withAppendedId(TableInterests.CONTENT_URI,
+                            rowID);
+                    getContext().getContentResolver().notifyChange(uri, null);
+                    return retUri;
+                }
+                throw new SQLException("Failed to insert row into " + uri);
         }
         return retUri;
     }
@@ -164,7 +181,7 @@ public class DatabaseProvider extends ContentProvider {
 		 * doesn't already exist.
 		 */
         mSqldb = mDbHelper.getWritableDatabase();
-        return (mSqldb == null) ? false : true;
+        return mSqldb != null;
 
     }
 
@@ -239,6 +256,16 @@ public class DatabaseProvider extends ContentProvider {
                     cursor.setNotificationUri(getContext().getContentResolver(),
                             uri);
                 break;
+            case TableInterests.TABLE_INDEX:
+                mSqldb = mDbHelper.getReadableDatabase();
+                tableName = uri.getLastPathSegment();
+                queryBuilder.setTables(tableName);
+                cursor = queryBuilder.query(mSqldb, projection, selection,
+                        selectionArgs, null, null, sortOrder);
+                if (cursor != null)
+                    cursor.setNotificationUri(getContext().getContentResolver(),
+                            uri);
+                break;
         }
         return cursor;
     }
@@ -274,6 +301,10 @@ public class DatabaseProvider extends ContentProvider {
                 count = mSqldb.update(TableCourse.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
+            case TableInterests.TABLE_INDEX:
+                count = mSqldb.update(TableInterests.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
         }
         getContext().getContentResolver().notifyChange(uri, null);
         return count;
@@ -299,6 +330,7 @@ public class DatabaseProvider extends ContentProvider {
             db.execSQL("drop table  if exists " + TableServerSyncDetails.TABLE_NAME);
             db.execSQL("drop table  if exists " + TableContacts.TABLE_NAME);
             db.execSQL("drop table  if exists " + TableCourse.TABLE_NAME);
+            db.execSQL("drop table  if exists " + TableInterests.TABLE_NAME);
 
             onCreate(db);
         }
@@ -311,7 +343,7 @@ public class DatabaseProvider extends ContentProvider {
             db.execSQL(TableServerSyncDetails.SQL_CREATE_TABLE);
             db.execSQL(TableContacts.SQL_CREATE_TABLE);
             db.execSQL(TableCourse.SQL_CREATE_TABLE);
-
+            db.execSQL(TableInterests.SQL_CREATE_TABLE);
         }
     }
 }

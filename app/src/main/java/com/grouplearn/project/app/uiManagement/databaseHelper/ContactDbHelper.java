@@ -4,24 +4,26 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.text.TextUtils;
 
 import com.grouplearn.project.app.databaseManagament.tables.TableContacts;
 import com.grouplearn.project.bean.GLContact;
+import com.grouplearn.project.bean.GLInterest;
 
 import java.util.ArrayList;
 
 /**
- * Created by Godwin Joseph on 07-06-2016 21:48 for Group Learn application.
+ * Created by Godwin on 07-06-2016 21:48 for Group Learn application 13:17 for GroupLearn.
+ * @author : Godwin Joseph Kurinjikattu
  */
 public class ContactDbHelper extends DataBaseHelper {
 
-    private ContentResolver mContentResolver;
+    private final ContentResolver mContentResolver;
+    private final InterestDbHelper interestDbHelper;
 
     public ContactDbHelper(Context mContext) {
         super(mContext);
-        this.mContext = mContext;
         this.mContentResolver = mContext.getContentResolver();
+        this.interestDbHelper = new InterestDbHelper(mContext);
     }
 
     public void addContact(ArrayList<GLContact> models) {
@@ -35,22 +37,30 @@ public class ContactDbHelper extends DataBaseHelper {
         if (count <= 0) {
             ContentValues cv = getContentValuesForContacts(model);
             mContentResolver.insert(TableContacts.CONTENT_URI, cv);
+            if (model.getSkills() != null && model.getSkills().size() > 0) {
+                interestDbHelper.addInterests(model.getSkills());
+            }
+            if (model.getInterests() != null && model.getInterests().size() > 0) {
+                interestDbHelper.addInterests(model.getInterests());
+            }
         }
     }
 
     public int updateContact(GLContact model) {
-        ContentValues cv = new ContentValues();
-        String where = TableContacts.CONTACT_NUMBER + " = '" + model.getContactNumber() + "'";
-        cv.put(TableContacts.CONTACT_CLOUD_ID, model.getContactUniqueId());
-        cv.put(TableContacts.CONTACT_FOUND, model.getStatus());
-        cv.put(TableContacts.CONTACT_ICON_URI, model.getIconUrl());
-        if (!TextUtils.isEmpty(model.getContactStatus()))
-            cv.put(TableContacts.CONTACT_STATUS, model.getContactStatus());
+        ContentValues cv = getContentValuesForContacts(model);
+        String where = TableContacts.CONTACT_USER_ID + " = '" + model.getContactUserId() + "'";
+        cv.put(TableContacts.UPDATED_TIME, System.currentTimeMillis());
+        if (model.getSkills() != null && model.getSkills().size() > 0) {
+            interestDbHelper.addInterests(model.getSkills());
+        }
+        if (model.getInterests() != null && model.getInterests().size() > 0) {
+            interestDbHelper.addInterests(model.getInterests());
+        }
         return mContentResolver.update(TableContacts.CONTENT_URI, cv, where, null);
     }
 
     public ArrayList<GLContact> getContacts() {
-        String sort = TableContacts.CONTACT_CLOUD_ID + " ASC";
+        String sort = TableContacts.CONTACT_NAME + " ASC";
         Cursor cursor = mContentResolver.query(TableContacts.CONTENT_URI, null, null, null, sort);
         ArrayList<GLContact> contactModels = new ArrayList<>();
         if (cursor != null && cursor.getCount() > 0) {
@@ -58,6 +68,9 @@ public class ContactDbHelper extends DataBaseHelper {
             do {
                 GLContact contactModel = getContactFromCursor(cursor);
                 contactModels.add(contactModel);
+                contactModel.setInterests(interestDbHelper.getInterests(contactModel.getContactUserId(), GLInterest.INTEREST));
+                contactModel.setSkills(interestDbHelper.getInterests(contactModel.getContactUserId(), GLInterest.SKILL));
+
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -66,13 +79,11 @@ public class ContactDbHelper extends DataBaseHelper {
 
     private ContentValues getContentValuesForContacts(GLContact model) {
         ContentValues cv = new ContentValues();
-        cv.put(TableContacts.CONTACT_ID, model.getContactId());
-        cv.put(TableContacts.CONTACT_CLOUD_ID, model.getContactUniqueId());
-        cv.put(TableContacts.CONTACT_ICON_ID, model.getContactIconId());
+
+        cv.put(TableContacts.CONTACT_USER_ID, model.getContactUserId());
+        cv.put(TableContacts.CONTACT_MAIL_ID, model.getContactMailId());
         cv.put(TableContacts.CONTACT_NAME, model.getContactName());
         cv.put(TableContacts.CONTACT_STATUS, model.getContactStatus());
-        cv.put(TableContacts.CONTACT_NUMBER, model.getContactNumber());
-        cv.put(TableContacts.CONTACT_FOUND, model.getStatus());
         cv.put(TableContacts.CONTACT_ICON_URI, model.getIconUrl());
         return cv;
     }
@@ -80,13 +91,11 @@ public class ContactDbHelper extends DataBaseHelper {
     private GLContact getContactFromCursor(Cursor cursor) {
         if (cursor != null) {
             GLContact model = new GLContact();
-            model.setContactIconId(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_ICON_ID)));
-            model.setContactId(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_ID)));
-            model.setContactUniqueId(cursor.getLong(cursor.getColumnIndex(TableContacts.CONTACT_CLOUD_ID)));
+
+            model.setContactUserId(cursor.getLong(cursor.getColumnIndex(TableContacts.CONTACT_USER_ID)));
             model.setContactName(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_NAME)));
             model.setContactStatus(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_STATUS)));
-            model.setContactNumber(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_NUMBER)));
-            model.setStatus(cursor.getInt(cursor.getColumnIndex(TableContacts.CONTACT_FOUND)));
+            model.setContactMailId(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_MAIL_ID)));
             model.setIconUrl(cursor.getString(cursor.getColumnIndex(TableContacts.CONTACT_ICON_URI)));
 
             return model;
@@ -94,35 +103,23 @@ public class ContactDbHelper extends DataBaseHelper {
         return null;
     }
 
-    private GLContact getContact(String contactId) {
-        String where = TableContacts.CONTACT_ID + "='" + contactId + "'";
+    private GLContact getContact(long contactUserId) {
+        String where = TableContacts.CONTACT_USER_ID + "=" + contactUserId;
         Cursor cursor = mContentResolver.query(TableContacts.CONTENT_URI, null, where, null, null);
         GLContact contact = null;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             contact = getContactFromCursor(cursor);
+            contact.setInterests(interestDbHelper.getInterests(contact.getContactUserId(), GLInterest.INTEREST));
+            contact.setSkills(interestDbHelper.getInterests(contact.getContactUserId(), GLInterest.SKILL));
+
         }
         return contact;
     }
 
-    public long isContactFound(String contactNumber) {
-        String where = TableContacts.CONTACT_NUMBER + "'" + contactNumber + "'";
+    public long isContactExist(long contactId) {
+        String where = TableContacts.CONTACT_USER_ID + "=" + contactId;
         return getNumberOfRowsInDatabase(TableContacts.TABLE_NAME, where);
     }
 
-    public ArrayList<GLContact> getContactsInCloud() {
-        String where = TableContacts.CONTACT_FOUND + "=1";
-        String sort = TableContacts.CONTACT_FOUND + " ASC";
-        Cursor cursor = mContentResolver.query(TableContacts.CONTENT_URI, null, where, null, sort);
-        ArrayList<GLContact> contactModels = new ArrayList<>();
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            do {
-                GLContact contactModel = getContactFromCursor(cursor);
-                contactModels.add(contactModel);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        return contactModels;
-    }
 }

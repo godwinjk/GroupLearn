@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 public class CloudAddInterestResponse extends CloudConnectResponse {
     ArrayList<GLInterest> interests = new ArrayList<>();
+    ArrayList<GLInterest> skills = new ArrayList<>();
 
     public ArrayList<GLInterest> getInterests() {
         return interests;
@@ -18,5 +19,13 @@ public class CloudAddInterestResponse extends CloudConnectResponse {
 
     public void setInterests(ArrayList<GLInterest> interests) {
         this.interests = interests;
+    }
+
+    public ArrayList<GLInterest> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(ArrayList<GLInterest> skills) {
+        this.skills = skills;
     }
 }

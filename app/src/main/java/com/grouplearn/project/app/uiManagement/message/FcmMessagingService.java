@@ -12,6 +12,7 @@ import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
 import com.grouplearn.project.app.uiManagement.notification.NotificationManager;
 import com.grouplearn.project.bean.GLMessage;
+import com.grouplearn.project.utilities.AesHelper;
 import com.grouplearn.project.utilities.ChatUtilities;
 import com.grouplearn.project.utilities.Log;
 
@@ -57,7 +58,13 @@ public class FcmMessagingService extends FirebaseMessagingService {
                         JSONObject object = array.optJSONObject(i);
 //            JSONObject object = new JSONObject(body);
                         if (object != null) {
-                            model.setMessageBody(object.optString("message"));
+
+                            String encryptedMessage = object.optString("message");
+                            String key = "1234567890123456";
+                            String origMessage = AesHelper.decrypt(key, encryptedMessage);
+
+
+                            model.setMessageBody(origMessage);
                             model.setReceiverId(object.optLong("groupId"));
                             model.setSenderName(object.optString("senderName"));
                             model.setMessageType(object.optInt("messageType"));

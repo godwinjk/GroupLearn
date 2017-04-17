@@ -83,7 +83,6 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             convertView = inflater.inflate(R.layout.layout_contact_item, null);
             holder = new ContactItemHolder();
             holder.tvContactName = (TextView) convertView.findViewById(R.id.tv_contact_name);
-            holder.tvContactNumber = (TextView) convertView.findViewById(R.id.tv_contact_number);
             holder.tvInvite = (TextView) convertView.findViewById(R.id.tv_invite);
             holder.tvStatus = (TextView) convertView.findViewById(R.id.tv_contact_status);
             holder.ivIcon = (ImageView) convertView.findViewById(R.id.iv_contact_image);
@@ -107,7 +106,6 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
 
         holder.tvContactName.setText(model.getContactName());
         holder.tvStatus.setText(model.getContactStatus());
-        holder.tvContactNumber.setText(model.getContactNumber());
         holder.ivIcon.setBackground(getBackgroundDrawable(mContext, position));
 
         holder.tvInvite.setOnClickListener(new View.OnClickListener() {
@@ -118,26 +116,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
                 }
             }
         });
-        holder.ivIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (model.getContactId() != null) {
-                    if (onRecyclerItemClickListener != null) {
-                        onRecyclerItemClickListener.onItemClicked(position, model, holder.ivIcon);
-                    }
-                }
-            }
-        });
-        holder.llContactItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (model.getContactUniqueId() > 0) {
-                    if (onRecyclerItemClickListener != null) {
-                        onRecyclerItemClickListener.onItemClicked(position, model, holder.ivIcon);
-                    }
-                }
-            }
-        });
+
         String imageUri = model.getIconUrl();
         if (model.getStatus() == 1 && !TextUtils.isEmpty(imageUri)) {
             holder.ivIcon.setPadding(0, 0, 0, 0);
@@ -153,10 +132,6 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
                             holder.ivIcon.setImageDrawable(circularBitmapDrawable);
                         }
                     });
-        } else if (model.getContactImage() != null) {
-            Bitmap bitmap = model.getContactImage();
-            holder.ivIcon.setPadding(0, 0, 0, 0);
-            holder.ivIcon.setImageBitmap(bitmap);
         } else {
             float scale = mContext.getResources().getDisplayMetrics().density;
             int dpAsPixels = (int) (10 * scale + 0.5f);

@@ -491,7 +491,7 @@ public class CloudUserManager extends BaseManager implements CloudUserManagerInt
                                 }
                             } else {
                                 if (responseCallback != null) {
-                                    responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
+                                    responseCallback.onFailure(cloudRequest, new CloudError(statusObject.optInt("statusCode"), statusObject.optString("statusMessage")));
                                 }
                             }
                         } else {
@@ -523,7 +523,7 @@ public class CloudUserManager extends BaseManager implements CloudUserManagerInt
 //        headerMap.put("token", "" + cloudRequest.getToken());
         JSONObject entity = new JSONObject();
         try {
-            entity.put("userName", cloudRequest.getUserName());
+            entity.put("userEmail", cloudRequest.getUserName());
             entity.put("requestId", cloudRequest.getOtp());
             entity.put("password", AppUtility.hashString(cloudRequest.getPassword()));
 

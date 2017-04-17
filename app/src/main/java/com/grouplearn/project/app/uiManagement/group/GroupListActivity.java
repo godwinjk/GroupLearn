@@ -80,7 +80,7 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
             mVisible = visible;
             int height = mFab.getHeight();
 
-            Log.d(TAG, "FLoating action button state : || :  visible=" + visible + "  -- height=Margin=" + (height + getMarginBottom()));
+            Log.d(TAG, "Floating action button state : || :  visible=" + visible + "  -- height=Margin=" + (height + getMarginBottom()));
             int translationY = visible ? 0 : height + getMarginBottom();
             boolean show = visible ? true : false;
 

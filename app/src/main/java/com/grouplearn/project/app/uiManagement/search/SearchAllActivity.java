@@ -80,7 +80,7 @@ public class SearchAllActivity extends BaseActivity implements NavigationView.On
                 }
             }, 100);
         } else {
-            mNavController = new NavigationMenuController(mContext, mNavigationView);
+            mNavController = new NavigationMenuController(mContext, mNavigationView, 0);
         }
         mNavigationView = mNavController.createNavigationMenu();
     }
@@ -109,7 +109,7 @@ public class SearchAllActivity extends BaseActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-       if (id == R.id.nav_about) {
+        if (id == R.id.nav_about) {
             startActivity(new Intent(mContext, AboutActivity.class));
         } else if (id == R.id.nav_groups) {
             startActivity(new Intent(mContext, GroupListActivity.class));

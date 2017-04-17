@@ -3,7 +3,6 @@ package com.grouplearn.project.app.uiManagement.user;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,7 +22,7 @@ import com.grouplearn.project.utilities.InputValidator;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
 public class SignupActivity extends BaseActivity implements View.OnClickListener {
-    EditText etUserName, etDisplayName, etMailId,etPassword;
+    EditText etDisplayName, etMailId,etPassword;
     Button btnSignUp;
     Context mContext;
     AppSharedPreference mPref;
@@ -42,7 +41,7 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
     @Override
     public void initializeWidgets() {
         mPref = new AppSharedPreference(mContext);
-        etUserName = (EditText) findViewById(R.id.et_user_name);
+
         etDisplayName = (EditText) findViewById(R.id.et_display_name);
         etMailId = (EditText) findViewById(R.id.et_mail_id);
         etPassword = (EditText) findViewById(R.id.pf_password);
@@ -71,14 +70,13 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
     private void doSignUp() {
         CloudSignUpRequest request = new CloudSignUpRequest();
         request.setAppUniqueId(mPref.getIntegerPrefValue(PreferenceConstants.APP_ID));
-        String userName = etUserName.getText().toString();
         String displayName = etDisplayName.getText().toString();
         String mailId = etMailId.getText().toString();
         String password = etPassword.getText().toString();
 
         request.setDisplayName(displayName);
         request.setMailId(mailId);
-        request.setUserName(userName);
+
         request.setPassword(password);
 
         CloudResponseCallback callback = new CloudResponseCallback() {
@@ -103,11 +101,6 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
     private boolean validateUserCredentials() {
         InputValidator validator = new InputValidator(mContext);
         int status = 0;
-        String phoneNum = etUserName.getText().toString();
-        if (TextUtils.isEmpty(phoneNum)) {
-            etUserName.setError("Enter phone num");
-            return false;
-        }
 
         status = validator.validateFullName(etDisplayName);
         if (status != 0)

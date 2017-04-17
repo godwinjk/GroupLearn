@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/GroupLearn.iml" filepath="$PROJECT_DIR$/GroupLearn.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/chat_bot/chat_bot.iml" filepath="$PROJECT_DIR$/chat_bot/chat_bot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/emojicon/emojicon.iml" filepath="$PROJECT_DIR$/emojicon/emojicon.iml" />
     </modules>
   </component>
 </project>

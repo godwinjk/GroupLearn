@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group
+        android:id="@+id/group00"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dash_board"
+            android:checked="false"
+            android:icon="@drawable/user_settings_40"
+            android:title="Dashboard" />
+    </group>
+    <group
         android:id="@+id/group0"
         android:checkableBehavior="single">
         <item
@@ -28,6 +37,11 @@
             android:checked="false"
             android:icon="@drawable/search_user"
             android:title="Search Users" />
+        <item
+            android:id="@+id/nav_request_contact"
+            android:checked="false"
+            android:icon="@drawable/search_user"
+            android:title="Contact Requests" />
     </group>
 
 

@@ -11,7 +11,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.widget.SearchView;
@@ -31,18 +30,17 @@ import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.adapter.ContactListAdapter;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ContactDbHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
-import com.grouplearn.project.app.uiManagement.interactor.ContactListInteractor;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
+import com.grouplearn.project.bean.GLContact;
+import com.grouplearn.project.bean.GLGroup;
+import com.grouplearn.project.bean.GLRequest;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
 import com.grouplearn.project.cloud.CloudError;
 import com.grouplearn.project.cloud.CloudResponseCallback;
 import com.grouplearn.project.cloud.groupManagement.inviteGroup.CloudGroupInvitationResponse;
-import com.grouplearn.project.bean.GLContact;
-import com.grouplearn.project.bean.GLGroup;
-import com.grouplearn.project.bean.GLRequest;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
@@ -55,13 +53,13 @@ import java.util.Comparator;
 import java.util.Locale;
 
 public class ContactListActivity extends BaseActivity implements ContactViewInterface {
-    ListView lvContacts;
-    TextView tvNoContacts;
-    Context mContext;
-    ContactListAdapter mAdapter;
-    private String TAG = "ContactListActivity";
-    ContactDbHelper mDbHelper;
-    GLGroup groupModel;
+    private ListView lvContacts;
+    private TextView tvNoContacts;
+    private Context mContext;
+    private ContactListAdapter mAdapter;
+    private final String TAG = "ContactListActivity";
+    private ContactDbHelper mDbHelper;
+    private GLGroup groupModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,12 +67,11 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
         setContentView(R.layout.activity_contact_list);
         Toolbar toolbar = setupToolbar("Contacts", true);
         mContext = this;
-        long groupUniqueId = getIntent().getLongExtra("groupCloudId",-1);
+        long groupUniqueId = getIntent().getLongExtra("groupCloudId", -1);
         groupModel = new GroupDbHelper(mContext).getGroupInfo(groupUniqueId);
 
         initializeWidgets();
         registerListeners();
-//        getCountryData();
         getContactsFromDb();
     }
 
@@ -115,18 +112,13 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
                     if (groupModel != null) {
                         GLRequest requestModel = new GLRequest();
 
-                        requestModel.setUserId(contactModel.getContactUniqueId());
+                        requestModel.setUserId(contactModel.getContactUserId());
                         requestModel.setGroupIconId(groupModel.getGroupIconId());
                         requestModel.setGroupId(groupModel.getGroupUniqueId());
                         requestModel.setGroupName(groupModel.getGroupName());
-                        requestModel.setUserId(contactModel.getContactUniqueId());
 
                         callGroupInvite(requestModel);
-                    } else {
-                        sendSms(contactModel.getContactNumber());
                     }
-                } else if (v instanceof ImageView) {
-                    openContact(contactModel.getContactId());
                 }
             }
 
@@ -173,16 +165,13 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
 
     private void getContactsFromDb() {
         if (groupModel != null) {
-            ArrayList<GLContact> contactModels = new ContactDbHelper(mContext).getContactsInCloud();
+            ArrayList<GLContact> contactModels = new ContactDbHelper(mContext).getContacts();
             updateDataInList(contactModels);
         } else {
             ArrayList<GLContact> contactModels = mDbHelper.getContacts();
             if (contactModels != null && contactModels.size() > 0) {
                 updateDataInList(sortUserList(contactModels));
             }
-            ContactReadTask readTask = new ContactReadTask(this);
-            readTask.setContactViewInterface(this);
-            readTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
@@ -207,19 +196,13 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
     }
 
     @Override
-    public void onGetAllContacts(ArrayList<GLContact> contactModels) {
+    public void onGetAllContactsFromCloud(ArrayList<GLContact> contactModels) {
         updateDataInList(sortUserList(new ContactDbHelper(mContext).getContacts()));
     }
 
     @Override
     public void onGetAllContactsFromDb(ArrayList<GLContact> contactModels) {
-//        updateDataInList(sortUserList(contactModels));
-    }
-
-    @Override
-    public void onGetContactsFinished(ArrayList<GLContact> contactModels) {
         updateDataInList(sortUserList(contactModels));
-        new ContactListInteractor(mContext).addAllContacts(contactModels, this);
     }
 
     @Override

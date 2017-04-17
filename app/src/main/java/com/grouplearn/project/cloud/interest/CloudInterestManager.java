@@ -2,6 +2,8 @@ package com.grouplearn.project.cloud.interest;
 
 import android.content.Context;
 
+import com.grouplearn.project.bean.GLCourse;
+import com.grouplearn.project.bean.GLInterest;
 import com.grouplearn.project.cloud.BaseManager;
 import com.grouplearn.project.cloud.CloudConstants;
 import com.grouplearn.project.cloud.CloudError;
@@ -14,8 +16,6 @@ import com.grouplearn.project.cloud.interest.get.CloudGetInterestRequest;
 import com.grouplearn.project.cloud.interest.get.CloudGetInterestResponse;
 import com.grouplearn.project.cloud.networkManagement.CloudAPICallback;
 import com.grouplearn.project.cloud.networkManagement.CloudHttpMethod;
-import com.grouplearn.project.bean.GLCourse;
-import com.grouplearn.project.bean.GLInterest;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
 
 import org.json.JSONArray;
@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by WiSilica on 04-12-2016 21:12 for GroupLearn application.
+ * Created by Godwin on 04-12-2016 21:12 for GroupLearn application 22:22 for GroupLearn.
+ * @author : Godwin Joseph Kurinjikattu
  */
 
 public class CloudInterestManager extends BaseManager implements CloudInterestManagerInterface {
@@ -54,19 +55,38 @@ public class CloudInterestManager extends BaseManager implements CloudInterestMa
                         JSONObject statusObject = jsonObject.optJSONObject(STATUS);
                         if (statusObject != null) {
                             response = (CloudAddInterestResponse) getUpdatedResponse(statusObject, response);
-                            JSONArray dataArray = jsonObject.optJSONArray(DATA);
-                            if (dataArray != null) {
+                            JSONObject dataObject = jsonObject.optJSONObject(DATA);
+                            if (dataObject != null) {
+                                JSONArray interestArray = dataObject.optJSONArray("myInterests");
+
                                 ArrayList<GLInterest> glInterests = new ArrayList<>();
-                                for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
-                                    JSONObject modelObject = dataArray.optJSONObject(i);
+                                for (int i = 0; interestArray != null && i < interestArray.length(); i++) {
+                                    JSONObject modelObject = interestArray.optJSONObject(i);
                                     GLInterest interest = new GLInterest();
 
                                     interest.setInterestId(modelObject.optLong("interestId"));
                                     interest.setInterestName(modelObject.optString("interest"));
+                                    interest.setStatus(modelObject.optInt("status"));
+                                    interest.setInterestType(GLInterest.INTEREST);
+                                    interest.setMessage(modelObject.optString("message"));
 
                                     glInterests.add(interest);
                                 }
                                 response.setInterests(glInterests);
+                                JSONArray skillsArray = dataObject.optJSONArray("mySkills");
+                                ArrayList<GLInterest> glSkills = new ArrayList<>();
+                                for (int i = 0; skillsArray != null && i < skillsArray.length(); i++) {
+                                    JSONObject modelObject = skillsArray.optJSONObject(i);
+                                    GLInterest interest = new GLInterest();
+
+                                    interest.setInterestId(modelObject.optLong("skillId"));
+                                    interest.setInterestName(modelObject.optString("skill"));
+                                    interest.setStatus(modelObject.optInt("status"));
+                                    interest.setInterestType(GLInterest.SKILL);
+                                    interest.setMessage(modelObject.optString("message"));
+                                    glSkills.add(interest);
+                                }
+                                response.setSkills(glSkills);
                                 if (responseCallback != null) {
                                     responseCallback.onSuccess(cloudRequest, response);
                                 }
@@ -108,15 +128,40 @@ public class CloudInterestManager extends BaseManager implements CloudInterestMa
 
         httpMethod.setHeaderMap(hashMap);
         JSONArray entity = new JSONArray();
+        JSONObject object = new JSONObject();
+        JSONArray interestsArray = new JSONArray();
         for (GLInterest model : cloudRequest.getInterests()) {
             JSONObject modelObject = new JSONObject();
             try {
                 modelObject.put("interest", model.getInterestName());
-                entity.put(modelObject);
+                modelObject.put("interestId", 0);
+                interestsArray.put(modelObject);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        try {
+            object.put("myInterests", interestsArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JSONArray skillsArray = new JSONArray();
+        for (GLInterest model : cloudRequest.getSkills()) {
+            JSONObject modelObject = new JSONObject();
+            try {
+                modelObject.put("skill", model.getInterestName());
+                modelObject.put("skillId", 0);
+                skillsArray.put(modelObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            object.put("mySkills", skillsArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        entity.put(object);
         httpMethod.setEntityString(entity.toString());
         httpMethod.execute();
     }
@@ -217,19 +262,38 @@ public class CloudInterestManager extends BaseManager implements CloudInterestMa
                         JSONObject statusObject = jsonObject.optJSONObject(STATUS);
                         if (statusObject != null) {
                             response = (CloudAddInterestResponse) getUpdatedResponse(statusObject, response);
-                            JSONArray dataArray = jsonObject.optJSONArray(DATA);
-                            if (dataArray != null) {
+                            JSONObject dataObject = jsonObject.optJSONObject(DATA);
+                            if (dataObject != null) {
+                                JSONArray interestArray = dataObject.optJSONArray("myInterests");
+
                                 ArrayList<GLInterest> glInterests = new ArrayList<>();
-                                for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
-                                    JSONObject modelObject = dataArray.optJSONObject(i);
+                                for (int i = 0; interestArray != null && i < interestArray.length(); i++) {
+                                    JSONObject modelObject = interestArray.optJSONObject(i);
                                     GLInterest interest = new GLInterest();
 
                                     interest.setInterestId(modelObject.optLong("interestId"));
                                     interest.setInterestName(modelObject.optString("interest"));
+                                    interest.setStatus(modelObject.optInt("status"));
+                                    interest.setInterestType(GLInterest.INTEREST);
+                                    interest.setMessage(modelObject.optString("message"));
 
                                     glInterests.add(interest);
                                 }
                                 response.setInterests(glInterests);
+                                JSONArray skillsArray = dataObject.optJSONArray("mySkills");
+                                ArrayList<GLInterest> glSkills = new ArrayList<>();
+                                for (int i = 0; skillsArray != null && i < skillsArray.length(); i++) {
+                                    JSONObject modelObject = skillsArray.optJSONObject(i);
+                                    GLInterest interest = new GLInterest();
+
+                                    interest.setInterestId(modelObject.optLong("skillId"));
+                                    interest.setInterestName(modelObject.optString("skill"));
+                                    interest.setStatus(modelObject.optInt("status"));
+                                    interest.setInterestType(GLInterest.SKILL);
+                                    interest.setMessage(modelObject.optString("message"));
+                                    glSkills.add(interest);
+                                }
+                                response.setSkills(glInterests);
                                 if (responseCallback != null) {
                                     responseCallback.onSuccess(cloudRequest, response);
                                 }
@@ -270,16 +334,42 @@ public class CloudInterestManager extends BaseManager implements CloudInterestMa
         hashMap.put("token", cloudRequest.getToken());
 
         httpMethod.setHeaderMap(hashMap);
+
         JSONArray entity = new JSONArray();
+        JSONObject object = new JSONObject();
+        JSONArray interestsArray = new JSONArray();
         for (GLInterest model : cloudRequest.getInterests()) {
             JSONObject modelObject = new JSONObject();
             try {
+                modelObject.put("interest", model.getInterestName());
                 modelObject.put("interestId", model.getInterestId());
-                entity.put(modelObject);
+                interestsArray.put(modelObject);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        try {
+            object.put("myInterests", interestsArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JSONArray skillsArray = new JSONArray();
+        for (GLInterest model : cloudRequest.getSkills()) {
+            JSONObject modelObject = new JSONObject();
+            try {
+                modelObject.put("skill", model.getInterestName());
+                modelObject.put("skillId", model.getInterestId());
+                skillsArray.put(modelObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            object.put("mySkills", skillsArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        entity.put(object);
         httpMethod.setEntityString(entity.toString());
         httpMethod.execute();
     }
@@ -300,23 +390,47 @@ public class CloudInterestManager extends BaseManager implements CloudInterestMa
                         if (statusObject != null) {
                             response = (CloudGetInterestResponse) getUpdatedResponse(statusObject, response);
                             if (dataObject != null) {
-                                int courseCount = dataObject.optInt("interestCount", 0);
-                                JSONArray dataArray = dataObject.optJSONArray("interestDetails");
-                                response.setInterestCount(courseCount);
+                                JSONObject interestObject = dataObject.optJSONObject("myInterests");
+
+                                //Retrieving interests
+                                int interestCount = interestObject.optInt("interestCount", 0);
+                                JSONArray interestArray = interestObject.optJSONArray("interestDetails");
+                                response.setInterestCount(interestCount);
 
                                 ArrayList<GLInterest> glInterests = new ArrayList<>();
-                                for (int i = 0; dataArray != null && courseCount > 0 && i < dataArray.length(); i++) {
-                                    JSONObject modelObject = dataArray.optJSONObject(i);
+                                for (int i = 0; interestArray != null && interestCount > 0 && i < interestArray.length(); i++) {
+                                    JSONObject modelObject = interestArray.optJSONObject(i);
                                     GLInterest glInterest = new GLInterest();
 
                                     glInterest.setInterestId(modelObject.optLong("interestId"));
                                     glInterest.setInterestName(modelObject.optString("interest"));
                                     glInterest.setUserId(modelObject.optLong("userId"));
+                                    glInterest.setInterestType(GLInterest.INTEREST);
                                     glInterest.setTimeStamp(modelObject.optString("timestamp"));
 
                                     glInterests.add(glInterest);
                                 }
                                 response.setInterests(glInterests);
+                                //retrieving skills
+                                JSONObject skillObject = dataObject.optJSONObject("mySkills");
+                                int skillsCount = skillObject.optInt("skillCount", 0);
+                                JSONArray skillsArray = skillObject.optJSONArray("skillDetails");
+                                response.setSkillsCount(skillsCount);
+
+                                ArrayList<GLInterest> glSkills = new ArrayList<>();
+                                for (int i = 0; skillsArray != null && skillsCount > 0 && i < skillsArray.length(); i++) {
+                                    JSONObject modelObject = skillsArray.optJSONObject(i);
+                                    GLInterest glInterest = new GLInterest();
+
+                                    glInterest.setInterestId(modelObject.optLong("skillId"));
+                                    glInterest.setInterestName(modelObject.optString("skill"));
+                                    glInterest.setUserId(modelObject.optLong("userId"));
+                                    glInterest.setInterestType(GLInterest.SKILL);
+                                    glInterest.setTimeStamp(modelObject.optString("timestamp"));
+
+                                    glSkills.add(glInterest);
+                                }
+                                response.setSkills(glSkills);
                                 if (responseCallback != null) {
                                     responseCallback.onSuccess(cloudRequest, response);
                                 }

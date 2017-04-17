@@ -7,13 +7,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
-import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -21,11 +18,11 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
@@ -33,7 +30,7 @@ import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
 import android.view.animation.ScaleAnimation;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -49,47 +46,49 @@ import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
 import com.grouplearn.project.app.uiManagement.notification.NotificationManager;
 import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.bean.GLMessage;
-import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.ChatUtilities;
-import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Random;
 
-import it.moondroid.chatbot.BrainService;
-import it.moondroid.chatbot.Constants;
+import io.github.rockerhieu.emojicon.EmojiconEditText;
+import io.github.rockerhieu.emojicon.EmojiconGridFragment;
+import io.github.rockerhieu.emojicon.EmojiconsFragment;
+import io.github.rockerhieu.emojicon.emoji.Emojicon;
 
 
-public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnInitListener {
+public class GroupChatActivity extends BaseActivity implements EmojiconGridFragment.OnEmojiconClickedListener,
+        EmojiconsFragment.OnEmojiconBackspaceClickedListener,
+        View.OnClickListener {
 
     private static final String TAG = "GroupChatActivity";
     private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 101;
-    long groupUniqueId;
-    Toolbar toolbar;
-    ImageView ivSent;
-    ImageView ivInputType;
-    EditText etChatBox;
-    Context mContext;
-    GLGroup mGroupModel;
+    private static final int ACTION_SELECT_DOC = 201;
+    private static final int ACTION_SELECT_VIDEO = 202;
+    private static final int ACTION_SELECT_IMAGE = 203;
+    private long groupUniqueId;
 
-    ChatRecyclerAdapter mChatRecyclerAdapter;
-    RecyclerView rvChatList;
-    ChatDbHelper mDbHelper;
-    AppSharedPreference mPref;
+    private Toolbar toolbar;
+    private ImageView ivSent;
 
-    boolean isGodwinBot = false;
-    boolean isTtsEnabled = false;
-    long myUserId;
-    ImageView ivGroupIcon;
-    TextToSpeech textToSpeech;
-    private ArrayList<GLMessage> godwinBotConversation = new ArrayList<>();
+    private EmojiconEditText etChatBox;
+    private RecyclerView rvChatList;
+    private Context mContext;
+    private GLGroup mGroupModel;
+    private ImageView ivGroupIcon, ivKeyboard, ivImage, ivEmojicon, ivVideo, ivDoc;
+    private FrameLayout flEmojicon;
+    private ChatRecyclerAdapter mChatRecyclerAdapter;
+
+    private ChatDbHelper mDbHelper;
+    private AppSharedPreference mPref;
+
+    private long myUserId;
+
     private boolean isZoomAnimation = true;
-    SpeechRecognizer recognizer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,9 +100,6 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
 
         groupUniqueId = intent.getLongExtra("groupCloudId", -1);
 
-        if (groupUniqueId == -11223344) {
-            isGodwinBot = true;
-        }
         mGroupModel = new GroupDbHelper(mContext).getGroupInfo(groupUniqueId);
         if (mGroupModel != null)
             toolbar = setupToolbar(mGroupModel.getGroupName(), true);
@@ -112,6 +108,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
 
         initializeWidgets();
         registerListeners();
+        setEmojiconFragment(false);
     }
 
     @Override
@@ -122,9 +119,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
 
         MessageInteractor.getInstance().getAllMessages(groupUniqueId);
 
-        IntentFilter intentFilter = new IntentFilter(Constants.BROADCAST_ACTION_BRAIN_STATUS);
-        intentFilter.addAction(Constants.BROADCAST_ACTION_BRAIN_ANSWER);
-        intentFilter.addAction(Constants.BROADCAST_ACTION_LOGGER);
+        IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("chat");
         intentFilter.addAction("chatRefresh");
 
@@ -154,20 +149,18 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
 
         rvChatList.setAdapter(mChatRecyclerAdapter);
 
-        etChatBox = (EditText) findViewById(R.id.et_chat_box);
+        etChatBox = (EmojiconEditText) findViewById(R.id.et_chat_box);
+
         ivSent = (ImageView) findViewById(R.id.iv_sent);
-        ivInputType = (ImageView) findViewById(R.id.iv_input_type);
+        ivImage = (ImageView) findViewById(R.id.iv_image);
+        ivEmojicon = (ImageView) findViewById(R.id.iv_emojiocn);
+        ivKeyboard = (ImageView) findViewById(R.id.iv_keyboard);
+        ivDoc = (ImageView) findViewById(R.id.iv_doc);
+        ivVideo = (ImageView) findViewById(R.id.iv_video);
 
         ivGroupIcon = (ImageView) findViewById(R.id.iv_group_icon);
         rvChatList.scrollToPosition(mChatRecyclerAdapter.getItemCount() - 1);
-
-        setSentButtonType(1);
-        ivInputType.setTag(true);
-        if (isGodwinBot) {
-            ivInputType.setVisibility(View.GONE);
-        }
-
-        textToSpeech = new TextToSpeech(mContext, this);
+        flEmojicon = (FrameLayout) findViewById(R.id.fl_emojicons);
 
         if (mPref.getBooleanPrefValue(PreferenceConstants.IS_ENTER_KEY_SEND_MESSAGE)) {
             etChatBox.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
@@ -200,19 +193,31 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
     }
 
     @Override
+    public void onEmojiconClicked(Emojicon emojicon) {
+        EmojiconsFragment.input(etChatBox, emojicon);
+    }
+
+    @Override
+    public void onEmojiconBackspaceClicked(View v) {
+        EmojiconsFragment.backspace(etChatBox);
+    }
+
+    @Override
     public void registerListeners() {
-        ivInputType.setOnClickListener(new View.OnClickListener() {
+        ivKeyboard.setOnClickListener(this);
+        ivVideo.setOnClickListener(this);
+        ivDoc.setOnClickListener(this);
+        ivImage.setOnClickListener(this);
+        ivEmojicon.setOnClickListener(this);
+
+        etChatBox.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                if ((boolean) ivInputType.getTag()) {
-                    ivInputType.setImageResource(R.drawable.happy_32);
-                    ivInputType.setTag(false);
-                    hideSoftKeyboard();
-                } else {
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (flEmojicon.getVisibility() == View.VISIBLE) {
                     openSoftKeyBoard();
-                    ivInputType.setImageResource(R.drawable.key_board_32);
-                    ivInputType.setTag(true);
+                    setVisibility(flEmojicon, View.GONE);
                 }
+                return false;
             }
         });
         toolbar.setOnClickListener(new View.OnClickListener() {
@@ -224,29 +229,9 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
                 startActivity(chatIntent);
             }
         });
-        ivSent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if ((Integer) ivSent.getTag() == 2) {
-                    speechRecognizer();
-                } else {
-                    String message = etChatBox.getText().toString();
-                    message = message.trim();
-                    if (!TextUtils.isEmpty(message)) {
-                        addChatToDb(message);
-                    }
-                }
-                if (TextUtils.isEmpty(etChatBox.getText().toString())) {
-                    setSentButtonType(1);
-                } else {
-                    setSentButtonType(2);
-                }
-            }
-        });
         etChatBox.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     if (mPref.getBooleanPrefValue(PreferenceConstants.IS_ENTER_KEY_SEND_MESSAGE)) {
@@ -264,181 +249,33 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
                 return false;
             }
         });
-        etChatBox.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (TextUtils.isEmpty(s.toString())) {
-                    setSentButtonType(1);
-                } else {
-                    setSentButtonType(2);
-                }
-            }
-        });
     }
 
-    private void speechRecognizer() {
-        if (checkPermission()) {
-            recognizer = SpeechRecognizer.createSpeechRecognizer(mContext);
-
-            final StringBuilder builder = new StringBuilder();
-            recognizer.setRecognitionListener(new RecognitionListener() {
-                @Override
-                public void onReadyForSpeech(Bundle params) {
-                    Log.e(TAG, "onReadyForSpeech");
-                }
-
-                @Override
-                public void onBeginningOfSpeech() {
-                    Log.e(TAG, "onBeginningOfSpeech");
-                }
-
-                @Override
-                public void onRmsChanged(float rmsdB) {
-                    float value = (float) (10 * Math.pow(10, ((double) rmsdB / (double) 10)));
-                    Log.e(TAG, "onRmsChanged \t" + rmsdB + " value \t" + value);
-//                zoomAnimation(rmsdB);
-                }
-
-                @Override
-                public void onBufferReceived(byte[] buffer) {
-                    Log.e(TAG, "onBufferReceived");
-                }
-
-                @Override
-                public void onEndOfSpeech() {
-                    Log.e(TAG, "onEndOfSpeech");
-                }
-
-                @Override
-                public void onError(int error) {
-                    Log.e(TAG, "onError" + error);
-                    DisplayInfo.showToast(mContext, getErrorText(error));
-                }
-
-                @Override
-                public void onResults(Bundle results) {
-                    Log.e(TAG, "onResults" + results.toString());
-                    final ArrayList<String> texts = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-
-//                builder.append(texts.get(0) + "\t");
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            String finalText = texts.get(0);
-                            etChatBox.setText(finalText);
-                            processResult(finalText);
-                        }
-                    });
-                }
-
-                @Override
-                public void onPartialResults(Bundle partialResults) {
-                    Log.e(TAG, "onPartialResults");
-                    ArrayList<String> texts = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-//                for (String word : texts) {
-//                    builder.append(word + "\t");
-//                }
-                    builder.append(texts.get(0) + " ");
-                    etChatBox.setText(texts.get(0));
-                    Log.e(TAG, "onPartialResults" + builder.toString());
-                }
-
-                @Override
-                public void onEvent(int eventType, Bundle params) {
-                    Log.e(TAG, "onEvent");
-                }
-            });
-            Intent recognizerIntent;
-            recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, this.getPackageName());
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1000);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 3000);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak Now");
-
-            recognizer.startListening(recognizerIntent);
-//        startActivity(recognizerIntent);
-            Log.e(TAG, "START LISTNEING");
-//        DisplayInfo.showToast(mContext, "Say 'SEND' or 'CANCEL/DISMISS' at last to send or dismiss message");
-            DisplayInfo.showToast(mContext, "Say something loud");
-        }
-    }
-
-    private void processResult(String message) {
-        if (message != null) {
-            String[] words = message.split(" ");
-            if (words != null && words.length > 1) {
-//                if (words[words.length - 1].equals("send") || words[words.length - 1].equals("sent")) {
-                ivSent.performClick();
-//                } else if (words[words.length - 1].equals("cancel") || words[words.length - 1].equals("dismiss")) {
-                etChatBox.setText("");
-                etChatBox.setEnabled(true);
-//                }
-
+    private void setVisibility(final View v, final int visibility) {
+        int time = 0;
+        if (visibility == View.VISIBLE)
+            time = 150;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                v.setVisibility(visibility);
             }
-        }
+        }, time);
     }
 
-    public String getErrorText(int errorCode) {
-        String message;
-        switch (errorCode) {
-            case SpeechRecognizer.ERROR_AUDIO:
-                message = "Audio recording error";
-                break;
-            case SpeechRecognizer.ERROR_CLIENT:
-                message = "Client side error";
-                break;
-            case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                message = "Insufficient permissions";
-                break;
-            case SpeechRecognizer.ERROR_NETWORK:
-                message = "Network error";
-                break;
-            case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
-                message = "Network timeout";
-                break;
-            case SpeechRecognizer.ERROR_NO_MATCH:
-                message = "No match";
-                break;
-            case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                message = "RecognitionService busy";
-                break;
-            case SpeechRecognizer.ERROR_SERVER:
-                message = "error from server";
-                break;
-            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                message = "No speech input";
-                break;
-            default:
-                message = "Didn't understand, please try again.";
-                break;
-        }
-        return message;
+    private void setEmojiconFragment(boolean useSystemDefault) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fl_emojicons, EmojiconsFragment.newInstance(useSystemDefault))
+                .commit();
+        flEmojicon.setVisibility(View.GONE);
     }
 
     private void updateChatList() {
-        if (!isGodwinBot) {
-            ArrayList<GLMessage> messageModels = mDbHelper.getMessages(groupUniqueId);
-            mChatRecyclerAdapter.setMessageModels(messageModels);
-            rvChatList.scrollToPosition(mChatRecyclerAdapter.getItemCount() - 1);
-            updateLastActivity();
-        } else {
-            mChatRecyclerAdapter.setMessageModels(godwinBotConversation);
-        }
+        ArrayList<GLMessage> messageModels = mDbHelper.getMessages(groupUniqueId);
+        mChatRecyclerAdapter.setMessageModels(messageModels);
+        rvChatList.scrollToPosition(mChatRecyclerAdapter.getItemCount() - 1);
+        updateLastActivity();
     }
 
     private void updateLastActivity() {
@@ -478,72 +315,11 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
                 updateChatList();
                 MessageInteractor.getInstance().getAllMessages(groupUniqueId);
             }
-            if (intent.getAction().equalsIgnoreCase(Constants.BROADCAST_ACTION_BRAIN_STATUS)) {
-                int status = intent.getIntExtra(Constants.EXTRA_BRAIN_STATUS, 0);
-                switch (status) {
-                    case Constants.STATUS_BRAIN_LOADING:
-                        if (isGodwinBot) {
-                            DisplayInfo.showToast(mContext, "Aimi is  loading");
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    etChatBox.setEnabled(false);
-                                    etChatBox.setText("Godwin is loading");
-                                    ivSent.setEnabled(false);
-                                }
-                            });
-                        }
-                        break;
-
-                    case Constants.STATUS_BRAIN_LOADED:
-                        if (isGodwinBot) {
-                            DisplayInfo.showToast(mContext, "Aimi is ready");
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    etChatBox.setEnabled(true);
-                                    etChatBox.setText("");
-                                    etChatBox.setHint("Ask to Aimi");
-                                    ivSent.setEnabled(true);
-                                }
-                            });
-                        }
-                        break;
-                }
-            }
-
-            if (intent.getAction().equalsIgnoreCase(Constants.BROADCAST_ACTION_BRAIN_ANSWER)) {
-                String answer = intent.getStringExtra(Constants.EXTRA_BRAIN_ANSWER);
-                GLMessage model = new GLMessage();
-                model.setMessageBody(answer);
-                model.setSenderId(1122);
-                model.setSenderName("Aimi");
-                godwinBotConversation.add(model);
-                mChatRecyclerAdapter.setMessageModels(godwinBotConversation);
-                if (mPref.getBooleanPrefValue(PreferenceConstants.IS_SPEAK_ENABLED))
-                    speakOut(answer);
-            }
-
-            if (intent.getAction().equalsIgnoreCase(Constants.BROADCAST_ACTION_LOGGER)) {
-
-                String info = intent.getStringExtra(Constants.EXTENDED_LOGGER_INFO);
-                if (info != null) {
-                    Log.i("EXTENDED_LOGGER_INFO", info);
-                }
-            }
         }
     };
 
-    private void speakOut(String message) {
-        if (isTtsEnabled && message != null) {
-            textToSpeech.setSpeechRate(.8f);
-            textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null);
-        }
-    }
-
     private void addChatToDb(String message) {
         etChatBox.setText("");
-
 
         String userName = mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME);
         GLMessage model = new GLMessage();
@@ -556,16 +332,7 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
         model.setTempId(getRandomTempId());
         model.setSentStatus(ChatUtilities.NOT_SENT);
         model.setReadStatus(ChatUtilities.READ);
-        if (!isGodwinBot) {
-            mDbHelper.addMessageToDb(model);
-            MessageInteractor.getInstance().updateMessageToCloud();
-        } else {
-            Intent brainIntent = new Intent(mContext, BrainService.class);
-            brainIntent.setAction(BrainService.ACTION_QUESTION);
-            brainIntent.putExtra(BrainService.EXTRA_QUESTION, message);
-            startService(brainIntent);
-            godwinBotConversation.add(model);
-        }
+
         updateChatList();
     }
 
@@ -601,71 +368,94 @@ public class GroupChatActivity extends BaseActivity implements TextToSpeech.OnIn
         }
     }
 
-    private void setSentButtonType(int tag) {
-        if (tag == 1)
-            return;
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (tag == 1) {
-                ivSent.setTag(2);
-                ivSent.setImageResource(R.drawable.mic_128);
-            } else {
-                ivSent.setTag(1);
-                ivSent.setImageResource(R.drawable.sent);
-            }
-            if (ivSent.getTag() != null && (Integer) ivSent.getTag() == tag) {
-                rotateAnimation();
-            }
-        } else {
-            ivSent.setTag(1);
-            ivSent.setImageResource(R.drawable.sent);
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.iv_sent:
+                String message = etChatBox.getText().toString();
+                message = message.trim();
+                if (!TextUtils.isEmpty(message)) {
+                    addChatToDb(message);
+                }
+                break;
+            case R.id.toolbar:
+                Intent chatIntent = new Intent(mContext, GroupInfoActivity.class);
+                chatIntent.putExtra("groupCloudId", groupUniqueId);
+                startActivity(chatIntent);
+                break;
+            case R.id.iv_keyboard:
+                openSoftKeyBoard();
+                setVisibility(flEmojicon, View.GONE);
+                break;
+            case R.id.iv_emojiocn:
+                hideSoftKeyboard();
+                setVisibility(flEmojicon, View.VISIBLE);
+                break;
+            case R.id.iv_image:
+                hideSoftKeyboard();
+                startActivity(ACTION_SELECT_IMAGE);
+                break;
+            case R.id.iv_video:
+                hideSoftKeyboard();
+                startActivity(ACTION_SELECT_VIDEO);
+                break;
+            case R.id.iv_doc:
+                hideSoftKeyboard();
+                startActivity(ACTION_SELECT_DOC);
+                break;
         }
     }
 
     @Override
-    public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
-
-            int result = textToSpeech.setLanguage(Locale.US);
-            if (result == TextToSpeech.LANG_NOT_SUPPORTED || result == TextToSpeech.LANG_MISSING_DATA) {
-                Log.e(TAG, "LANGIAGE NOT SUPPORTED ");
-                isTtsEnabled = false;
-            } else {
-                Log.e(TAG, "SUCCESS SUCCESS");
-                isTtsEnabled = true;
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            String filePath = null;
+            if (requestCode == ACTION_SELECT_DOC) {
+                filePath = data.getData().getPath();
+            } else if (requestCode == ACTION_SELECT_IMAGE) {
+                Uri uri = data.getData();
+                if (null != uri) {
+                    filePath = uri.getPath();
+                }
+            } else if (requestCode == ACTION_SELECT_VIDEO) {
+                Uri uri = data.getData();
+                if (null != uri) {
+                    filePath = uri.getPath();
+                }
             }
+            Log.d(TAG, " PAth " + filePath);
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (textToSpeech != null) {
-            textToSpeech.stop();
-            textToSpeech.shutdown();
-        }
-        if (recognizer != null) {
-            recognizer.stopListening();
-            recognizer.cancel();
-            recognizer.destroy();
-        }
-        super.onDestroy();
-    }
-
-    private boolean checkPermission() {
-        if (AppUtility.checkPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.RECORD_AUDIO
-                    },
-                    MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
-            return false;
-        } else
-            return true;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (grantResults != null) {
-            speechRecognizer();
+        DisplayInfo.showToast(mContext, "Please try again.");
+    }
+
+    private boolean checkPermission() {
+        boolean status = false;
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
+            } else status = true;
+        } else status = true;
+        return status;
+    }
+
+    private void startActivity(int action) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        if (action == ACTION_SELECT_DOC) {
+            intent.setType("file/*");
+        } else if (action == ACTION_SELECT_IMAGE) {
+            intent.setType("image/*");
+        } else if (action == ACTION_SELECT_VIDEO) {
+            intent.setType("video/*");
+        }
+        if (checkPermission()) {
+            startActivityForResult(Intent.createChooser(intent, "GroupLearn"), action);
         }
     }
 }

@@ -31,7 +31,7 @@ public class NotificationManager {
     private static final int TYPE_NEW_GROUP_REQUEST = 1;
     private static final int TYPE_GROUP_ADDED = 2;
     private static final int TYPE_NEW_MESSAGE = 3;
-    private static final int TYPE_NEW_GROUP_INVITATION = 4;
+    private static final int TYPE_NEW_GROUP_INVITATION = 5;
 
     int number = 0;
     private static final int NOTIFICATION_ID = -1101;

@@ -21,9 +21,9 @@ import java.util.ArrayList;
  * Created by Godwin Joseph on 25-09-2016 13:29 for Group Learn application.
  */
 public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatViewHolder> {
-    ArrayList<GLMessage> messageModels = new ArrayList<>();
-    Context mContext;
-    long myUserId;
+    private ArrayList<GLMessage> messageModels = new ArrayList<>();
+    private Context mContext;
+    private long myUserId;
 
     public ChatRecyclerAdapter(Context mContext) {
         this.mContext = mContext;
@@ -67,12 +67,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatViewHolder> {
     @Override
     public int getItemViewType(int position) {
         GLMessage model = messageModels.get(position);
-        int senderId = (int) model.getSenderId();
-        int viewType = 0;
-        if (senderId != myUserId) {
-            viewType = 1;
-        }
-        return viewType;
+        return model.getViewType(myUserId);
     }
 
     private void setDynamicColor(LinearLayout ll, long id) {

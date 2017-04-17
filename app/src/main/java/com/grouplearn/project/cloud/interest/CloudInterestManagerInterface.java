@@ -13,6 +13,8 @@ public interface CloudInterestManagerInterface {
     public void addInterest(CloudAddInterestRequest request, CloudResponseCallback callback);
 
     public void editInterest(CloudAddInterestRequest request, CloudResponseCallback callback);
+
     public void deleteInterest(CloudDeleteInterestRequest request, CloudResponseCallback callback);
+
     public void getInterest(CloudGetInterestRequest request, CloudResponseCallback callback);
 }

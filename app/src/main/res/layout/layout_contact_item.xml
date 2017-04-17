@@ -39,16 +39,6 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_contact_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:paddingTop="5dp"
-                android:text="+919400391512"
-                android:visibility="gone" />
-
-            <TextView
                 android:id="@+id/tv_contact_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

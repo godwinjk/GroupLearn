@@ -14,7 +14,7 @@ import com.grouplearn.project.R;
 
 public class CourseSearchViewHolder extends RecyclerView.ViewHolder {
     public ImageView ivCourseIcon;
-    public TextView tvSiteAddress, tvCourseName, tvDescription, tvView,tvBadge;
+    public TextView  tvCourseName, tvDescription, tvView,tvBadge;
     public LinearLayout llSearchItem;
 
     public CourseSearchViewHolder(View v) {
@@ -25,7 +25,6 @@ public class CourseSearchViewHolder extends RecyclerView.ViewHolder {
         llSearchItem = (LinearLayout) v.findViewById(R.id.ll_search_item);
 
         tvCourseName = (TextView) v.findViewById(R.id.tv_item_name);
-        tvSiteAddress = (TextView) v.findViewById(R.id.tv_site);
         tvDescription = (TextView) v.findViewById(R.id.tv_details);
         tvView = (TextView) v.findViewById(R.id.tv_view);
     }
