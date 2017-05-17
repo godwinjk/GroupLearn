@@ -16,6 +16,8 @@ public class ErrorHandler {
     public static final int EMPTY_RESPONSE_FROM_CLOUD = 11006;
     public static final int GCM_REG_FAILED = 11007;
     public static final int NO_ITEMS = 11008;
+    public static final int ERROR_FROM_SERVER = 11009;
+    public static final int DOWNLOAD_FAILED = 11010;
 
     public static class ErrorMessage {
         public static final String TOKEN_MISSING = "TOKEN_MISSING";
@@ -30,5 +32,7 @@ public class ErrorHandler {
         public static final String EMPTY_RESPONSE_FROM_CLOUD = "EMPTY_RESPONSE_FROM_CLOUD";
         public static final String GCM_REG_FAILED = "GCM_REG_FAILED";
         public static final String NO_ITEMS = "NO_ITEMS";
+        public static final String ERROR_FROM_SERVER = "Error from server";
+        public static final String DOWNLOAD_FAILED = "Download_failed";
     }
 }

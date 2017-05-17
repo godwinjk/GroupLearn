@@ -115,6 +115,7 @@ public class GroupListFragment extends BaseFragment implements View.OnClickListe
         mFab.setVisibility(View.GONE);
         revealHide(0);
         getGroupData();
+
     }
 
     @Override
@@ -241,15 +242,15 @@ public class GroupListFragment extends BaseFragment implements View.OnClickListe
         super.onResume();
         getActivity().registerReceiver(chatReceiver, new IntentFilter("chat"));
         getActivity().registerReceiver(chatReceiver, new IntentFilter("chatRefresh"));
-        getGroupsFromDb();
-        getMessages();
+//        getGroupsFromDb();
+//        getMessages();
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (getActivity() != null) {
-            getGroupsFromDb();
+//            getGroupsFromDb();
             if (isVisibleToUser) {
                 hideSoftKeyboard();
                 revealHide(0);

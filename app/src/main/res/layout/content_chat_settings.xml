@@ -28,7 +28,7 @@
                 android:drawableLeft="@drawable/speak_60"
                 android:drawablePadding="10dp"
                 android:padding="20dp"
-                android:text="Speak message" />
+                android:text="Speak mMessage" />
 
             <CheckBox
                 android:id="@+id/cb_speak"
@@ -52,7 +52,7 @@
                 android:drawableLeft="@drawable/enter_key"
                 android:drawablePadding="10dp"
                 android:padding="20dp"
-                android:text="Enter key to send message" />
+                android:text="Enter key to send mMessage" />
 
             <CheckBox
                 android:id="@+id/cb_enter_key_send_message"

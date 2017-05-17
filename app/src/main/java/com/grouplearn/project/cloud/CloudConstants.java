@@ -18,6 +18,7 @@ public class CloudConstants {
 //    private static final String BASE_URL = "http://192.168.10.152/grouplearn/public/";
     private static final String BASE_URL = "http://bodyretreatbeautyzone.com/grouplearn/public/";
     private static final String PROFILE_BASE_URL = "http://bodyretreatbeautyzone.com/grouplearn";
+    private static final String FILE_BASE_URL = "http://bodyretreatbeautyzone.com/grouplearn/public/group-file";
 
     public static String getBaseUrl() {
         String ip = new AppSharedPreference(MyApplication.getAppContext()).getStringPrefValue(PreferenceConstants.CUSTOM_URL);
@@ -31,6 +32,14 @@ public class CloudConstants {
         String ip = new AppSharedPreference(MyApplication.getAppContext()).getStringPrefValue(PreferenceConstants.CUSTOM_URL);
         if (TextUtils.isEmpty(ip))
             return PROFILE_BASE_URL;
+        else {
+            return ("http://" + ip + "/grouplearn");
+        }
+    }
+    public static String getFileUploadBaseUrl() {
+        String ip = new AppSharedPreference(MyApplication.getAppContext()).getStringPrefValue(PreferenceConstants.CUSTOM_URL);
+        if (TextUtils.isEmpty(ip))
+            return FILE_BASE_URL;
         else {
             return ("http://" + ip + "/grouplearn");
         }

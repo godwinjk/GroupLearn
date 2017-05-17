@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,15 +21,9 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.OvershootInterpolator;
-import android.view.animation.RotateAnimation;
-import android.view.animation.ScaleAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -38,6 +33,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
+import com.grouplearn.project.app.file.FileManager;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.adapter.ChatRecyclerAdapter;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
@@ -46,10 +42,18 @@ import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
 import com.grouplearn.project.app.uiManagement.notification.NotificationManager;
 import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.bean.GLMessage;
+import com.grouplearn.project.cloud.download.OnFileDownloadListener;
+import com.grouplearn.project.cloud.upload.CloudFileUploader;
+import com.grouplearn.project.cloud.upload.OnFileUploadListener;
+import com.grouplearn.project.utilities.AesHelper;
 import com.grouplearn.project.utilities.ChatUtilities;
+import com.grouplearn.project.utilities.Log;
+import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
+import java.io.File;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,16 +64,21 @@ import io.github.rockerhieu.emojicon.EmojiconGridFragment;
 import io.github.rockerhieu.emojicon.EmojiconsFragment;
 import io.github.rockerhieu.emojicon.emoji.Emojicon;
 
+import static com.grouplearn.project.utilities.AppUtility.getFilePath;
+
 
 public class GroupChatActivity extends BaseActivity implements EmojiconGridFragment.OnEmojiconClickedListener,
         EmojiconsFragment.OnEmojiconBackspaceClickedListener,
-        View.OnClickListener {
+        View.OnClickListener,
+        OnFileUploadListener,
+        OnFileDownloadListener {
 
     private static final String TAG = "GroupChatActivity";
     private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 101;
-    private static final int ACTION_SELECT_DOC = 201;
-    private static final int ACTION_SELECT_VIDEO = 202;
-    private static final int ACTION_SELECT_IMAGE = 203;
+    private static final int ACTION_SELECT_DOC = GLMessage.DOCUMENT;
+    private static final int ACTION_SELECT_VIDEO = GLMessage.VIDEO;
+    private static final int ACTION_SELECT_IMAGE = GLMessage.IMAGE;
+    private static final int ACTION_SELECT_GIF = GLMessage.GIF;
     private long groupUniqueId;
 
     private Toolbar toolbar;
@@ -87,8 +96,6 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
     private AppSharedPreference mPref;
 
     private long myUserId;
-
-    private boolean isZoomAnimation = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +152,6 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
         rvChatList.setLayoutManager(new StaggeredGridLayoutManager(1, 1));
 
         mChatRecyclerAdapter = new ChatRecyclerAdapter(mContext);
-        mChatRecyclerAdapter.setMyUserId(myUserId);
 
         rvChatList.setAdapter(mChatRecyclerAdapter);
 
@@ -209,7 +215,7 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
         ivDoc.setOnClickListener(this);
         ivImage.setOnClickListener(this);
         ivEmojicon.setOnClickListener(this);
-
+        ivSent.setOnClickListener(this);
         etChatBox.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -327,12 +333,13 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
         model.setSenderName(userName);
         model.setSenderId(myUserId);
         model.setReceiverId(groupUniqueId);
-        model.setMessageType(0);
+        model.setMessageType(GLMessage.MESSAG);
         model.setTimeStamp(new BigDecimal(System.currentTimeMillis()).toPlainString());
         model.setTempId(getRandomTempId());
         model.setSentStatus(ChatUtilities.NOT_SENT);
         model.setReadStatus(ChatUtilities.READ);
 
+        mDbHelper.addMessageToDb(model);
         updateChatList();
     }
 
@@ -345,36 +352,13 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
             return id;
     }
 
-    private void rotateAnimation() {
-        RotateAnimation animation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, .5f, Animation.RELATIVE_TO_SELF, .5f);
-        animation.setInterpolator(new DecelerateInterpolator());
-        animation.setDuration(500);
-        ivSent.startAnimation(animation);
-    }
-
-    private void zoomAnimation(float rms) {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                isZoomAnimation = true;
-            }
-        }, 200);
-        if (isZoomAnimation) {
-            ScaleAnimation scaleAnimation = new ScaleAnimation(.5f, rms / 10, .5f, rms / 10, Animation.RELATIVE_TO_SELF, .5f, Animation.RELATIVE_TO_SELF, .5f);
-            scaleAnimation.setInterpolator(new OvershootInterpolator());
-            scaleAnimation.setDuration(200);
-            ivSent.startAnimation(scaleAnimation);
-            isZoomAnimation = false;
-        }
-    }
-
-
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.iv_sent:
                 String message = etChatBox.getText().toString();
                 message = message.trim();
+                Log.v(TAG, message);
                 if (!TextUtils.isEmpty(message)) {
                     addChatToDb(message);
                 }
@@ -411,21 +395,20 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            String filePath = null;
-            if (requestCode == ACTION_SELECT_DOC) {
-                filePath = data.getData().getPath();
-            } else if (requestCode == ACTION_SELECT_IMAGE) {
+            File file = null;
+            if (requestCode == ACTION_SELECT_DOC || requestCode == ACTION_SELECT_IMAGE || requestCode == ACTION_SELECT_VIDEO) {
                 Uri uri = data.getData();
                 if (null != uri) {
-                    filePath = uri.getPath();
-                }
-            } else if (requestCode == ACTION_SELECT_VIDEO) {
-                Uri uri = data.getData();
-                if (null != uri) {
-                    filePath = uri.getPath();
+                    try {
+                        file = new File(getFilePath(this, uri));
+                        Log.d(TAG, " PAth " + file.getAbsolutePath());
+//                        File outPutFile = copyToLocalFolder(file, requestCode);
+                        uploadFile(file, requestCode);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-            Log.d(TAG, " PAth " + filePath);
         }
     }
 
@@ -457,5 +440,84 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
         if (checkPermission()) {
             startActivityForResult(Intent.createChooser(intent, "GroupLearn"), action);
         }
+    }
+
+    private void uploadFile(File file, int action) {
+        if (file != null) {
+            GLMessage message = new GLMessage();
+            message.setFile(file);
+            String userName = mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME);
+
+            message.setMessageBody(AesHelper.encrypt(groupUniqueId, ""));
+
+            message.setLocalFilePath(file.getAbsolutePath());
+            message.setSenderName(userName);
+            message.setSenderId(myUserId);
+            message.setReceiverId(groupUniqueId);
+            message.setMessageType(action);
+            message.setTimeStamp(new BigDecimal(System.currentTimeMillis()).toPlainString());
+            message.setTempId(getRandomTempId());
+            message.setSentStatus(ChatUtilities.NOT_SENT_FILE);
+            message.setReadStatus(ChatUtilities.READ);
+
+            mDbHelper.addMessageToDb(message);
+
+            CloudFileUploader uploader = new CloudFileUploader(mContext, message, this);
+            uploader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+    }
+
+    private File copyToLocalFolder(File file, int type) {
+        FileManager manager = new FileManager(mContext);
+        return manager.copyToLocal(file, type);
+    }
+
+    @Override
+    public void onUploadSuccess(GLMessage message) {
+        mDbHelper.updateMessageInDb(message);
+        message.setOperationOnProgress(true);
+        mChatRecyclerAdapter.notifyDataSetChanged();
+        updateChatList();
+    }
+
+    @Override
+    public void onUploadInProgress(GLMessage message, int progress) {
+        message.setProgress(progress);
+        message.setOperationOnProgress(true);
+        mChatRecyclerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onUploadFailed(GLMessage message, AppError error) {
+        message.setOperationOnProgress(false);
+        mChatRecyclerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (flEmojicon.getVisibility() == View.VISIBLE)
+            setVisibility(flEmojicon, View.GONE);
+        else
+            super.onBackPressed();
+
+    }
+
+    @Override
+    public void onDownloadSuccess(GLMessage message) {
+        message.setOperationOnProgress(false);
+        mChatRecyclerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDownloadInProgress(GLMessage message, int progress) {
+        message.setProgress(progress);
+        message.setOperationOnProgress(true);
+        mChatRecyclerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDownloadFailed(GLMessage message, AppError error) {
+        message.setOperationOnProgress(false);
+        mChatRecyclerAdapter.notifyDataSetChanged();
     }
 }

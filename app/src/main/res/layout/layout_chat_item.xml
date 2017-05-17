@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:emojicon="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -27,7 +27,7 @@
                 android:gravity="right"
                 android:text="Me"
                 android:textColor="@color/white"
-                android:textSize="12dp"
+                android:textSize="16dp"
                 android:textStyle="bold"
                 android:visibility="gone" />
 
@@ -39,6 +39,7 @@
                 android:gravity="right"
                 android:text="Hi"
                 android:textColor="@color/white"
+                android:textSize="16dp"
                 emojicon:emojiconAlignment="baseline" />
         </LinearLayout>
     </LinearLayout>
@@ -47,34 +48,44 @@
         android:id="@+id/ll_image_thumbnail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxHeight="100dp"
-        android:maxWidth="100dp"
-        android:orientation="vertical">
+        android:layout_margin="10dp"
+        android:maxHeight="200dp"
+        android:maxWidth="200dp"
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <RelativeLayout
+            android:id="@+id/rl_thumbnail"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp">
 
-            <ImageView
-                android:id="@+id/iv_thumbnail"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:padding="10dp"
-                android:src="@drawable/user_placeholder" />
+                android:layout_centerInParent="true">
+
+                <ImageView
+                    android:id="@+id/iv_thumbnail"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/image_128" />
+
+                <ImageView
+                    android:id="@+id/iv_play_button"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/playbutton" />
+            </RelativeLayout>
 
             <ImageView
-                android:id="@+id/iv_play_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:src="@drawable/playbutton" />
-            <ImageView
+                android:id="@+id/iv_download"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentStart="true"
-                android:layout_margin="10dp"
+                android:layout_marginLeft="10dp"
                 android:src="@drawable/download_48"
                 android:tint="@color/colorPrimary" />
         </RelativeLayout>
@@ -86,4 +97,4 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true" />
     </LinearLayout>
-</RelativeLayout>
+</android.support.v7.widget.CardView>

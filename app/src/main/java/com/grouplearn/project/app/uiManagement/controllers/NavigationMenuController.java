@@ -12,6 +12,7 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -59,11 +60,11 @@ public class NavigationMenuController {
         return setUpHeaderView(mHeaderView);
     }
 
-    private NavigationView setUpHeaderView(View headerView) {
+    private NavigationView setUpHeaderView(final View headerView) {
         TextView mDisplayName = (TextView) headerView.findViewById(R.id.tv_display_name);
         TextView mUserName = (TextView) headerView.findViewById(R.id.tv_user_name);
         final ImageView ivProfile = (ImageView) headerView.findViewById(R.id.iv_profile);
-//        LinearLayout ivProfile = (LinearLayout) headerView.findViewById(R.id.ll_nav_header);
+        final LinearLayout llNavheader = (LinearLayout) headerView.findViewById(R.id.ll_nav_header);
 
         mDisplayName.setText(mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME));
         mUserName.setText(mPref.getStringPrefValue(PreferenceConstants.USER_NAME));
@@ -76,18 +77,16 @@ public class NavigationMenuController {
                     RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
                     circularBitmapDrawable.setCircular(true);
                     ivProfile.setImageDrawable(circularBitmapDrawable);
+
+                    /*int width = headerView.getWidth() <= 0 ? 200 : headerView.getWidth();
+
+                    resource = getResizedBitmap(resource, width);
+                    resource = blurRenderScript(mContext, resource, 3);
+                    Drawable d = new BitmapDrawable(mContext.getResources(), resource);
+                    llNavheader.setBackground(d);*/
                 }
             });
         }
-        /*if (imagePath != null) {
-            Bitmap b = BitmapFactory.decodeFile(imagePath);
-            int width = headerView.getWidth() <= 0 ? 200 : headerView.getWidth();
-
-            b = getResizedBitmap(b, width);
-            b = blurRenderScript(mContext, b, 5);
-            Drawable d = new BitmapDrawable(mContext.getResources(), b);
-            ivProfile.setBackground(d);
-        }*/
         return mNavigationView;
     }
 

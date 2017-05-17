@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 import com.grouplearn.project.R;
 
+import io.github.rockerhieu.emojicon.EmojiconTextView;
+
 /**
  * Created by WiSilica on 21-01-2017 14:06.
  *
@@ -16,7 +18,8 @@ import com.grouplearn.project.R;
 
 public class GroupFrontViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView tvGroupName, tvLastMessage, tvMessageCount, tvRequest,tvBadge;
+    public TextView tvGroupName, tvMessageCount, tvRequest, tvBadge;
+    public EmojiconTextView tvLastMessage;
     public ImageView ivGroupIcon;
     public LinearLayout llMain;
 
@@ -25,7 +28,7 @@ public class GroupFrontViewHolder extends RecyclerView.ViewHolder {
         tvGroupName = (TextView) v.findViewById(R.id.tv_group_name);
         tvMessageCount = (TextView) v.findViewById(R.id.tv_msg_count);
         ivGroupIcon = (ImageView) v.findViewById(R.id.iv_group_icon);
-        tvLastMessage = (TextView) v.findViewById(R.id.tv_last_msg);
+        tvLastMessage = (EmojiconTextView) v.findViewById(R.id.tv_last_msg);
         tvRequest = (TextView) v.findViewById(R.id.tv_group_request);
         llMain = (LinearLayout) v.findViewById(R.id.ll_group_item);
         tvBadge = (TextView) v.findViewById(R.id.tv_badge);

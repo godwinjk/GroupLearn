@@ -3,18 +3,26 @@ package com.grouplearn.project.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.File;
+
 /**
  * Created by Godwin Joseph on 25-09-2016 13:31 for Group Learn application.
  */
 public class GLMessage extends BaseModel implements Parcelable {
     public static final int MESSAG = 1;
     public static final int MESSAGE_OTHER = -1;
+
     public static final int IMAGE = 2;
     public static final int MAGE_OTHER = -2;
+
     public static final int VIDEO = 3;
     public static final int VIDEO_OTHER = -3;
+
     public static final int DOCUMENT = 4;
     public static final int DOCUMENT_OTHER = -4;
+
+    public static final int GIF = -5;
+    public static final int GIF_OTHER = -5;
 
     private String messageBody;
     private int messageType;
@@ -26,6 +34,11 @@ public class GLMessage extends BaseModel implements Parcelable {
     private int messageStatus;
     private int readStatus = 0;
     private int sentStatus = 0;
+    private String localFilePath = null;
+    private String cloudFilePath = null;
+    private File file = null;
+    private int progress = 0;
+    private boolean isOperationOnProgress = false;
 
     public int getReadStatus() {
         return readStatus;
@@ -114,8 +127,46 @@ public class GLMessage extends BaseModel implements Parcelable {
         return senderId == userId;
     }
 
-    public int getViewType(long userId) {
-        return isMe(userId) ? messageType : messageType * -1;
+    public String getLocalFilePath() {
+        return localFilePath;
+    }
+
+    public void setLocalFilePath(String localFilePath) {
+        this.localFilePath = localFilePath;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    public boolean isOperationOnProgress() {
+        return isOperationOnProgress;
+    }
+
+    public void setOperationOnProgress(boolean operationOnProgress) {
+        isOperationOnProgress = operationOnProgress;
+    }
+
+    public File getFile() {
+        if (file == null && localFilePath != null)
+            file = new File(localFilePath);
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public String getCloudFilePath() {
+        return cloudFilePath;
+    }
+
+    public void setCloudFilePath(String cloudFilePath) {
+        this.cloudFilePath = cloudFilePath;
     }
 
     protected GLMessage(Parcel in) {

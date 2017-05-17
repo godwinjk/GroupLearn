@@ -13,7 +13,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 import com.grouplearn.project.app.databaseManagament.constants.DatabaseConstants;
-import com.grouplearn.project.app.databaseManagament.tables.TableChat;
+import com.grouplearn.project.app.databaseManagament.tables.TableMessage;
 import com.grouplearn.project.app.databaseManagament.tables.TableContacts;
 import com.grouplearn.project.app.databaseManagament.tables.TableCourse;
 import com.grouplearn.project.app.databaseManagament.tables.TableGroups;
@@ -31,8 +31,8 @@ public class DatabaseProvider extends ContentProvider {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(DatabaseConstants.AUTHORITY, TableSubscribedGroups.TABLE_NAME,
                 TableSubscribedGroups.TABLE_INDEX);
-        uriMatcher.addURI(DatabaseConstants.AUTHORITY, TableChat.TABLE_NAME,
-                TableChat.TABLE_INDEX);
+        uriMatcher.addURI(DatabaseConstants.AUTHORITY, TableMessage.TABLE_NAME,
+                TableMessage.TABLE_INDEX);
         uriMatcher.addURI(DatabaseConstants.AUTHORITY, TableGroups.TABLE_NAME,
                 TableGroups.TABLE_INDEX);
         uriMatcher.addURI(DatabaseConstants.AUTHORITY, TableServerSyncDetails.TABLE_NAME,
@@ -58,7 +58,7 @@ public class DatabaseProvider extends ContentProvider {
                 databasetable = uri.getPathSegments().get(0);
                 count = mSqldb.delete(databasetable, selection, selectionArgs);
                 break;
-            case TableChat.TABLE_INDEX:
+            case TableMessage.TABLE_INDEX:
                 databasetable = uri.getPathSegments().get(0);
                 count = mSqldb.delete(databasetable, selection, selectionArgs);
                 break;
@@ -98,11 +98,11 @@ public class DatabaseProvider extends ContentProvider {
         long rowID = -1;
         Uri retUri = null;
         switch (uriMatcher.match(uri)) {
-            case TableChat.TABLE_INDEX:
-                rowID = mSqldb.insert(TableChat.TABLE_NAME, "", values);
+            case TableMessage.TABLE_INDEX:
+                rowID = mSqldb.insert(TableMessage.TABLE_NAME, "", values);
                 // ---if added successfully---
                 if (rowID > 0) {
-                    retUri = ContentUris.withAppendedId(TableChat.CONTENT_URI,
+                    retUri = ContentUris.withAppendedId(TableMessage.CONTENT_URI,
                             rowID);
                     getContext().getContentResolver().notifyChange(uri, null);
                     return retUri;
@@ -196,7 +196,7 @@ public class DatabaseProvider extends ContentProvider {
         String tableName = null;
         Cursor cursor = null;
         switch (choice) {
-            case TableChat.TABLE_INDEX:
+            case TableMessage.TABLE_INDEX:
                 mSqldb = mDbHelper.getReadableDatabase();
                 tableName = uri.getLastPathSegment();
                 queryBuilder.setTables(tableName);
@@ -281,8 +281,8 @@ public class DatabaseProvider extends ContentProvider {
                 count = mSqldb.update(TableSubscribedGroups.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
-            case TableChat.TABLE_INDEX:
-                count = mSqldb.update(TableChat.TABLE_NAME, values, selection,
+            case TableMessage.TABLE_INDEX:
+                count = mSqldb.update(TableMessage.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             case TableGroups.TABLE_INDEX:
@@ -325,7 +325,7 @@ public class DatabaseProvider extends ContentProvider {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             // db.execSQL("drop if exists "+DataBaseConstants.TABLE_CATEGORY);
             db.execSQL("drop table  if exists " + TableSubscribedGroups.TABLE_NAME);
-            db.execSQL("drop table  if exists " + TableChat.TABLE_NAME);
+            db.execSQL("drop table  if exists " + TableMessage.TABLE_NAME);
             db.execSQL("drop table  if exists " + TableGroups.TABLE_NAME);
             db.execSQL("drop table  if exists " + TableServerSyncDetails.TABLE_NAME);
             db.execSQL("drop table  if exists " + TableContacts.TABLE_NAME);
@@ -339,7 +339,7 @@ public class DatabaseProvider extends ContentProvider {
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(TableSubscribedGroups.SQL_CREATE_TABLE);
             db.execSQL(TableGroups.SQL_CREATE_TABLE);
-            db.execSQL(TableChat.SQL_CREATE_TABLE);
+            db.execSQL(TableMessage.SQL_CREATE_TABLE);
             db.execSQL(TableServerSyncDetails.SQL_CREATE_TABLE);
             db.execSQL(TableContacts.SQL_CREATE_TABLE);
             db.execSQL(TableCourse.SQL_CREATE_TABLE);

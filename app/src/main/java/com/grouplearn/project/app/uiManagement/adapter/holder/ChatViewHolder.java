@@ -6,6 +6,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.grouplearn.project.R;
@@ -17,9 +18,10 @@ import io.github.rockerhieu.emojicon.EmojiconTextView;
  */
 public class ChatViewHolder extends RecyclerView.ViewHolder {
     public LinearLayout llChatItem, llMessageItem, llThumbNail;
+    public RelativeLayout rlThumbNail;
     public TextView tvTitle;
     public EmojiconTextView tvMessage;
-    public ImageView ivThumbNail, ivPlayButton;
+    public ImageView ivThumbNail, ivPlayButton, ivDownload;
     public ContentLoadingProgressBar pbLoading;
 
     public ChatViewHolder(View v, int viewType) {
@@ -31,12 +33,14 @@ public class ChatViewHolder extends RecyclerView.ViewHolder {
         llMessageItem = (LinearLayout) v.findViewById(R.id.ll_message_item);
         llChatItem = (LinearLayout) v.findViewById(R.id.ll_message_chat_item);
         llThumbNail = (LinearLayout) v.findViewById(R.id.ll_image_thumbnail);
+        rlThumbNail = (RelativeLayout) v.findViewById(R.id.rl_thumbnail);
 
         tvTitle = (TextView) v.findViewById(R.id.tv_chat_who);
         tvMessage = (EmojiconTextView) v.findViewById(R.id.tv_chat_body);
 
         ivPlayButton = (ImageView) v.findViewById(R.id.iv_play_button);
         ivThumbNail = (ImageView) v.findViewById(R.id.iv_thumbnail);
+        ivDownload = (ImageView) v.findViewById(R.id.iv_download);
 
         pbLoading = (ContentLoadingProgressBar) v.findViewById(R.id.pb_loading);
         pbLoading.setVisibility(View.GONE);
@@ -47,6 +51,7 @@ public class ChatViewHolder extends RecyclerView.ViewHolder {
             llThumbNail.setGravity(Gravity.RIGHT);
             tvMessage.setGravity(Gravity.RIGHT);
             tvTitle.setVisibility(View.GONE);
+            ivDownload.setVisibility(View.GONE);
         } else {
             llChatItem.setBackgroundResource(R.drawable.chat_bubble_other);
             llMessageItem.setGravity(Gravity.LEFT);
@@ -54,6 +59,7 @@ public class ChatViewHolder extends RecyclerView.ViewHolder {
             tvMessage.setGravity(Gravity.LEFT);
             tvTitle.setGravity(Gravity.LEFT);
             tvTitle.setVisibility(View.VISIBLE);
+            ivDownload.setVisibility(View.VISIBLE);
         }
         if (tempViewType == 1) {
             llChatItem.setVisibility(View.VISIBLE);

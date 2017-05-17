@@ -249,9 +249,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                             responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
                         }
                     }
-                } else
-
-                {
+                } else{
                     if (responseCallback != null) {
                         responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
                     }

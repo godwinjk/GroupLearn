@@ -56,16 +56,16 @@ public class FcmMessagingService extends FirebaseMessagingService {
                     MessageInteractor.getInstance().getAllMessages();
                     for (int i = 0; array != null && i < array.length(); i++) {
                         JSONObject object = array.optJSONObject(i);
-//            JSONObject object = new JSONObject(body);
                         if (object != null) {
 
                             String encryptedMessage = object.optString("message");
-                            String key = "1234567890123456";
-                            String origMessage = AesHelper.decrypt(key, encryptedMessage);
 
+                            long groupId = object.optLong("groupId");
+                            String origMessage = AesHelper.decrypt(groupId, encryptedMessage);
+                            model.setReceiverId(groupId);
 
                             model.setMessageBody(origMessage);
-                            model.setReceiverId(object.optLong("groupId"));
+
                             model.setSenderName(object.optString("senderName"));
                             model.setMessageType(object.optInt("messageType"));
                             model.setSenderId(object.optInt("senderId", 12));

@@ -126,13 +126,13 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
             ivAddInterest.setVisibility(View.VISIBLE);
             ivAddSkills.setVisibility(View.VISIBLE);
             imagePath = mPref.getStringPrefValue(PreferenceConstants.DP_PATH);
-            btnConnect.setVisibility(View.VISIBLE);
+            btnConnect.setVisibility(View.GONE);
         } else {
             isOtherUser = true;
             ivAddInterest.setVisibility(View.GONE);
             ivAddSkills.setVisibility(View.GONE);
             imagePath = userModel.getIconUrl();
-            btnConnect.setVisibility(View.GONE);
+            btnConnect.setVisibility(View.VISIBLE);
         }
         if (imagePath != null) {
             setProfilePic(imagePath);

@@ -17,9 +17,11 @@ import javax.crypto.spec.SecretKeySpec;
  */
 
 public class AesHelper {
+    public static final String KEY = "1234567890123456";
+    private final static String HEX = "0123456789ABCDEF";
 
-    public static String encrypt(String key, String message) {
-        SecretKey skeySpec = new SecretKeySpec(key.getBytes(), "AES");
+    public static String encrypt(long groupId, String message) {
+        SecretKey skeySpec = new SecretKeySpec(getKey(groupId), "AES");
         Cipher cipher = null;
         try {
             cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
@@ -27,36 +29,20 @@ public class AesHelper {
             byte[] encrypted = cipher.doFinal(message.getBytes());
             return toHex(encrypted);
 
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e1) {
-            e1.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static String decrypt(String key, String encryptString) {
+    public static String decrypt(long groupId, String encryptString) {
         try {
-            SecretKey skeySpec = new SecretKeySpec(key.getBytes(), "AES");
+            SecretKey skeySpec = new SecretKeySpec(getKey(groupId), "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, skeySpec);
             byte[] decrypted = cipher.doFinal(AesHelper.toByte(encryptString));
             return new String(decrypted);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e1) {
-            e1.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
         }
         return null;
@@ -81,7 +67,11 @@ public class AesHelper {
         return result.toString();
     }
 
-    private final static String HEX = "0123456789ABCDEF";
+    private static byte[] getKey(long groupId) {
+        String groupUniqueId = String.valueOf(groupId);
+        String newKey = KEY.substring(0, (16 - groupUniqueId.length())) + groupUniqueId;
+        return newKey.getBytes();
+    }
 
     private static void appendHex(StringBuffer sb, byte b) {
         sb.append(HEX.charAt((b >> 4) & 0x0f)).append(HEX.charAt(b & 0x0f));

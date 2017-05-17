@@ -1,6 +1,7 @@
 package com.grouplearn.project.cloud.message;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.grouplearn.project.bean.GLMessage;
 import com.grouplearn.project.cloud.BaseManager;
@@ -21,6 +22,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -62,8 +65,10 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
                                 GLMessage messageModel = new GLMessage();
 
                                 String encryptedMessage = modelObject.optString("message");
-                                String key = "1234567890123456";
-                                String origMessage = AesHelper.decrypt(key, encryptedMessage);
+                                long groupCloudId = modelObject.optLong("groupId");
+                                messageModel.setReceiverId(groupCloudId);
+
+                                String origMessage = AesHelper.decrypt(groupCloudId, encryptedMessage);
                                 messageModel.setMessageBody(origMessage);
 
                                 messageModel.setMessageType(modelObject.optInt("messageType"));
@@ -71,6 +76,17 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
                                 messageModel.setSenderName(modelObject.optString("senderName"));
                                 messageModel.setMessageId(modelObject.optLong("messageId"));
                                 messageModel.setSenderId(modelObject.optLong("sender_id"));
+                                messageModel.setCloudFilePath(modelObject.optString("fileUrl"));
+                                String url = modelObject.optString("fileUrl");
+                                if (!TextUtils.isEmpty(url)) {
+                                    try {
+                                        url = URLDecoder.decode(url, "UTF-8");
+                                        url = CloudConstants.getFileUploadBaseUrl() + url;
+                                        messageModel.setCloudFilePath(url);
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 messageModel.setReadStatus(ChatUtilities.NOT_READ);
                                 messageModel.setTimeStamp(modelObject.optString("timestamp"));
 
@@ -142,9 +158,10 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
                                     GLMessage messageModel = new GLMessage();
 
                                     String encryptedMessage = modelObject.optString("message");
-                                    String key = "1234567890123456";
-                                    String origMessage = AesHelper.decrypt(key, encryptedMessage);
+                                    long groupCloudId = modelObject.optLong("groupId");
+                                    messageModel.setReceiverId(groupCloudId);
 
+                                    String origMessage = AesHelper.decrypt(groupCloudId, encryptedMessage);
                                     messageModel.setMessageBody(origMessage);
 
                                     messageModel.setMessageType(modelObject.optInt("messageType"));
@@ -152,6 +169,18 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
                                     messageModel.setSenderName(modelObject.optString("senderName"));
                                     messageModel.setTempId(modelObject.optLong("tempId"));
                                     messageModel.setMessageId(modelObject.optLong("messageId"));
+                                    messageModel.setCloudFilePath(modelObject.optString("fileUrl"));
+
+                                    String url = modelObject.optString("fileUrl");
+                                    if (!TextUtils.isEmpty(url)) {
+                                        try {
+                                            url = URLDecoder.decode(url, "UTF-8");
+                                            url = CloudConstants.getFileUploadBaseUrl() + url;
+                                            messageModel.setCloudFilePath(url);
+                                        } catch (UnsupportedEncodingException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
                                     messageModel.setReadStatus(ChatUtilities.NOT_READ);
                                     messageModel.setTimeStamp(modelObject.optString("timestamp"));
 
@@ -202,12 +231,13 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
         for (GLMessage model : cloudRequest.getMessageModels()) {
             JSONObject modelObject = new JSONObject();
             try {
-                modelObject.put("groupId", model.getReceiverId());
+                long groupCloudId = model.getReceiverId();
+                modelObject.put("groupId", groupCloudId);
+
                 modelObject.put("messageType", model.getMessageType());
 
                 String origMessage = model.getMessageBody();
-                String key = "1234567890123456";
-                String encryptedMessage = AesHelper.encrypt(key, origMessage);
+                String encryptedMessage = AesHelper.encrypt(groupCloudId, origMessage);
 
                 modelObject.put("message", encryptedMessage);
                 modelObject.put("senderName", model.getSenderName());

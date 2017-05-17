@@ -44,7 +44,7 @@
                 android:imeOptions="actionSend"
                 android:inputType="textCapSentences|textMultiLine"
                 android:maxLines="5"
-                android:padding="10dp"
+                android:padding="5dp"
                 app:emojiconSize="28sp" />
 
             <ImageView
@@ -61,51 +61,60 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:orientation="horizontal"
-            android:layout_margin="5dp">
+            android:orientation="horizontal">
 
             <ImageView
-                android:background="?attr/selectableItemBackground"
                 android:id="@+id/iv_keyboard"
                 android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="9dp"
+                android:paddingTop="9dp"
                 android:src="@drawable/key_board_32"
                 android:tint="@color/text_gray_nav" />
 
             <ImageView
-                android:background="?attr/selectableItemBackground"
                 android:id="@+id/iv_emojiocn"
                 android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="9dp"
+                android:paddingTop="9dp"
                 android:src="@drawable/emojicon_32"
                 android:tint="@color/text_gray_nav" />
 
             <ImageView
-                android:background="?attr/selectableItemBackground"
                 android:id="@+id/iv_image"
                 android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="9dp"
+                android:paddingTop="9dp"
                 android:src="@drawable/image_message_32"
                 android:tint="@color/text_gray_nav" />
 
             <ImageView
-                android:background="?attr/selectableItemBackground"
                 android:id="@+id/iv_video"
                 android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="9dp"
+                android:paddingTop="9dp"
                 android:src="@drawable/video_message_32"
                 android:tint="@color/text_gray_nav" />
 
             <ImageView
-                android:background="?attr/selectableItemBackground"
                 android:id="@+id/iv_doc"
                 android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="9dp"
+                android:paddingTop="9dp"
                 android:src="@drawable/docs_32"
                 android:tint="@color/text_gray_nav" />
         </LinearLayout>

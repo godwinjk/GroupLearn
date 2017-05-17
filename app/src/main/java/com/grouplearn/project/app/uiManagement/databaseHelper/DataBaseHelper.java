@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.grouplearn.project.app.MyApplication;
 import com.grouplearn.project.app.databaseManagament.DatabaseProvider;
-import com.grouplearn.project.app.databaseManagament.tables.TableChat;
+import com.grouplearn.project.app.databaseManagament.tables.TableMessage;
 import com.grouplearn.project.app.databaseManagament.tables.TableContacts;
 import com.grouplearn.project.app.databaseManagament.tables.TableCourse;
 import com.grouplearn.project.app.databaseManagament.tables.TableGroups;
@@ -26,7 +26,7 @@ public class DataBaseHelper {
 
     public void clearDatabase() {
         ContentResolver mResolver = MyApplication.getAppContext().getContentResolver();
-        mResolver.delete(TableChat.CONTENT_URI, null, null);
+        mResolver.delete(TableMessage.CONTENT_URI, null, null);
         mResolver.delete(TableSubscribedGroups.CONTENT_URI, null, null);
         mResolver.delete(TableContacts.CONTENT_URI, null, null);
         mResolver.delete(TableGroups.CONTENT_URI, null, null);

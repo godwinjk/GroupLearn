@@ -21,7 +21,6 @@ import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
-import com.grouplearn.project.app.uiManagement.group.GroupListNewActivity;
 import com.grouplearn.project.cloud.CloudConnectManager;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
@@ -222,7 +221,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void startMainActivity() {
-        Intent intent = new Intent(mContext, GroupListNewActivity.class);
+        Intent intent = new Intent(mContext, UserListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         finish();

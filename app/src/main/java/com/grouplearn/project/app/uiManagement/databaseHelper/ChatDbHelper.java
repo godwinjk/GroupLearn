@@ -5,7 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.grouplearn.project.app.databaseManagament.tables.TableChat;
+import com.grouplearn.project.app.databaseManagament.tables.TableMessage;
 import com.grouplearn.project.bean.GLMessage;
 import com.grouplearn.project.utilities.ChatUtilities;
 
@@ -25,7 +25,7 @@ public class ChatDbHelper extends DataBaseHelper {
 
     public void addMessageToDb(GLMessage messageModel) {
         ContentValues cv = getContentValues(messageModel);
-        contentResolver.insert(TableChat.CONTENT_URI, cv);
+        contentResolver.insert(TableMessage.CONTENT_URI, cv);
     }
 
     public void addMessageToDb(ArrayList<GLMessage> messageModels) {
@@ -42,26 +42,26 @@ public class ChatDbHelper extends DataBaseHelper {
     }
 
     public long updateMessageInDb(GLMessage model) {
-        String where = TableChat.CHAT_ID + "=" + model.getMessageId();
+        String where = TableMessage.CHAT_ID + "=" + model.getMessageId();
         ContentValues cv = new ContentValues();
-        cv.put(TableChat.USER_NAME, model.getSenderName());
-        return contentResolver.update(TableChat.CONTENT_URI, cv, where, null);
+        cv.put(TableMessage.USER_NAME, model.getSenderName());
+        return contentResolver.update(TableMessage.CONTENT_URI, cv, where, null);
     }
 
     public void updateAllRead(long groupId) {
-        String where = TableChat.GROUP_ID + "='" + groupId + "'";
+        String where = TableMessage.GROUP_ID + "='" + groupId + "'";
         ContentValues cv = new ContentValues();
-        cv.put(TableChat.READ_STATUS, ChatUtilities.READ);
-        contentResolver.update(TableChat.CONTENT_URI, cv, where, null);
+        cv.put(TableMessage.READ_STATUS, ChatUtilities.READ);
+        contentResolver.update(TableMessage.CONTENT_URI, cv, where, null);
     }
 
     public void updateAllSent(ArrayList<GLMessage> messageModels) {
         for (GLMessage model : messageModels) {
-            String where = TableChat.TEMP_ID + "=" + model.getTempId();
+            String where = TableMessage.TEMP_ID + "=" + model.getTempId();
             ContentValues cv = new ContentValues();
-            cv.put(TableChat.SENT_STATUS, ChatUtilities.SENT_SUCCESS);
-            cv.put(TableChat.CHAT_ID, model.getMessageId());
-            contentResolver.update(TableChat.CONTENT_URI, cv, where, null);
+            cv.put(TableMessage.SENT_STATUS, ChatUtilities.SENT_SUCCESS);
+            cv.put(TableMessage.CHAT_ID, model.getMessageId());
+            contentResolver.update(TableMessage.CONTENT_URI, cv, where, null);
         }
     }
 
@@ -69,9 +69,9 @@ public class ChatDbHelper extends DataBaseHelper {
         updateAllRead(groupId);
 
         ArrayList<GLMessage> messageModels = new ArrayList<>();
-        String where = TableChat.GROUP_ID + "='" + groupId + "'";
-        String sort = TableChat.TIME_STAMP + " ASC";
-        Cursor cursor = contentResolver.query(TableChat.CONTENT_URI, null, where, null, sort);
+        String where = TableMessage.GROUP_ID + "='" + groupId + "'";
+        String sort = TableMessage.TIME_STAMP + " ASC";
+        Cursor cursor = contentResolver.query(TableMessage.CONTENT_URI, null, where, null, sort);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
@@ -83,9 +83,9 @@ public class ChatDbHelper extends DataBaseHelper {
 
     public GLMessage getLastMessages(long groupId) {
         GLMessage messageModel = null;
-        String where = TableChat.GROUP_ID + "='" + groupId + "'";
-        String sort = TableChat.TIME_STAMP + " DESC";
-        Cursor cursor = contentResolver.query(TableChat.CONTENT_URI, null, where, null, sort);
+        String where = TableMessage.GROUP_ID + "='" + groupId + "'";
+        String sort = TableMessage.TIME_STAMP + " DESC";
+        Cursor cursor = contentResolver.query(TableMessage.CONTENT_URI, null, where, null, sort);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
 
@@ -95,54 +95,58 @@ public class ChatDbHelper extends DataBaseHelper {
     }
 
     public long getNumberOfNewMessage(long groupId) {
-        String where = TableChat.GROUP_ID + "='" + groupId + "' AND " + TableChat.READ_STATUS + "=" + ChatUtilities.NOT_READ;
-        return getNumberOfRowsInDatabase(TableChat.TABLE_NAME, where);
+        String where = TableMessage.GROUP_ID + "='" + groupId + "' AND " + TableMessage.READ_STATUS + "=" + ChatUtilities.NOT_READ;
+        return getNumberOfRowsInDatabase(TableMessage.TABLE_NAME, where);
     }
 
     public long isTempIdExist(long tempId) {
-        String where = TableChat.TEMP_ID + "=" + tempId;
-        return getNumberOfRowsInDatabase(TableChat.TABLE_NAME, where);
+        String where = TableMessage.TEMP_ID + "=" + tempId;
+        return getNumberOfRowsInDatabase(TableMessage.TABLE_NAME, where);
     }
 
     private ContentValues getContentValues(GLMessage model) {
         ContentValues cv = new ContentValues();
-        cv.put(TableChat.USER_NAME, model.getSenderName());
-        cv.put(TableChat.USER_ID, model.getSenderId());
-        cv.put(TableChat.GROUP_ID, model.getReceiverId());
-        cv.put(TableChat.CHAT_ID, model.getMessageId());
-        cv.put(TableChat.SENT_STATUS, model.getSentStatus());
-        cv.put(TableChat.CHAT_MESSAGE, model.getMessageBody());
-        cv.put(TableChat.MESSAGE_TYPE, model.getMessageType());
-        cv.put(TableChat.SENT_STATUS, model.getSentStatus());
-        cv.put(TableChat.READ_STATUS, model.getReadStatus());
-        cv.put(TableChat.TIME_STAMP, model.getTimeStamp());
-        cv.put(TableChat.TEMP_ID, model.getTempId());
+        cv.put(TableMessage.USER_NAME, model.getSenderName());
+        cv.put(TableMessage.USER_ID, model.getSenderId());
+        cv.put(TableMessage.GROUP_ID, model.getReceiverId());
+        cv.put(TableMessage.CHAT_ID, model.getMessageId());
+        cv.put(TableMessage.SENT_STATUS, model.getSentStatus());
+        cv.put(TableMessage.CHAT_MESSAGE, model.getMessageBody());
+        cv.put(TableMessage.MESSAGE_TYPE, model.getMessageType());
+        cv.put(TableMessage.READ_STATUS, model.getReadStatus());
+        cv.put(TableMessage.CLOUD_FILE_PATH, model.getCloudFilePath());
+        cv.put(TableMessage.LOCAL_FILE_PATH, model.getLocalFilePath());
+        cv.put(TableMessage.READ_STATUS, model.getReadStatus());
+        cv.put(TableMessage.TIME_STAMP, model.getTimeStamp());
+        cv.put(TableMessage.TEMP_ID, model.getTempId());
         return cv;
     }
 
     private GLMessage getMessageFromCursor(Cursor cursor) {
         GLMessage model = new GLMessage();
-        String message = cursor.getString(cursor.getColumnIndex(TableChat.CHAT_MESSAGE));
+        String message = cursor.getString(cursor.getColumnIndex(TableMessage.CHAT_MESSAGE));
 
-        model.setSenderName(cursor.getString(cursor.getColumnIndex(TableChat.USER_NAME)));
-        model.setMessageId(cursor.getLong(cursor.getColumnIndex(TableChat.CHAT_ID)));
-        model.setReceiverId(cursor.getLong(cursor.getColumnIndex(TableChat.GROUP_ID)));
-        model.setSenderId(cursor.getLong(cursor.getColumnIndex(TableChat.USER_ID)));
-        model.setMessageType(cursor.getInt(cursor.getColumnIndex(TableChat.MESSAGE_TYPE)));
-        model.setMessageStatus(cursor.getInt(cursor.getColumnIndex(TableChat.SENT_STATUS)));
-        model.setTimeStamp(cursor.getString(cursor.getColumnIndex(TableChat.TIME_STAMP)));
-        model.setMessageBody(cursor.getString(cursor.getColumnIndex(TableChat.CHAT_MESSAGE)));
-        model.setSentStatus(cursor.getInt(cursor.getColumnIndex(TableChat.SENT_STATUS)));
-        model.setReadStatus(cursor.getInt(cursor.getColumnIndex(TableChat.READ_STATUS)));
-        model.setTempId(cursor.getLong(cursor.getColumnIndex(TableChat.TEMP_ID)));
+        model.setSenderName(cursor.getString(cursor.getColumnIndex(TableMessage.USER_NAME)));
+        model.setMessageId(cursor.getLong(cursor.getColumnIndex(TableMessage.CHAT_ID)));
+        model.setReceiverId(cursor.getLong(cursor.getColumnIndex(TableMessage.GROUP_ID)));
+        model.setSenderId(cursor.getLong(cursor.getColumnIndex(TableMessage.USER_ID)));
+        model.setMessageType(cursor.getInt(cursor.getColumnIndex(TableMessage.MESSAGE_TYPE)));
+        model.setMessageStatus(cursor.getInt(cursor.getColumnIndex(TableMessage.SENT_STATUS)));
+        model.setTimeStamp(cursor.getString(cursor.getColumnIndex(TableMessage.TIME_STAMP)));
+        model.setMessageBody(cursor.getString(cursor.getColumnIndex(TableMessage.CHAT_MESSAGE)));
+        model.setSentStatus(cursor.getInt(cursor.getColumnIndex(TableMessage.SENT_STATUS)));
+        model.setReadStatus(cursor.getInt(cursor.getColumnIndex(TableMessage.READ_STATUS)));
+        model.setCloudFilePath(cursor.getString(cursor.getColumnIndex(TableMessage.CLOUD_FILE_PATH)));
+        model.setLocalFilePath(cursor.getString(cursor.getColumnIndex(TableMessage.LOCAL_FILE_PATH)));
+        model.setTempId(cursor.getLong(cursor.getColumnIndex(TableMessage.TEMP_ID)));
 
         return model;
     }
 
     public Object getUnSyncedMessages() {
         ArrayList<GLMessage> messageModels = new ArrayList<>();
-        String where = TableChat.SENT_STATUS + "=" + ChatUtilities.NOT_SENT;
-        Cursor cursor = contentResolver.query(TableChat.CONTENT_URI, null, where, null, null);
+        String where = TableMessage.SENT_STATUS + "=" + ChatUtilities.NOT_SENT;
+        Cursor cursor = contentResolver.query(TableMessage.CONTENT_URI, null, where, null, null);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
