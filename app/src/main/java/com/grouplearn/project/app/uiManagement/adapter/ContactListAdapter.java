@@ -112,7 +112,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             @Override
             public void onClick(View v) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, model, v);
+                    onRecyclerItemClickListener.onItemClicked(position, model,1, v);
                 }
             }
         });

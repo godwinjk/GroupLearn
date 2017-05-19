@@ -47,7 +47,6 @@ import com.grouplearn.project.app.uiManagement.interactor.ContactInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.bean.GLInterest;
-import com.grouplearn.project.bean.GLUser;
 import com.grouplearn.project.cloud.CloudConnectManager;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
@@ -96,7 +95,7 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     private CardView cvVisibility;
     private boolean isOtherUser;
     private String userName;
-    private GLUser userModel;
+    private GLContact mContact;
     private ImageView ivAddInterest, ivAddSkills;
     private Button btnConnect;
 
@@ -110,12 +109,12 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
 
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle("User Info");
-        userModel = getIntent().getParcelableExtra("user");
+        mContact = getIntent().getParcelableExtra("user");
 
-        if (userModel == null) {
+        if (mContact == null) {
             userName = mPref.getStringPrefValue(PreferenceConstants.USER_NAME);
         } else {
-            userName = userModel.getUserName();
+            userName = mContact.getContactUserName();
         }
         String appUserName = mPref.getStringPrefValue(PreferenceConstants.USER_NAME);
         initializeWidgets();
@@ -131,7 +130,7 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
             isOtherUser = true;
             ivAddInterest.setVisibility(View.GONE);
             ivAddSkills.setVisibility(View.GONE);
-            imagePath = userModel.getIconUrl();
+            imagePath = mContact.getIconUrl();
             btnConnect.setVisibility(View.VISIBLE);
         }
         if (imagePath != null) {
@@ -185,9 +184,9 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
 
     private void setUserDetails() {
         if (isOtherUser) {
-            collapsingToolbarLayout.setTitle(userModel.getUserDisplayName());
-            tvName.setText(userModel.getUserDisplayName());
-            tvStatus.setText(userModel.getUserStatus());
+            collapsingToolbarLayout.setTitle(mContact.getContactName());
+            tvName.setText(mContact.getContactName());
+            tvStatus.setText(mContact.getContactStatus());
             cbVisibility.setVisibility(View.GONE);
         } else {
             collapsingToolbarLayout.setTitle(mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME));
@@ -206,13 +205,13 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         btnConnect.setOnClickListener(this);
         OnRecyclerItemClickListener clickListener = new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model, View v) {
+            public void onItemClicked(int position, Object model,int action, View v) {
                 GLInterest interest = (GLInterest) model;
                 deleteInterest(interest, interest.isSkill());
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, View v) {
+            public void onItemLongClicked(int position, Object model, int action,View v) {
 
             }
         };
@@ -332,13 +331,10 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void requestContact() {
-        GLContact contact = new GLContact();
-        contact.setContactUserId(userModel.getUserId());
-        contact.setContactMailId(userModel.getUserEmail());
-        contact.setContactName(userModel.getUserDisplayName());
+
         ContactInteractor interactor = new ContactInteractor(mContext);
         DisplayInfo.showLoader(mContext, "Please wait");
-        interactor.requestToConnect(contact, new CloudResponseCallback() {
+        interactor.requestToConnect(mContact, new CloudResponseCallback() {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 DisplayInfo.dismissLoader(mContext);
@@ -678,9 +674,9 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
             ivStatusEdit.setVisibility(View.GONE);
             cvVisibility.setVisibility(View.GONE);
             ivSelect.setVisibility(View.GONE);
-            collapsingToolbarLayout.setTitle(userModel.getUserDisplayName());
-            tvName.setText(userModel.getUserDisplayName());
-            tvStatus.setText(userModel.getUserStatus());
+            collapsingToolbarLayout.setTitle(mContact.getContactName());
+            tvName.setText(mContact.getContactName());
+            tvStatus.setText(mContact.getContactStatus());
         } else {
             ivNameEdit.setVisibility(View.VISIBLE);
             ivStatusEdit.setVisibility(View.VISIBLE);
@@ -710,7 +706,7 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         String token = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN);
         request.setToken(token);
         if (isOtherUser) {
-            request.setUserId(userModel.getUserId());
+            request.setUserId(mContact.getContactUserId());
         } else {
             request.setUserId(new AppSharedPreference(mContext).getLongPrefValue(PreferenceConstants.USER_ID));
         }

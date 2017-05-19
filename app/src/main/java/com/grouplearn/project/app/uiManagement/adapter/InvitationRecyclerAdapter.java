@@ -48,7 +48,7 @@ public class InvitationRecyclerAdapter extends RecyclerView.Adapter<InvitationVi
             @Override
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, model, view);
+                    onRecyclerItemClickListener.onItemClicked(position, model,1, view);
                 }
             }
         });
@@ -56,7 +56,7 @@ public class InvitationRecyclerAdapter extends RecyclerView.Adapter<InvitationVi
             @Override
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, model, view);
+                    onRecyclerItemClickListener.onItemClicked(position, model,1, view);
                 }
             }
         });

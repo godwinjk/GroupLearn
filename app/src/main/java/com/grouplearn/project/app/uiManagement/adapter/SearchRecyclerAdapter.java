@@ -45,7 +45,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchViewHolder
             @Override
             public void onClick(View v) {
                 if (mItemClickListener != null) {
-                    mItemClickListener.onItemClicked(position, groupList.get(position), v);
+                    mItemClickListener.onItemClicked(position, groupList.get(position), 1,v);
                 }
             }
         });

@@ -3,6 +3,8 @@ package com.grouplearn.project.app.uiManagement.controllers;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
@@ -39,10 +41,13 @@ public class NavigationMenuController {
     }
 
     public NavigationView createNavigationMenu() {
-        if (mode == 0)
+        if (mode == 0) {
             mNavigationView.getMenu().findItem(R.id.nav_dash_board).setVisible(false);
-        else
+            mNavigationView.getMenu().findItem(R.id.nav_user_list).setVisible(true);
+        } else {
             mNavigationView.getMenu().findItem(R.id.nav_dash_board).setVisible(true);
+            mNavigationView.getMenu().findItem(R.id.nav_user_list).setVisible(false);
+        }
         return setupNavigationHeader();
     }
 
@@ -78,12 +83,14 @@ public class NavigationMenuController {
                     circularBitmapDrawable.setCircular(true);
                     ivProfile.setImageDrawable(circularBitmapDrawable);
 
-                    /*int width = headerView.getWidth() <= 0 ? 200 : headerView.getWidth();
+//                    Bitmap bitmap = Bitmap.createBitmap(resource);
+                    Bitmap bitmap = Bitmap.createScaledBitmap(resource, resource.getWidth() + 1, resource.getHeight() + 1, false);
+                    int width = headerView.getWidth() <= 0 ? 200 : headerView.getWidth();
 
-                    resource = getResizedBitmap(resource, width);
-                    resource = blurRenderScript(mContext, resource, 3);
-                    Drawable d = new BitmapDrawable(mContext.getResources(), resource);
-                    llNavheader.setBackground(d);*/
+                    bitmap = getResizedBitmap(bitmap, width);
+                    bitmap = blurRenderScript(mContext, bitmap, 3);
+                    Drawable d = new BitmapDrawable(mContext.getResources(), bitmap);
+                    llNavheader.setBackground(d);
                 }
             });
         }

@@ -38,8 +38,8 @@ import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
+import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.bean.GLGroup;
-import com.grouplearn.project.bean.GLUser;
 import com.grouplearn.project.cloud.CloudConnectManager;
 import com.grouplearn.project.cloud.CloudConnectRequest;
 import com.grouplearn.project.cloud.CloudConnectResponse;
@@ -126,15 +126,15 @@ public class GroupInfoActivity extends BaseActivity {
         });
         mRecyclerAdapter.setItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model, View v) {
-                GLUser userModel = (GLUser) model;
+            public void onItemClicked(int position, Object model, int action,View v) {
+                GLContact userModel = (GLContact) model;
                 Intent intent = new Intent(mContext, UserProfileActivity.class);
                 intent.putExtra("user", userModel);
                 startActivity(intent);
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, View v) {
+            public void onItemLongClicked(int position, Object model,int action, View v) {
 
             }
         });
@@ -183,7 +183,7 @@ public class GroupInfoActivity extends BaseActivity {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 GetGroupSubscribersResponse res = (GetGroupSubscribersResponse) cloudResponse;
-                ArrayList<GLUser> userModels = res.getUserModels();
+                ArrayList<GLContact> userModels = res.getUserModels();
                 setDataToAdapter(userModels);
             }
 
@@ -196,7 +196,7 @@ public class GroupInfoActivity extends BaseActivity {
             interactor.getGroupSubscribers(mModel.getGroupUniqueId(), callback);
     }
 
-    private void setDataToAdapter(ArrayList<GLUser> userModels) {
+    private void setDataToAdapter(ArrayList<GLContact> userModels) {
         mRecyclerAdapter.setUserList(userModels);
     }
 

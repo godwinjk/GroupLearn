@@ -36,7 +36,7 @@ public class InterestRecyclerAdapter extends RecyclerView.Adapter<InterestViewHo
             @Override
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, interest, holder.ivClose);
+                    onRecyclerItemClickListener.onItemClicked(position, interest,1, holder.ivClose);
                 }
             }
         });

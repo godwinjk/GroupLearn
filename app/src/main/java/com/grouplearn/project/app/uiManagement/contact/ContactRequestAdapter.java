@@ -53,7 +53,7 @@ public class ContactRequestAdapter extends RecyclerView.Adapter<RequestViewHolde
                 @Override
                 public void onClick(View v) {
                     if (onRecyclerItemClickListener != null) {
-                        onRecyclerItemClickListener.onItemClicked(position, requestModel, holder.tvAccept);
+                        onRecyclerItemClickListener.onItemClicked(position, requestModel,1, holder.tvAccept);
                     }
                 }
             });
@@ -61,7 +61,7 @@ public class ContactRequestAdapter extends RecyclerView.Adapter<RequestViewHolde
                 @Override
                 public void onClick(View v) {
                     if (onRecyclerItemClickListener != null) {
-                        onRecyclerItemClickListener.onItemClicked(position, requestModel, holder.tvIgnore);
+                        onRecyclerItemClickListener.onItemClicked(position, requestModel,1, holder.tvIgnore);
                     }
                 }
             });

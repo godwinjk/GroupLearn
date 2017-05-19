@@ -63,7 +63,7 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
             @Override
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, course, holder.llSearchItem);
+                    onRecyclerItemClickListener.onItemClicked(position, course,1, holder.llSearchItem);
                 }
             }
         });
@@ -71,7 +71,7 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
             @Override
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, course, holder.tvView);
+                    onRecyclerItemClickListener.onItemClicked(position, course, 1,holder.tvView);
                 }
             }
         });

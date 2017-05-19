@@ -1,6 +1,6 @@
 package com.grouplearn.project.app.file;
 
-import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Environment;
 
 import com.grouplearn.project.bean.GLMessage;
@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -32,10 +33,8 @@ public class FileManager {
     public static final String DOCUMENT_FOLDER_PATH = ROOT_PATH + "/Doc";
     public static final String SENT_DOCUMENT_FOLDER_PATH = DOCUMENT_FOLDER_PATH + "/Sent";
 
-    private Context mContext;
 
-    public FileManager(Context mContext) {
-        this.mContext = mContext;
+    public FileManager() {
         createDirectory();
     }
 
@@ -117,5 +116,25 @@ public class FileManager {
             file = new File(IMAGE_FOLDER_PATH);
         }
         return file;
+    }
+
+    public void saveBitmap(String name, Bitmap resource) {
+        FileOutputStream out = null;
+        try {
+            File file = new File(IMAGE_FOLDER_PATH, getFileName(name));
+            out = new FileOutputStream(file);
+            resource.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+            // PNG is a lossless format, the compression factor (100) is ignored
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

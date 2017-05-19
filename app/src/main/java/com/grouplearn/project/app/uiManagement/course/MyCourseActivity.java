@@ -93,13 +93,13 @@ public class MyCourseActivity extends BaseActivity {
         });
         mRecyclerAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model, View v) {
+            public void onItemClicked(int position, Object model,int action, View v) {
                 course = (GLCourse) model;
                 setup(course);
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, View v) {
+            public void onItemLongClicked(int position, Object model, int action,View v) {
 
             }
         });

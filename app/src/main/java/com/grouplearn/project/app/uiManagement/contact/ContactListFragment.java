@@ -29,7 +29,6 @@ import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
 import com.grouplearn.project.bean.GLContact;
-import com.grouplearn.project.bean.GLUser;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
@@ -102,7 +101,7 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
 
         mAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
                                                     @Override
-                                                    public void onItemClicked(int position, Object model, View v) {
+                                                    public void onItemClicked(int position, Object model,int action, View v) {
                                                         GLContact contactModel = (GLContact) model;
                                                         if (v instanceof LinearLayout) {
                                                             openUserDetailsWindow(v, contactModel);
@@ -110,7 +109,7 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
                                                     }
 
                                                     @Override
-                                                    public void onItemLongClicked(int position, Object model, View v) {
+                                                    public void onItemLongClicked(int position, Object model,int action, View v) {
 
                                                     }
                                                 }
@@ -119,15 +118,8 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
 
     private void openUserDetailsWindow(View v, GLContact contactModel) {
         Intent intent = new Intent(mContext, UserProfileActivity.class);
-        GLUser userModel = new GLUser();
 
-        userModel.setIconUrl(contactModel.getIconUrl());
-        userModel.setUserDisplayName(contactModel.getContactName());
-        userModel.setUserId(contactModel.getContactUserId());
-        userModel.setUserEmail(contactModel.getContactMailId());
-        userModel.setUserStatus(contactModel.getContactStatus());
-
-        intent.putExtra("user", userModel);
+        intent.putExtra("user", contactModel);
 
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), v, "transition_group_icon");
         startActivity(intent, options.toBundle());

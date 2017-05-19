@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.grouplearn.project.R;
@@ -26,10 +27,12 @@ import com.grouplearn.project.app.uiManagement.group.InvitationActivity;
 import com.grouplearn.project.app.uiManagement.group.RequestAcceptingActivity;
 import com.grouplearn.project.app.uiManagement.interactor.ContactInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
+import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.search.SearchUserActivity;
 import com.grouplearn.project.app.uiManagement.settings.SettingsActivity;
 import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.utilities.errorManagement.AppError;
+import com.grouplearn.project.utilities.views.SpaceItemDecoration;
 
 import java.util.ArrayList;
 
@@ -77,6 +80,7 @@ public class UserListActivity extends BaseActivity
 
         rvUsers = (RecyclerView) findViewById(R.id.rv_users);
         rvUsers.setLayoutManager(new StaggeredGridLayoutManager(2, 1));
+        rvUsers.addItemDecoration(new SpaceItemDecoration(10));
         mAdapter = new UserListAdapter();
         rvUsers.setAdapter(mAdapter);
 
@@ -89,6 +93,20 @@ public class UserListActivity extends BaseActivity
             @Override
             public void onRefresh() {
                 fetchUsers();
+            }
+        });
+        mAdapter.setOnItemClickListener(new OnRecyclerItemClickListener() {
+            @Override
+            public void onItemClicked(int position, Object model,int action, View v) {
+                GLContact contact = (GLContact) model;
+                Intent intent = new Intent(mContext, UserProfileActivity.class);
+                intent.putExtra("user", contact);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onItemLongClicked(int position, Object model, int action,View v) {
+
             }
         });
     }
@@ -138,7 +156,9 @@ public class UserListActivity extends BaseActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.nav_dash_board) {
+
             startActivity(new Intent(mContext, GroupListNewActivity.class));
+            finish();
         } else if (id == R.id.nav_profile) {
             startActivity(new Intent(mContext, UserProfileActivity.class));
         } else if (id == R.id.nav_group) {

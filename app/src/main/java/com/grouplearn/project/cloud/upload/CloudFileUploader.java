@@ -11,6 +11,10 @@ import com.grouplearn.project.utilities.ChatUtilities;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
+import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.AsyncHttpPost;
+import com.koushikdutta.async.http.AsyncHttpResponse;
+import com.koushikdutta.async.http.body.MultipartFormDataBody;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,14 +75,13 @@ public class CloudFileUploader extends AsyncTask<String, Void, String> {
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Connection", "Keep-Alive");
             conn.setRequestProperty("ENCTYPE", "multipart/form-data");
-            conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary + ";fileToUpload=+" + mFile.getName());
+            conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
             conn.setRequestProperty("Accept", "application/json");
             conn.setRequestProperty("fileToUpload", mFile.getName());
-            String contentLength = Long.toString(mFile.length());
-//            conn.setRequestProperty("Content-Length",contentLength );
 
             AppSharedPreference mPref = new AppSharedPreference(mContext);
             String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
+
             conn.setRequestProperty("token", token);
             conn.setRequestProperty("groupId", "" + mMessage.getReceiverId());
             conn.setRequestProperty("message", "" + mMessage.getMessageBody());
@@ -88,7 +91,8 @@ public class CloudFileUploader extends AsyncTask<String, Void, String> {
             dos = new DataOutputStream(conn.getOutputStream());
 
             dos.writeBytes(twoHyphens + boundary + lineEnd);
-            dos.writeBytes("Content-Disposition: form-data; name=\"myFile\";filename=\"" + mFile.getName() + "\"" + lineEnd);
+            dos.writeBytes("Content-Disposition: form-data; name=\"" + "fileToUpload" + "\";filename="
+                    + mFile.getName() + lineEnd);
             dos.writeBytes(lineEnd);
 
             bytesAvailable = fileInputStream.available();
@@ -199,7 +203,29 @@ public class CloudFileUploader extends AsyncTask<String, Void, String> {
         }
     }
 
-    private void updateInLocalDatabase() {
+    public void upload() {
 
+        AppSharedPreference mPref = new AppSharedPreference(mContext);
+        String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
+
+        AsyncHttpPost post = new AsyncHttpPost(CloudConstants.getFileUploadBaseUrl());
+        MultipartFormDataBody body = new MultipartFormDataBody();
+        body.addFilePart("fileToUpload", mFile);
+        post.setHeader("token", token);
+        post.setHeader("groupId", "" + mMessage.getReceiverId());
+        post.setHeader("message", "" + mMessage.getMessageBody());
+        post.setHeader("messageType", "" + mMessage.getMessageType());
+        post.setHeader("senderName", "" + mMessage.getSenderName());
+        post.setBody(body);
+        AsyncHttpClient.getDefaultInstance().executeString(post, new AsyncHttpClient.StringCallback() {
+            @Override
+            public void onCompleted(Exception ex, AsyncHttpResponse source, String result) {
+                if (ex != null) {
+                    ex.printStackTrace();
+                    return;
+                }
+                System.out.println("Server says: " + result);
+            }
+        });
     }
 }

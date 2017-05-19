@@ -105,7 +105,7 @@ public class GroupListFrontAdapter extends RecyclerView.Adapter<GroupFrontViewHo
             @Override
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, mGroupModel, holder.tvRequest);
+                    onRecyclerItemClickListener.onItemClicked(position, mGroupModel, 1,holder.tvRequest);
                 }
             }
         });
@@ -113,7 +113,7 @@ public class GroupListFrontAdapter extends RecyclerView.Adapter<GroupFrontViewHo
             @Override
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, mGroupModel, holder.ivGroupIcon);
+                    onRecyclerItemClickListener.onItemClicked(position, mGroupModel, 1,holder.ivGroupIcon);
                 }
             }
         });
@@ -121,7 +121,7 @@ public class GroupListFrontAdapter extends RecyclerView.Adapter<GroupFrontViewHo
             @Override
             public boolean onLongClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemLongClicked(position, mGroupModel, holder.ivGroupIcon);
+                    onRecyclerItemClickListener.onItemLongClicked(position, mGroupModel, 1,holder.ivGroupIcon);
                 }
                 return false;
             }

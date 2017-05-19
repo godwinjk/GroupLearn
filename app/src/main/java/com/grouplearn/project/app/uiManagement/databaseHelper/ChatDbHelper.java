@@ -48,6 +48,13 @@ public class ChatDbHelper extends DataBaseHelper {
         return contentResolver.update(TableMessage.CONTENT_URI, cv, where, null);
     }
 
+    public long updateMessageByTempId(GLMessage model) {
+        String where = TableMessage.TEMP_ID + "=" + model.getTempId();
+        ContentValues cv = getContentValues(model);
+        cv.put(TableMessage.USER_NAME, model.getSenderName());
+        return contentResolver.update(TableMessage.CONTENT_URI, cv, where, null);
+    }
+
     public void updateAllRead(long groupId) {
         String where = TableMessage.GROUP_ID + "='" + groupId + "'";
         ContentValues cv = new ContentValues();

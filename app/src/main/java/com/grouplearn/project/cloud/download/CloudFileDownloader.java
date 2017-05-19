@@ -54,7 +54,7 @@ public class CloudFileDownloader extends AsyncTask<Void, String, Void> {
             InputStream input = new BufferedInputStream(url.openStream(), 8192);
 
             // Output stream to write file
-            FileManager manager = new FileManager(mContext);
+            FileManager manager = new FileManager();
             File directory = manager.getDirectory(mMessage.getMessageType());
             File file = new File(directory, getName(f_url));
             OutputStream output = new FileOutputStream(file);

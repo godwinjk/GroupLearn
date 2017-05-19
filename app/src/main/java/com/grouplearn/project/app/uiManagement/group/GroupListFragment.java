@@ -86,7 +86,8 @@ public class GroupListFragment extends BaseFragment implements View.OnClickListe
         super.onViewCreated(view, savedInstanceState);
         initializeWidgets(view);
         registerListeners();
-
+        getGroupsFromDb();
+        getMessages();
     }
 
     @Override
@@ -123,7 +124,7 @@ public class GroupListFragment extends BaseFragment implements View.OnClickListe
         mFab.setOnClickListener(this);
         mGroupListAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model, View v) {
+            public void onItemClicked(int position, Object model,int action, View v) {
                 Intent chatIntent = new Intent(getActivity(), GroupChatActivity.class);
                 GLGroup group = (GLGroup) model;
                 long groupUniqueId = group.getGroupUniqueId();
@@ -140,7 +141,7 @@ public class GroupListFragment extends BaseFragment implements View.OnClickListe
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, View v) {
+            public void onItemLongClicked(int position, Object model,int action, View v) {
                 GLGroup group = (GLGroup) model;
                 if (group.isMine()) {
                     showContextMenu(group);
@@ -242,8 +243,6 @@ public class GroupListFragment extends BaseFragment implements View.OnClickListe
         super.onResume();
         getActivity().registerReceiver(chatReceiver, new IntentFilter("chat"));
         getActivity().registerReceiver(chatReceiver, new IntentFilter("chatRefresh"));
-//        getGroupsFromDb();
-//        getMessages();
     }
 
     @Override

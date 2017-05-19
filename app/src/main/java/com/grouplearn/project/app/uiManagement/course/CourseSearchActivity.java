@@ -151,7 +151,7 @@ public class CourseSearchActivity extends BaseActivity {
         });
         mRecyclerAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model, View v) {
+            public void onItemClicked(int position, Object model,int action, View v) {
                 course = (GLCourse) model;
                 if (v instanceof LinearLayout) {
                     setup(course);
@@ -159,7 +159,7 @@ public class CourseSearchActivity extends BaseActivity {
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, View v) {
+            public void onItemLongClicked(int position, Object model,int action, View v) {
 
             }
         });

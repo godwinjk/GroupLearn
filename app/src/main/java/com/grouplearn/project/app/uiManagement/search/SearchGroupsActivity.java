@@ -107,7 +107,7 @@ public class SearchGroupsActivity extends BaseActivity implements View.OnClickLi
         });
         mRecyclerAdapter.setItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model, View v) {
+            public void onItemClicked(int position, Object model, int action,View v) {
                 CloudGroupManagement groupManagement = new CloudGroupManagement(mContext);
                 groupManagement.addSubscribedGroup((GLGroup) model, new CloudOperationCallback() {
                     @Override
@@ -123,7 +123,7 @@ public class SearchGroupsActivity extends BaseActivity implements View.OnClickLi
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, View v) {
+            public void onItemLongClicked(int position, Object model,int action, View v) {
 
             }
         });
@@ -160,11 +160,11 @@ public class SearchGroupsActivity extends BaseActivity implements View.OnClickLi
     }
 
     @Override
-    public void onItemClicked(int position, Object model, View v) {
+    public void onItemClicked(int position, Object model, int action,View v) {
     }
 
     @Override
-    public void onItemLongClicked(int position, Object model, View v) {
+    public void onItemLongClicked(int position, Object model,int action, View v) {
 
     }
 

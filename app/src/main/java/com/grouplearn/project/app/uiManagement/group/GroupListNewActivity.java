@@ -25,6 +25,7 @@ import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
 import com.grouplearn.project.app.uiManagement.search.SearchUserActivity;
 import com.grouplearn.project.app.uiManagement.settings.SettingsActivity;
+import com.grouplearn.project.app.uiManagement.user.UserListActivity;
 import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -116,6 +117,10 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
             startActivity(new Intent(mContext, UserProfileActivity.class));
         } else if (id == R.id.nav_group) {
             startActivity(new Intent(mContext, GroupMenuActivity.class));
+        } else if (id == R.id.nav_user_list) {
+
+            startActivity(new Intent(mContext, UserListActivity.class));
+            finish();
         } else if (id == R.id.nav_course) {
             startActivity(new Intent(mContext, CourseMenuActivity.class));
         } else if (id == R.id.nav_users) {

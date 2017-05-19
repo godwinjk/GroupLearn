@@ -15,8 +15,8 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.ProfileViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
+import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.bean.GLGroup;
-import com.grouplearn.project.bean.GLUser;
 
 import java.util.ArrayList;
 
@@ -27,7 +27,7 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<ProfileViewHold
     public final static int GROUP_LIST = 0;
     public final static int USER_LIST = 1;
     ArrayList<GLGroup> groupList = new ArrayList<>();
-    ArrayList<GLUser> userList = new ArrayList<>();
+    ArrayList<GLContact> userList = new ArrayList<>();
     int whichAdapter = 0;
 
     OnRecyclerItemClickListener mItemClickListener;
@@ -51,9 +51,9 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<ProfileViewHold
             holder.tvName.setText(groupModel.getGroupName());
             holder.tvDetails.setText(groupModel.getGroupDescription());
         } else {
-            GLUser userModel = userList.get(position);
-            holder.tvName.setText(userModel.getUserDisplayName());
-            holder.tvDetails.setText(userModel.getUserStatus());
+            GLContact userModel = userList.get(position);
+            holder.tvName.setText(userModel.getContactName());
+            holder.tvDetails.setText(userModel.getContactStatus());
 
             final Context mContext = holder.itemView.getContext();
             String imageUri = userModel.getIconUrl();
@@ -79,9 +79,9 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<ProfileViewHold
                 @Override
                 public void onClick(View v) {
                     if (whichAdapter == 0) {
-                        mItemClickListener.onItemClicked(position, getGroupList().get(position), v);
+                        mItemClickListener.onItemClicked(position, getGroupList().get(position),1, v);
                     } else {
-                        mItemClickListener.onItemClicked(position, getUserList().get(position), v);
+                        mItemClickListener.onItemClicked(position, getUserList().get(position), 1,v);
                     }
                 }
             });
@@ -121,11 +121,11 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<ProfileViewHold
         notifyDataSetChanged();
     }
 
-    public ArrayList<GLUser> getUserList() {
+    public ArrayList<GLContact> getUserList() {
         return userList;
     }
 
-    public void setUserList(ArrayList<GLUser> userList) {
+    public void setUserList(ArrayList<GLContact> userList) {
         this.userList = userList;
         notifyDataSetChanged();
     }

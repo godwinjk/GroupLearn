@@ -1,6 +1,7 @@
 package com.grouplearn.project.cloud.contactManagement;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.bean.GLInterest;
@@ -23,6 +24,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -225,15 +228,26 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                             ArrayList<GLContact> contacts = new ArrayList<>();
                             for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
                                 JSONObject modelObject = dataArray.optJSONObject(i);
-                                GLContact groupModel = new GLContact();
-                                groupModel.setContactUserId(modelObject.optLong("contactId"));
-                                groupModel.setContactUserId(modelObject.optLong("userId"));
-                                groupModel.setContactStatus(modelObject.optString("userStatus"));
-                                groupModel.setIconUrl(modelObject.optString("userIconUrl"));
-                                groupModel.setContactMailId(modelObject.optString("userEmail"));
-                                groupModel.setContactName(modelObject.optString("userDisplayName"));
+                                GLContact contact = new GLContact();
+                                contact.setContactUserId(modelObject.optLong("contactId"));
+                                contact.setContactUserId(modelObject.optLong("userId"));
+                                contact.setContactStatus(modelObject.optString("userStatus"));
+                                contact.setIconUrl(modelObject.optString("userIconUrl"));
+                                contact.setContactMailId(modelObject.optString("userEmail"));
+                                contact.setContactName(modelObject.optString("userDisplayName"));
 
-                                contacts.add(groupModel);
+                                String url = modelObject.optString("userIconUrl");
+                                if (!TextUtils.isEmpty(url)) {
+                                    try {
+                                        url = URLDecoder.decode(url, "UTF-8");
+                                        url = CloudConstants.getProfileBaseUrl() + url;
+                                        contact.setIconUrl(url);
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                contacts.add(contact);
                             }
                             response.setContacts(contacts);
                             if (responseCallback != null) {
@@ -249,7 +263,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                             responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
                         }
                     }
-                } else{
+                } else {
                     if (responseCallback != null) {
                         responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
                     }
@@ -312,6 +326,16 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                                 contact.setContactMailId(modelObject.optString("userEmail"));
                                 contact.setContactName(modelObject.optString("userDisplayName"));
 //fetching interests;
+                                String url = modelObject.optString("userIconUrl");
+                                if (!TextUtils.isEmpty(url)) {
+                                    try {
+                                        url = URLDecoder.decode(url, "UTF-8");
+                                        url = CloudConstants.getProfileBaseUrl() + url;
+                                        contact.setIconUrl(url);
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 JSONArray interestArray = modelObject.optJSONArray("interests");
                                 if (interestArray != null) {
                                     ArrayList<GLInterest> interests = new ArrayList<>();
@@ -402,17 +426,14 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                         JSONObject dataObject = jsonObject.optJSONObject(DATA);
                         if (statusObject != null) {
                             response = (CloudContactGetResponse) getUpdatedResponse(statusObject, response);
-                            if (responseCallback != null) {
-                                responseCallback.onFailure(cloudRequest, new CloudError(response.getResponseStatus(), response.getResponseMessage()));
-                            }
                         } else {
                             if (responseCallback != null) {
                                 responseCallback.onFailure(cloudRequest, new CloudError(ErrorHandler.INVALID_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.INVALID_RESPONSE_FROM_CLOUD));
                             }
                         }
                         if (dataObject != null) {
-                            JSONArray dataArray = dataObject.optJSONArray("contactDetails");
-                            int contactRequestCount = dataObject.optInt("contactCount", 0);
+                            JSONArray dataArray = dataObject.optJSONArray("userDetails");
+                            int contactRequestCount = dataObject.optInt("userCount", 0);
                             response.setContactCount(contactRequestCount);
                             ArrayList<GLContact> contacts = new ArrayList<>();
                             for (int i = 0; dataArray != null && i < dataArray.length(); i++) {
@@ -423,21 +444,34 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                                 contact.setContactStatus(modelObject.optString("userStatus"));
                                 contact.setIconUrl(modelObject.optString("userIconUrl"));
                                 contact.setContactMailId(modelObject.optString("userEmail"));
+                                contact.setPrivacy(modelObject.optInt("userPrivacy"));
                                 contact.setContactName(modelObject.optString("userDisplayName"));
 //fetching interests;
+                                String url = modelObject.optString("userIconUrl");
+                                if (!TextUtils.isEmpty(url)) {
+                                    try {
+                                        url = URLDecoder.decode(url, "UTF-8");
+                                        url = CloudConstants.getProfileBaseUrl() + url;
+                                        contact.setIconUrl(url);
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
                                 JSONArray interestArray = modelObject.optJSONArray("interests");
                                 if (interestArray != null) {
                                     ArrayList<GLInterest> interests = new ArrayList<>();
-                                    for (int j = 0; interestArray != null && i < interestArray.length(); i++) {
+                                    for (int j = 0; interestArray != null && j < interestArray.length(); j++) {
                                         JSONObject interestObject = interestArray.optJSONObject(j);
                                         GLInterest interest = new GLInterest();
                                         interest.setInterestType(GLInterest.INTEREST);
                                         interest.setInterestId(interestObject.optInt("interestId"));
                                         interest.setInterestName(interestObject.optString("interest"));
                                         interest.setUserId(interestObject.optLong("userId"));
+                                        interest.setStatus(interestObject.optInt("status", -1));
                                         interest.setTimeStamp(interestObject.optString("timestamp"));
-
-                                        interests.add(interest);
+                                        if (interest.getStatus() != 0)
+                                            interests.add(interest);
                                     }
                                     contact.setInterests(interests);
                                 }
@@ -445,7 +479,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                                 JSONArray skillArray = modelObject.optJSONArray("skills");
                                 if (skillArray != null) {
                                     ArrayList<GLInterest> skills = new ArrayList<>();
-                                    for (int j = 0; skillArray != null && i < skillArray.length(); i++) {
+                                    for (int j = 0; skillArray != null && j < skillArray.length(); j++) {
                                         JSONObject interestObject = skillArray.optJSONObject(j);
                                         GLInterest interest = new GLInterest();
                                         interest.setInterestType(GLInterest.INTEREST);
@@ -453,8 +487,9 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                                         interest.setInterestName(interestObject.optString("interest"));
                                         interest.setUserId(interestObject.optLong("userId"));
                                         interest.setTimeStamp(interestObject.optString("timestamp"));
-
-                                        skills.add(interest);
+                                        interest.setStatus(interestObject.optInt("status", -1));
+                                        if (interest.getStatus() != 0)
+                                            skills.add(interest);
                                     }
                                     contact.setSkills(skills);
                                 }

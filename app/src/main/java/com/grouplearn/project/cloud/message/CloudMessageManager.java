@@ -81,7 +81,7 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
                                 if (!TextUtils.isEmpty(url)) {
                                     try {
                                         url = URLDecoder.decode(url, "UTF-8");
-                                        url = CloudConstants.getFileUploadBaseUrl() + url;
+                                        url = CloudConstants.getProfileBaseUrl() + url;
                                         messageModel.setCloudFilePath(url);
                                     } catch (UnsupportedEncodingException e) {
                                         e.printStackTrace();
@@ -175,7 +175,7 @@ public class CloudMessageManager extends BaseManager implements CloudMessageMana
                                     if (!TextUtils.isEmpty(url)) {
                                         try {
                                             url = URLDecoder.decode(url, "UTF-8");
-                                            url = CloudConstants.getFileUploadBaseUrl() + url;
+                                            url = CloudConstants.getProfileBaseUrl() + url;
                                             messageModel.setCloudFilePath(url);
                                         } catch (UnsupportedEncodingException e) {
                                             e.printStackTrace();

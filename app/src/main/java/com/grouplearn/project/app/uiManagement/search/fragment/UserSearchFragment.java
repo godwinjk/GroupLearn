@@ -22,7 +22,6 @@ import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickLis
 import com.grouplearn.project.app.uiManagement.search.SearchAllActivity;
 import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
 import com.grouplearn.project.bean.GLContact;
-import com.grouplearn.project.bean.GLUser;
 import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -114,22 +113,17 @@ public class UserSearchFragment extends BaseFragment implements ContactViewInter
         });
         listAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model, View v) {
+            public void onItemClicked(int position, Object model, int action,View v) {
                 GLContact contactModel = (GLContact) model;
-                GLUser userModel = new GLUser();
-                userModel.setUserDisplayName(contactModel.getContactName());
-                userModel.setUserStatus(contactModel.getContactStatus());
-                userModel.setUserId(contactModel.getContactUserId());
-                userModel.setUserEmail(contactModel.getContactMailId());
                 Intent intent = new Intent(activity, UserProfileActivity.class);
 
-                intent.putExtra("user", userModel);
+                intent.putExtra("user", contactModel);
 
                 startActivity(intent);
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, View v) {
+            public void onItemLongClicked(int position, Object model,int action, View v) {
 
             }
         });

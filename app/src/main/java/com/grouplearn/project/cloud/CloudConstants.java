@@ -15,10 +15,16 @@ public class CloudConstants {
     public static final int SUCCESS_CODE = 1000;
     public static final String SUCCESS_MESSAGE = "SUCCESS";
 
-//    private static final String BASE_URL = "http://192.168.10.152/grouplearn/public/";
+    //    private static final String BASE_URL = "http://192.168.43.239/grouplearn/public/";
     private static final String BASE_URL = "http://bodyretreatbeautyzone.com/grouplearn/public/";
+
+    //    private static final String PROFILE_BASE_URL = "http://192.168.43.239/grouplearn";
     private static final String PROFILE_BASE_URL = "http://bodyretreatbeautyzone.com/grouplearn";
+
+
+    //    private static final String FILE_BASE_URL = "http://192.168.43.239/grouplearn/public/group-file";
     private static final String FILE_BASE_URL = "http://bodyretreatbeautyzone.com/grouplearn/public/group-file";
+
 
     public static String getBaseUrl() {
         String ip = new AppSharedPreference(MyApplication.getAppContext()).getStringPrefValue(PreferenceConstants.CUSTOM_URL);
@@ -28,6 +34,7 @@ public class CloudConstants {
             return ("http://" + ip + "/grouplearn/public/");
         }
     }
+
     public static String getProfileBaseUrl() {
         String ip = new AppSharedPreference(MyApplication.getAppContext()).getStringPrefValue(PreferenceConstants.CUSTOM_URL);
         if (TextUtils.isEmpty(ip))
@@ -36,12 +43,13 @@ public class CloudConstants {
             return ("http://" + ip + "/grouplearn");
         }
     }
+
     public static String getFileUploadBaseUrl() {
         String ip = new AppSharedPreference(MyApplication.getAppContext()).getStringPrefValue(PreferenceConstants.CUSTOM_URL);
         if (TextUtils.isEmpty(ip))
             return FILE_BASE_URL;
         else {
-            return ("http://" + ip + "/grouplearn");
+            return ("http://" + ip + "/grouplearn/public/group-file");
         }
     }
 }

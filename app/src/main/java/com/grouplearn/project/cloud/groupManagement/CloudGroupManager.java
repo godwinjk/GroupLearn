@@ -3,9 +3,9 @@ package com.grouplearn.project.cloud.groupManagement;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.bean.GLRequest;
-import com.grouplearn.project.bean.GLUser;
 import com.grouplearn.project.cloud.BaseManager;
 import com.grouplearn.project.cloud.CloudConnectResponse;
 import com.grouplearn.project.cloud.CloudConstants;
@@ -707,15 +707,15 @@ public class CloudGroupManager extends BaseManager implements CloudGroupManagerI
                                 JSONArray dataArray = dataObject.optJSONArray("groupSubscribedUsersDetails");
                                 ((GetGroupSubscribersResponse) response).setUserCount(userCount);
 
-                                ArrayList<GLUser> userModels = new ArrayList<>();
+                                ArrayList<GLContact> userModels = new ArrayList<>();
                                 for (int i = 0; dataArray != null /*&& groupCount > 0*/ && i < dataArray.length(); i++) {
                                     JSONObject modelObject = dataArray.optJSONObject(i);
-                                    GLUser userModel = new GLUser();
-                                    userModel.setUserId(modelObject.optLong("userId"));
-                                    userModel.setUserName(modelObject.optString("userName"));
-                                    userModel.setUserStatus(modelObject.optString("userStatus"));
-                                    userModel.setUserEmail(modelObject.optString("userEmail"));
-                                    userModel.setUserDisplayName(modelObject.optString("userDisplayName"));
+                                    GLContact userModel = new GLContact();
+                                    userModel.setContactUserId(modelObject.optLong("userId"));
+                                    userModel.setContactUserName(modelObject.optString("userName"));
+                                    userModel.setContactStatus(modelObject.optString("userStatus"));
+                                    userModel.setContactMailId(modelObject.optString("userEmail"));
+                                    userModel.setContactName(modelObject.optString("userDisplayName"));
 
                                     String url = modelObject.optString("userIconUrl");
                                     if (!TextUtils.isEmpty(url)) {

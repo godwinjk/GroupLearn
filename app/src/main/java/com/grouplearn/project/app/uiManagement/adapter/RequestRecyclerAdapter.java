@@ -50,7 +50,7 @@ public class RequestRecyclerAdapter extends RecyclerView.Adapter<RequestViewHold
                 @Override
                 public void onClick(View v) {
                     if (onRecyclerItemClickListener != null) {
-                        onRecyclerItemClickListener.onItemClicked(position, requestModel, holder.tvAccept);
+                        onRecyclerItemClickListener.onItemClicked(position, requestModel,1, holder.tvAccept);
                     }
                 }
             });
@@ -58,7 +58,7 @@ public class RequestRecyclerAdapter extends RecyclerView.Adapter<RequestViewHold
                 @Override
                 public void onClick(View v) {
                     if (onRecyclerItemClickListener != null) {
-                        onRecyclerItemClickListener.onItemClicked(position, requestModel, holder.tvIgnore);
+                        onRecyclerItemClickListener.onItemClicked(position, requestModel, 1,holder.tvIgnore);
                     }
                 }
             });

@@ -76,7 +76,7 @@ public class RequestAcceptingActivity extends BaseActivity implements GroupReque
         });
         mRecyclerAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model, View v) {
+            public void onItemClicked(int position, Object model,int action, View v) {
                 GLRequest requestModel = (GLRequest) model;
                 if (((TextView) v).getText().toString().equalsIgnoreCase("Accept")) {
                     requestModel.setAction(1);
@@ -88,7 +88,7 @@ public class RequestAcceptingActivity extends BaseActivity implements GroupReque
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, View v) {
+            public void onItemLongClicked(int position, Object model,int action, View v) {
 
             }
         });

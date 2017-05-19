@@ -1,9 +1,7 @@
 package com.grouplearn.project.app.uiManagement.contact;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -73,7 +71,7 @@ public class ContactRequestActivity extends BaseActivity implements ContactViewI
         });
         mAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model, View v) {
+            public void onItemClicked(int position, Object model, int action,View v) {
                 GLContact requestModel = (GLContact) model;
                 if (((TextView) v).getText().toString().equalsIgnoreCase("Accept")) {
                     requestModel.setAction(1);
@@ -85,7 +83,7 @@ public class ContactRequestActivity extends BaseActivity implements ContactViewI
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, View v) {
+            public void onItemLongClicked(int position, Object model,int action, View v) {
 
             }
         });

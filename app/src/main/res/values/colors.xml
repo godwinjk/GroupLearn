@@ -10,6 +10,7 @@
     <color name="transparent_blue">#303498db</color>
 
     <color name="black_overlay">#66000000</color>
+    <color name="transparent_black">#40000000</color>
     <color name="light_grey">#DBDBDB</color>>
     <color name="grey_light">#ccccb3</color>>
     <color name="grey_back">#f4f4f4</color>>

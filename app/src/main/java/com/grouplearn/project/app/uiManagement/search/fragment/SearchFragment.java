@@ -163,7 +163,7 @@ public class SearchFragment extends BaseFragment implements GroupViewInterface, 
     }
 
     @Override
-    public void onItemClicked(int position, Object model, View v) {
+    public void onItemClicked(int position, Object model, int action,View v) {
         CloudGroupManagement groupManagement = new CloudGroupManagement(getActivity());
         groupManagement.addSubscribedGroup((GLGroup) model, new CloudOperationCallback() {
             @Override
@@ -179,7 +179,7 @@ public class SearchFragment extends BaseFragment implements GroupViewInterface, 
     }
 
     @Override
-    public void onItemLongClicked(int position, Object model, View v) {
+    public void onItemLongClicked(int position, Object model,int action, View v) {
 
     }
 

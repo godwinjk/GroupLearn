@@ -1,8 +1,5 @@
 package com.grouplearn.project.app.uiManagement.user;
 
-import android.graphics.Bitmap;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -13,10 +10,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.bean.GLContact;
+import com.grouplearn.project.bean.GLInterest;
 
 import java.util.ArrayList;
 
@@ -37,26 +35,65 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
     }
 
     @Override
-    public void onBindViewHolder(final UserViewHolder holder, int position) {
-        GLContact contact = contacts.get(position);
+    public void onBindViewHolder(final UserViewHolder holder, final int position) {
+        final GLContact contact = contacts.get(position);
         String imageUri = contact.getIconUrl();
+        String text = contact.getContactName();
+        if (!TextUtils.isEmpty(text) && text.length() > 16) {
+            text = text.substring(0, 16) + "...";
+        }
+        String interests = getStringArray("Interests : ", contact.getInterests());
+        String skills = getStringArray("Skills : ", contact.getSkills());
+        if (!TextUtils.isEmpty(interests)) {
+            holder.tvContactInterests.setVisibility(View.VISIBLE);
+            holder.tvContactInterests.setText(interests);
+        } else {
+            holder.tvContactInterests.setVisibility(View.GONE);
+        }
+        if (!TextUtils.isEmpty(skills)) {
+            holder.tvContactSkills.setVisibility(View.VISIBLE);
+            holder.tvContactSkills.setText(skills);
+        } else {
+            holder.tvContactSkills.setVisibility(View.GONE);
+        }
+        holder.tvCotactName.setText(text);
         if (!TextUtils.isEmpty(imageUri)) {
             Glide.with(holder.ivContactImage.getContext())
                     .load(imageUri)
-                    .asBitmap()
-                    .centerCrop()
+                    .asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .fitCenter().into(holder.ivContactImage);
 //                    .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
-                    .into(new BitmapImageViewTarget(holder.ivContactImage) {
+                    /*.into(new BitmapImageViewTarget(holder.ivContactImage) {
                         @Override
                         protected void setResource(Bitmap resource) {
                             RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(holder.ivContactImage.getContext().getResources(), resource);
                             circularBitmapDrawable.setCircular(true);
                             holder.ivContactImage.setImageDrawable(circularBitmapDrawable);
                         }
-                    });
+                    });*/
         } else {
             holder.ivContactImage.setImageResource(R.drawable.user_placeholder);
         }
+        holder.llContactItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+if (onItemClickListener!=null){
+    onItemClickListener.onItemClicked(position,contact,1,v);
+}
+            }
+        });
+    }
+
+    private String getStringArray(String key, ArrayList<GLInterest> array) {
+        StringBuilder builder = new StringBuilder();
+        if (array != null && array.size() > 0) {
+            builder.append(key);
+            for (GLInterest interest : array) {
+                builder.append(interest.getInterestName());
+                builder.append(", ");
+            }
+        }
+        return builder.toString();
     }
 
     @Override
@@ -70,6 +107,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
     public void setContacts(ArrayList<GLContact> contacts) {
         this.contacts = contacts;
+        notifyDataSetChanged();
     }
 
     public void setOnItemClickListener(OnRecyclerItemClickListener onItemClickListener) {
@@ -77,14 +115,16 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
     }
 
     class UserViewHolder extends RecyclerView.ViewHolder {
-        TextView tvCotactName;
+        TextView tvCotactName, tvContactInterests, tvContactSkills;
         ImageView ivContactImage;
         LinearLayout llContactItem;
 
         public UserViewHolder(View v) {
             super(v);
             tvCotactName = (TextView) v.findViewById(R.id.tv_contact_name);
-            ivContactImage = (ImageView) v.findViewById(R.id.iv_contact_image);
+            tvContactInterests = (TextView) v.findViewById(R.id.tv_contact_interests);
+            tvContactSkills = (TextView) v.findViewById(R.id.tv_contact_skills);
+            ivContactImage = (ImageView) v.findViewById(R.id.iv_user_profile);
             llContactItem = (LinearLayout) v.findViewById(R.id.ll_contact_item);
         }
     }

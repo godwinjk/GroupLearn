@@ -106,7 +106,7 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
         });
         mAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model, View v) {
+            public void onItemClicked(int position, Object model, int action,View v) {
                 GLContact contactModel = (GLContact) model;
                 if (v instanceof TextView) {
                     if (groupModel != null) {
@@ -123,7 +123,7 @@ public class ContactListActivity extends BaseActivity implements ContactViewInte
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, View v) {
+            public void onItemLongClicked(int position, Object model,int action, View v) {
 
             }
         });

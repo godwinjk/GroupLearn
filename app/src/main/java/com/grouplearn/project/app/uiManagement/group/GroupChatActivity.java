@@ -39,9 +39,11 @@ import com.grouplearn.project.app.uiManagement.adapter.ChatRecyclerAdapter;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
+import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.notification.NotificationManager;
 import com.grouplearn.project.bean.GLGroup;
 import com.grouplearn.project.bean.GLMessage;
+import com.grouplearn.project.cloud.download.CloudFileDownloader;
 import com.grouplearn.project.cloud.download.OnFileDownloadListener;
 import com.grouplearn.project.cloud.upload.CloudFileUploader;
 import com.grouplearn.project.cloud.upload.OnFileUploadListener;
@@ -52,6 +54,7 @@ import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -255,6 +258,95 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
                 return false;
             }
         });
+        mChatRecyclerAdapter.setOnItemClickListener(new OnRecyclerItemClickListener() {
+            @Override
+            public void onItemClicked(int position, Object model, int action, View v) {
+                if (action == 2) {
+                    GLMessage message = (GLMessage) model;
+                    download(message);
+                } else if (action == 1) {
+                    GLMessage message = (GLMessage) model;
+                    try {
+                        String url = message.getLocalFilePath();
+                        if (!TextUtils.isEmpty(url)) {
+                            openFile(url);
+                        } else {
+                            download(message);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onItemLongClicked(int position, Object model, int action, View v) {
+
+            }
+        });
+    }
+
+    private void download(GLMessage message) {
+        CloudFileDownloader uploader = new CloudFileDownloader(mContext, message, this);
+        uploader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public void openFile(String url) throws IOException {
+        // Create URI
+
+        Uri uri = Uri.parse("file://" + url);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        // Check what kind of file you are trying to open, by comparing the url with extensions.
+        // When the if condition is matched, plugin sets the correct intent (mime) type,
+        // so Android knew what application to use to open the file
+        if (url.toString().contains(".doc") || url.toString().contains(".docx")) {
+            // Word document
+            intent.setDataAndType(uri, "application/msword");
+        } else if (url.toString().contains(".pdf")) {
+            // PDF file
+            intent.setDataAndType(uri, "application/pdf");
+        } else if (url.toString().contains(".ppt") || url.toString().contains(".pptx")) {
+            // Powerpoint file
+            intent.setDataAndType(uri, "application/vnd.ms-powerpoint");
+        } else if (url.toString().contains(".xls") || url.toString().contains(".xlsx")) {
+            // Excel file
+            intent.setDataAndType(uri, "application/vnd.ms-excel");
+        } else if (url.toString().contains(".zip") || url.toString().contains(".rar")) {
+            // WAV audio file
+            intent.setDataAndType(uri, "application/x-wav");
+        } else if (url.toString().contains(".rtf")) {
+            // RTF file
+            intent.setDataAndType(uri, "application/rtf");
+        } else if (url.toString().contains(".wav") || url.toString().contains(".mp3")) {
+            // WAV audio file
+            intent.setDataAndType(uri, "audio/x-wav");
+        } else if (url.toString().contains(".gif")) {
+            // GIF file
+            intent.setDataAndType(uri, "image/gif");
+        } else if (url.toString().contains(".jpg") || url.toString().contains(".jpeg") || url.toString().contains(".png")) {
+            // JPG file
+            intent.setDataAndType(uri, "image/jpeg");
+        } else if (url.toString().contains(".txt")) {
+            // Text file
+            intent.setDataAndType(uri, "text/plain");
+        } else if (url.toString().contains(".3gp") || url.toString().contains(".mpg") || url.toString().contains(".mpeg") || url.toString().contains(".mpe") || url.toString().contains(".mp4") || url.toString().contains(".avi")) {
+            // Video files
+            intent.setDataAndType(uri, "video/*");
+        } else if (url.toString().contains(".zip") || url.toString().contains(".rar")) {
+            // ZIP Files
+            intent.setDataAndType(uri, "application/zip");
+        } else {
+            //if you want you can also define the intent type for any other file
+
+            //additionally use else clause below, to manage other unknown extensions
+            //in this case, Android will show all applications installed on the device
+            //so you can choose which application to use
+            intent.setDataAndType(uri, "*/*");
+        }
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(intent);
     }
 
     private void setVisibility(final View v, final int visibility) {
@@ -402,8 +494,8 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
                     try {
                         file = new File(getFilePath(this, uri));
                         Log.d(TAG, " PAth " + file.getAbsolutePath());
-//                        File outPutFile = copyToLocalFolder(file, requestCode);
-                        uploadFile(file, requestCode);
+                        File outPutFile = copyToLocalFolder(file, requestCode);
+                        uploadFile(outPutFile, requestCode);
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
                     }
@@ -464,33 +556,52 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
 
             CloudFileUploader uploader = new CloudFileUploader(mContext, message, this);
             uploader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//            uploader.upload();
         }
     }
 
     private File copyToLocalFolder(File file, int type) {
-        FileManager manager = new FileManager(mContext);
+        FileManager manager = new FileManager();
         return manager.copyToLocal(file, type);
     }
 
     @Override
     public void onUploadSuccess(GLMessage message) {
-        mDbHelper.updateMessageInDb(message);
+        mDbHelper.updateMessageByTempId(message);
         message.setOperationOnProgress(true);
-        mChatRecyclerAdapter.notifyDataSetChanged();
-        updateChatList();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mChatRecyclerAdapter.notifyDataSetChanged();
+                updateChatList();
+            }
+        });
+
     }
 
     @Override
     public void onUploadInProgress(GLMessage message, int progress) {
         message.setProgress(progress);
         message.setOperationOnProgress(true);
-        mChatRecyclerAdapter.notifyDataSetChanged();
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mChatRecyclerAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
     public void onUploadFailed(GLMessage message, AppError error) {
         message.setOperationOnProgress(false);
-        mChatRecyclerAdapter.notifyDataSetChanged();
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mChatRecyclerAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -505,19 +616,37 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
     @Override
     public void onDownloadSuccess(GLMessage message) {
         message.setOperationOnProgress(false);
-        mChatRecyclerAdapter.notifyDataSetChanged();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mChatRecyclerAdapter.notifyDataSetChanged();
+            }
+        });
+
     }
 
     @Override
     public void onDownloadInProgress(GLMessage message, int progress) {
         message.setProgress(progress);
         message.setOperationOnProgress(true);
-        mChatRecyclerAdapter.notifyDataSetChanged();
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mChatRecyclerAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
     public void onDownloadFailed(GLMessage message, AppError error) {
         message.setOperationOnProgress(false);
-        mChatRecyclerAdapter.notifyDataSetChanged();
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mChatRecyclerAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }

@@ -10,6 +10,7 @@ import java.util.ArrayList;
  */
 public class GLContact extends BaseModel implements Parcelable {
     private String contactName;
+    private String contactUserName;
     private long contactUserId;
     private String contactStatus = null;
     private String contactMailId;
@@ -98,6 +99,14 @@ public class GLContact extends BaseModel implements Parcelable {
 
     public void setSkills(ArrayList<GLInterest> skills) {
         this.skills = skills;
+    }
+
+    public String getContactUserName() {
+        return contactUserName;
+    }
+
+    public void setContactUserName(String contactUserName) {
+        this.contactUserName = contactUserName;
     }
 
     public GLContact() {

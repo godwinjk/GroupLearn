@@ -34,11 +34,11 @@ public class ContactInteractor {
     }
 
     public void requestToConnect(GLContact contact, CloudResponseCallback callback) {
-    contactManager.requestToConnect(contact,callback);
+        contactManager.requestToConnect(contact, callback);
     }
 
     public void getRandomUsers(ContactViewInterface contactViewInterface) {
-        contactManager.getRandomUsers("0", contactViewInterface);
+        contactManager.getRandomUsers("852", contactViewInterface);
     }
 
     public void searchUsers(String keyWord, ContactViewInterface contactViewInterface) {
