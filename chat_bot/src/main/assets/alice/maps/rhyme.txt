@@ -1882,9 +1882,9 @@ courage:encourage
 encourage:courage
 sage:visage
 visage:passage
-passage:message
-message:passage
-usage:message
+passage:mMessage
+mMessage:passage
+usage:mMessage
 heritage:advantage
 advantage:disadvantage
 disadvantage:advantage

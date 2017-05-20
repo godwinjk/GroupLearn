@@ -124,7 +124,7 @@ public class GroupListFragment extends BaseFragment implements View.OnClickListe
         mFab.setOnClickListener(this);
         mGroupListAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model,int action, View v) {
+            public void onItemClicked(int position, Object model, int action, View v) {
                 Intent chatIntent = new Intent(getActivity(), GroupChatActivity.class);
                 GLGroup group = (GLGroup) model;
                 long groupUniqueId = group.getGroupUniqueId();
@@ -141,7 +141,7 @@ public class GroupListFragment extends BaseFragment implements View.OnClickListe
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model,int action, View v) {
+            public void onItemLongClicked(int position, Object model, int action, View v) {
                 GLGroup group = (GLGroup) model;
                 if (group.isMine()) {
                     showContextMenu(group);
@@ -200,7 +200,7 @@ public class GroupListFragment extends BaseFragment implements View.OnClickListe
                         String strName = arrayAdapter.getItem(which);
                         if (strName.equals("Mark as read")) {
                             new ChatDbHelper(getActivity()).updateAllRead(group.getGroupUniqueId());
-//                    getGroupsFromDb();
+                            getGroupsFromDb();
                         } else if (strName.equals("Group info")) {
                             Intent i = new Intent(getActivity(), GroupInfoActivity.class);
                             i.putExtra("groupCloudId", group.getGroupUniqueId());
@@ -249,7 +249,7 @@ public class GroupListFragment extends BaseFragment implements View.OnClickListe
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (getActivity() != null) {
-//            getGroupsFromDb();
+            getGroupsFromDb();
             if (isVisibleToUser) {
                 hideSoftKeyboard();
                 revealHide(0);

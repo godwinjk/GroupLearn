@@ -79,7 +79,7 @@
 <condition name="sraix">
 <li value="ALARMFAILED">I'm unable to set an alarm on this device.</li>
 <li>I'll <lowercase><person><star index="2"/></person></lowercase>.
-<oob><alarm><message><star/></message><get name="sraix"/></alarm></oob></li>
+<oob><alarm><mMessage><star/></mMessage><get name="sraix"/></alarm></oob></li>
 </condition></template>
 </category>
 <category><pattern>DO *</pattern>

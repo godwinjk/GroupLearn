@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -17,12 +18,16 @@ import com.bumptech.glide.Glide;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.adapter.CourseSearchRecyclerAdapter;
+import com.grouplearn.project.app.uiManagement.cloudHelper.CloudCourseManager;
 import com.grouplearn.project.app.uiManagement.databaseHelper.CourseDbHelper;
+import com.grouplearn.project.app.uiManagement.interfaces.CourseViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.settings.BrowserActivity;
 import com.grouplearn.project.bean.GLCourse;
 import com.grouplearn.project.cloud.ThumbNailLoader;
 import com.grouplearn.project.cloud.ThumbNailLoaderCallback;
+import com.grouplearn.project.utilities.AppUtility;
+import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
 import java.util.ArrayList;
@@ -40,6 +45,7 @@ public class MyCourseActivity extends BaseActivity {
             tvCourseDelete, tvSiteAddress, tvLearn;
     ImageView ivSiteIcon, ivClose;
     GLCourse course;
+    SwipeRefreshLayout srlMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +64,7 @@ public class MyCourseActivity extends BaseActivity {
     public void initializeWidgets() {
         llLoading = (LinearLayout) findViewById(R.id.ll_loading);
         llLoading.setVisibility(View.GONE);
-
+        srlMain = (SwipeRefreshLayout) findViewById(R.id.srl_main);
         mRecyclerAdapter = new CourseSearchRecyclerAdapter(mContext, true);
 
         tvNoItems = (TextView) findViewById(R.id.tv_no_items);
@@ -93,14 +99,20 @@ public class MyCourseActivity extends BaseActivity {
         });
         mRecyclerAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model,int action, View v) {
+            public void onItemClicked(int position, Object model, int action, View v) {
                 course = (GLCourse) model;
                 setup(course);
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, int action,View v) {
+            public void onItemLongClicked(int position, Object model, int action, View v) {
 
+            }
+        });
+        srlMain.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getCourses();
             }
         });
     }
@@ -173,10 +185,16 @@ public class MyCourseActivity extends BaseActivity {
     private void getCourses() {
         ArrayList<GLCourse> courses = new CourseDbHelper(mContext).getMyCourses();
         updateData(courses);
-        /*CourseViewInterface courseViewInterface = new CourseViewInterface() {
+        CourseViewInterface courseViewInterface = new CourseViewInterface() {
             @Override
             public void onCourseGetSucces(ArrayList<GLCourse> courses) {
                 updateData(courses);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        srlMain.setRefreshing(false);
+                    }
+                });
             }
 
             @Override
@@ -184,7 +202,7 @@ public class MyCourseActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        DisplayInfo.dismissLoader(mContext);
+                        srlMain.setRefreshing(false);
                     }
                 });
             }
@@ -192,10 +210,10 @@ public class MyCourseActivity extends BaseActivity {
         if (AppUtility.checkInternetConnection()) {
             CloudCourseManager manager = new CloudCourseManager(mContext);
             manager.getCourse(courseViewInterface);
-            DisplayInfo.showLoader(mContext, getString(R.string.please_wait));
+            srlMain.setRefreshing(true);
         } else {
             DisplayInfo.showToast(mContext, getString(R.string.no_network));
-        }*/
+        }
     }
 
     public void updateData(final ArrayList<GLCourse> courses) {

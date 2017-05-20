@@ -45,7 +45,7 @@ public class CloudMessageHelper {
         request.setToken(token);
         request.setGroupId(groupId);
         request.setLimit(LIMIT);
-        long serverSyncTime = new ServerSyncTimes(mContext).getLastUpdatedTime(ServerSyncTimes.MESSAGE_GET);
+        String serverSyncTime = new ServerSyncTimes(mContext).getLastUpdatedTime(ServerSyncTimes.MESSAGE_GET);
         request.setStartTime(serverSyncTime);
 
         CloudResponseCallback callback = new CloudResponseCallback() {

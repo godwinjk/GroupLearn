@@ -115,7 +115,7 @@ Who do you want to <lowercase><get name="modecom"/></lowercase>?</template>
 <set name="savedtopic"><get name="topic"/></set>
 <set name="topic">ASKING MESSAGEBODY</set>
 </think>
-What is your message to <get name="displayname"/>?</template>
+What is your mMessage to <get name="displayname"/>?</template>
 </category>
 <category><pattern>CONTACTDIALOG</pattern>
 <template><srai>CONTACTDEBUGINFO CONTACTDIALOG</srai>
@@ -736,7 +736,7 @@ birthday: <srai>CONTACTBIRTHDAY <get name="contactid"/></srai>
              <li value="unknown"><srai>RESOLVE CONTACTURI</srai></li>
              <li><condition name="messagebody">
                  <li value="unknown"><srai>ASK MESSAGEBODY</srai></li>
-                 <li><oob><sms><recipient><get name="contacturi"/></recipient><message><get name="messagebody"/></message></sms></oob> Now sending "<get name="messagebody"/>" to <get name="displayname"/>. <srai>CONTACTFINALIZE</srai></li>
+                 <li><oob><sms><recipient><get name="contacturi"/></recipient><mMessage><get name="messagebody"/></mMessage></sms></oob> Now sending "<get name="messagebody"/>" to <get name="displayname"/>. <srai>CONTACTFINALIZE</srai></li>
   		          </condition>
              </li>
              </condition>

@@ -41,7 +41,7 @@ public class ContactRequestActivity extends BaseActivity implements ContactViewI
         toolbar.setSubtitle("Contact Requests");
         mContext = this;
 
-                initializeWidgets();
+        initializeWidgets();
         registerListeners();
     }
 
@@ -55,6 +55,8 @@ public class ContactRequestActivity extends BaseActivity implements ContactViewI
 
         mAdapter = new ContactRequestAdapter();
         rvRequests.setAdapter(mAdapter);
+
+        interactor = new ContactInteractor(mContext);
     }
 
     public void fetchList() {
@@ -71,7 +73,7 @@ public class ContactRequestActivity extends BaseActivity implements ContactViewI
         });
         mAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model, int action,View v) {
+            public void onItemClicked(int position, Object model, int action, View v) {
                 GLContact requestModel = (GLContact) model;
                 if (((TextView) v).getText().toString().equalsIgnoreCase("Accept")) {
                     requestModel.setAction(1);
@@ -83,7 +85,7 @@ public class ContactRequestActivity extends BaseActivity implements ContactViewI
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model,int action, View v) {
+            public void onItemLongClicked(int position, Object model, int action, View v) {
 
             }
         });

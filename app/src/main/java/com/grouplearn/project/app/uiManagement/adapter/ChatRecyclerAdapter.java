@@ -131,7 +131,12 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatViewHolder> {
 
     private void saveImage(String cloudPath, Bitmap resource) {
         FileManager manager = new FileManager();
-        manager.saveBitmap(cloudPath, resource);
+        manager.saveBitmap(getName(cloudPath), resource);
+    }
+
+    private String getName(String cloudPath) {
+        String[] arr = cloudPath.split("/");
+        return arr[arr.length - 1];
     }
 
     private void setEventListeners(final int position, ChatViewHolder holder, final GLMessage message) {
@@ -151,12 +156,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatViewHolder> {
         };
         holder.ivPlayButton.setOnClickListener(onClickListener);
         holder.ivThumbNail.setOnClickListener(onClickListener);
-        holder.ivDownload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
+        holder.ivDownload.setOnClickListener(onClickListener);
     }
 
     @Override

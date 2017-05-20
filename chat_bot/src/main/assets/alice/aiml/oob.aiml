@@ -28,7 +28,7 @@
 </category>
 <category><pattern>REPORT A PROBLEM</pattern>
 <template><oob><dialog><title>Would you like to send a bug report?</title><list><item>Yes</item><item>No</item></list></dialog></oob>
-To help the developers understand your problem, you can choose to send us a transcript of your recent conversation with CallMom.  You can add your own comments to the email message too.  Would you like to send a report?</template>
+To help the developers understand your problem, you can choose to send us a transcript of your recent conversation with CallMom.  You can add your own comments to the email mMessage too.  Would you like to send a report?</template>
 </category>
 <category><pattern>YES</pattern><that>WOULD YOU LIKE TO SEND A REPORT</that>
 <template><srai>SEND BUG REPORT</srai></template>
@@ -137,7 +137,7 @@ To help the developers understand your problem, you can choose to send us a tran
 <template>I'll try search for jobs.  <oob><search>JOBS <star/></search></oob></template>
 </category>
 <category><pattern>TWEET *</pattern>
-<template><oob><url>https://twitter.com/intent/tweet?source=webclient&amp;text=<star/></url></oob>Please check the message and press Tweet if you are happy.</template>
+<template><oob><url>https://twitter.com/intent/tweet?source=webclient&amp;text=<star/></url></oob>Please check the mMessage and press Tweet if you are happy.</template>
 </category>
 <category><pattern>WWW DOT * DOT COM</pattern>
 <template>I'm opening <star/>.com.  <oob><url>http://www.<star/>.com</url></oob></template>
@@ -150,7 +150,7 @@ To help the developers understand your problem, you can choose to send us a tran
 <oob><alarm><hour>11</hour><minute>30</minute></alarm></oob></template>
 </category>
 <category><pattern>UPDATE FACEBOOK STATUS</pattern>
-<template><oob><url>http://www.facebook.com/dialog/feed?_path=feed&amp;app_id=294334050655455&amp;redirect_uri=https://www.facebook.com&amp;display=touch</url></oob>Now opening a screen for you to update your status. Type or speak your message into the status box and press share to post it on your wall.</template>
+<template><oob><url>http://www.facebook.com/dialog/feed?_path=feed&amp;app_id=294334050655455&amp;redirect_uri=https://www.facebook.com&amp;display=touch</url></oob>Now opening a screen for you to update your status. Type or speak your mMessage into the status box and press share to post it on your wall.</template>
 </category>
 <category><pattern>OPEN GOOGLE</pattern>
 <template><oob><search/></oob></template>

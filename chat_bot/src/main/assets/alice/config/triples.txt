@@ -1345,7 +1345,7 @@ DOCTOR:hasSyllables:2
 DOCTOR:isa:Health Care Provider
 DOCTOR:isa:Person
 DOCTOR:lifeArea:Physical
-DOCUMENT:hasPurpose:to convey a message
+DOCUMENT:hasPurpose:to convey a mMessage
 DOCUMENT:hasSize:4
 DOCUMENT:hasSyllables:3
 DOCUMENT:lifeArea:Physical
@@ -2667,7 +2667,7 @@ LESBIAN:hasSyllables:3
 LESBIAN:isa:Female Person
 LESBIAN:isa:Person
 LESBIAN:lifeArea:Social
-LETTER:hasPurpose:to send a message
+LETTER:hasPurpose:to send a mMessage
 LETTER:hasSize:4
 LETTER:hasSyllables:2
 LETTER:isa:Document
@@ -4140,7 +4140,7 @@ ROOT:hasSize:0
 ROOT:hasSyllables:1
 ROOT:isa:Plant Part
 ROOT:lifeArea:Education
-ROSE:hasPurpose:to send a message of love
+ROSE:hasPurpose:to send a mMessage of love
 ROSE:hasSize:3
 ROSE:hasSyllables:1
 ROSE:isa:Flower
@@ -4412,7 +4412,7 @@ SIGN:hasSize:0
 SIGN:hasSyllables:1
 SIGN:isa:Concept
 SIGN:lifeArea:Spiritual
-SIGNAL:hasPurpose:to send a message
+SIGNAL:hasPurpose:to send a mMessage
 SIGNAL:hasSize:0
 SIGNAL:hasSyllables:2
 SIGNAL:lifeArea:Physical

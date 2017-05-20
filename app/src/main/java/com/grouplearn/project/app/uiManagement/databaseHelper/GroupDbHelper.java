@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.text.TextUtils;
 
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.DatabaseHandler;
@@ -74,10 +75,10 @@ public class GroupDbHelper extends DataBaseHelper {
 
     public GLGroup getGroupInfo(long groupUniqueId) {
         Cursor cursor = dbHandler.getSubscribedGroupInfo(groupUniqueId);
-        GLGroup group=null;
+        GLGroup group = null;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
-            group= makeGroupModelFromCursor(cursor);
+            group = makeGroupModelFromCursor(cursor);
         }
         return group;
     }
@@ -107,11 +108,30 @@ public class GroupDbHelper extends DataBaseHelper {
         GLMessage lastMessage = chatDbHelper.getLastMessages(groupUniqueId);
         model.setMessageModel(lastMessage);
         if (lastMessage != null) {
-            String message = lastMessage.getSenderName() + " : " + lastMessage.getMessageBody();
-            model.setLastMessage(message);
+            StringBuilder message = new StringBuilder();
+            message.append(lastMessage.getSenderName());
+            message.append(" : ");
+            if (!TextUtils.isEmpty(lastMessage.getMessageBody())) {
+
+                message.append(lastMessage.getMessageBody());
+
+                model.setLastMessage(message.toString());
+            } else if (Math.abs(lastMessage.getMessageType()) == GLMessage.IMAGE) {
+                message.append("Image ");
+                model.setLastMessage(message.toString());
+            } else if (Math.abs(lastMessage.getMessageType()) == GLMessage.VIDEO) {
+                message.append("Video ");
+                model.setLastMessage(message.toString());
+            } else if (Math.abs(lastMessage.getMessageType()) == GLMessage.DOCUMENT) {
+                message.append("Document ");
+                model.setLastMessage(message.toString());
+            } else {
+                model.setLastMessage("");
+            }
         } else {
             model.setLastMessage("");
         }
+
         model.setNewMessage((int) numberOfNewMessage);
         return model;
     }

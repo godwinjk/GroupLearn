@@ -94,7 +94,6 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     private ImageView ivNameEdit, ivStatusEdit;
     private CardView cvVisibility;
     private boolean isOtherUser;
-    private String userName;
     private GLContact mContact;
     private ImageView ivAddInterest, ivAddSkills;
     private Button btnConnect;
@@ -110,17 +109,13 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle("User Info");
         mContact = getIntent().getParcelableExtra("user");
+        long userId = mPref.getLongPrefValue(PreferenceConstants.USER_ID);
 
-        if (mContact == null) {
-            userName = mPref.getStringPrefValue(PreferenceConstants.USER_NAME);
-        } else {
-            userName = mContact.getContactUserName();
-        }
-        String appUserName = mPref.getStringPrefValue(PreferenceConstants.USER_NAME);
+
         initializeWidgets();
         registerListeners();
         String imagePath = null;
-        if (appUserName.equals(userName)) {
+        if (userId == mContact.getContactUserId()) {
             isOtherUser = false;
             ivAddInterest.setVisibility(View.VISIBLE);
             ivAddSkills.setVisibility(View.VISIBLE);
@@ -205,13 +200,13 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         btnConnect.setOnClickListener(this);
         OnRecyclerItemClickListener clickListener = new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model,int action, View v) {
+            public void onItemClicked(int position, Object model, int action, View v) {
                 GLInterest interest = (GLInterest) model;
                 deleteInterest(interest, interest.isSkill());
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, int action,View v) {
+            public void onItemLongClicked(int position, Object model, int action, View v) {
 
             }
         };
@@ -372,13 +367,16 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
         final TextInputLayout etTextInput = (TextInputLayout) v.findViewById(R.id.et_interest);
         String message = "Interest";
         if (isSkill) message = "Skill";
+        String hint = "Enter your interest";
+        if (isSkill) hint = "Enter your skill";
+        etTextInput.setHint(hint);
         alertDialog.setTitle(message);
         alertDialog.setView(v);
         final String finalMessage = message;
         final Dialog dialog = alertDialog.setPositiveButton("Create", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                String interestName = etTextInput.getEditText().getText().toString();
+                String interestName = etTextInput.getEditText().getText().toString().trim();
                 if (!TextUtils.isEmpty(interestName) && interestName.length() > 3 && interestName.length() < 30) {
                     addInterest(interestName, isSkill);
                 } else {

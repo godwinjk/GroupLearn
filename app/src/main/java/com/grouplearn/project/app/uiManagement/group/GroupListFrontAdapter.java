@@ -78,7 +78,7 @@ public class GroupListFrontAdapter extends RecyclerView.Adapter<GroupFrontViewHo
                     .asBitmap()
                     .centerCrop()
                     .placeholder(R.drawable.group_person)
-                    .thumbnail(.2f)
+                    .thumbnail(.1f)
                     .into(new BitmapImageViewTarget(holder.ivGroupIcon) {
                         @Override
                         protected void setResource(Bitmap resource) {
@@ -105,7 +105,7 @@ public class GroupListFrontAdapter extends RecyclerView.Adapter<GroupFrontViewHo
             @Override
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, mGroupModel, 1,holder.tvRequest);
+                    onRecyclerItemClickListener.onItemClicked(position, mGroupModel, 1, holder.tvRequest);
                 }
             }
         });
@@ -113,7 +113,7 @@ public class GroupListFrontAdapter extends RecyclerView.Adapter<GroupFrontViewHo
             @Override
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, mGroupModel, 1,holder.ivGroupIcon);
+                    onRecyclerItemClickListener.onItemClicked(position, mGroupModel, 1, holder.ivGroupIcon);
                 }
             }
         });
@@ -121,7 +121,7 @@ public class GroupListFrontAdapter extends RecyclerView.Adapter<GroupFrontViewHo
             @Override
             public boolean onLongClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemLongClicked(position, mGroupModel, 1,holder.ivGroupIcon);
+                    onRecyclerItemClickListener.onItemLongClicked(position, mGroupModel, 1, holder.ivGroupIcon);
                 }
                 return false;
             }

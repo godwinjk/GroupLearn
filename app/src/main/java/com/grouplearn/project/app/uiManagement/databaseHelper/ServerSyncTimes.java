@@ -27,21 +27,21 @@ public class ServerSyncTimes {
         this.mContentResolver = mContext.getContentResolver();
     }
 
-    public long getLastUpdatedTime(int apiId) {
+    public String getLastUpdatedTime(int apiId) {
         String where = TableServerSyncDetails.API_ID + "=" + apiId;
         Cursor cursor = mContentResolver.query(TableServerSyncDetails.CONTENT_URI, null, where, null, null);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
-            int id = cursor.getInt(cursor.getColumnIndex(TableServerSyncDetails.API_ID));
-            long time = cursor.getLong(cursor.getColumnIndex(TableServerSyncDetails.LAST_UPDATED_TIME));
+//            int id = cursor.getInt(cursor.getColumnIndex(TableServerSyncDetails.API_ID));
+            String time = cursor.getString(cursor.getColumnIndex(TableServerSyncDetails.LAST_UPDATED_TIME));
             cursor.close();
             return time;
         } else
-            return 000;
+            return "0.0";
 
     }
 
-    public void updateLastServerSyncTimeForAPICall(int apiId, long lastUpdatedTime) {
+    public void updateLastServerSyncTimeForAPICall(int apiId, String lastUpdatedTime) {
         ContentValues cv = new ContentValues();
         cv.put(TableServerSyncDetails.LAST_UPDATED_TIME, lastUpdatedTime);
 
@@ -51,7 +51,7 @@ public class ServerSyncTimes {
             insertLastServerSyncTimeForAPICall(apiId, lastUpdatedTime);
     }
 
-    private Uri insertLastServerSyncTimeForAPICall(int apiId, long lastUpdatedTime) {
+    private Uri insertLastServerSyncTimeForAPICall(int apiId, String lastUpdatedTime) {
         ContentValues cv = new ContentValues();
         cv.put(TableServerSyncDetails.API_ID, apiId);
         cv.put(TableServerSyncDetails.LAST_UPDATED_TIME, lastUpdatedTime);

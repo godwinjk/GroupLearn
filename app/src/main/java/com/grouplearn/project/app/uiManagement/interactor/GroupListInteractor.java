@@ -89,7 +89,7 @@ public class GroupListInteractor implements CloudResponseCallback {
         CloudGetGroupsRequest request = new CloudGetGroupsRequest();
         request.setToken(token);
         request.setKey(query);
-        request.setStartTime(0);
+        request.setStartTime("0");
         request.setLimit(100);
         CloudConnectManager.getInstance(mContext).getCloudGroupManager(mContext).getAllGroups(request, this);
     }
@@ -203,7 +203,7 @@ public class GroupListInteractor implements CloudResponseCallback {
     public void getGroupInvitations(final GroupRequestCallback groupRequestCallback) {
         final CloudGetGroupInvitationRequest request = new CloudGetGroupInvitationRequest();
         String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
-        long lastTime = new ServerSyncTimes(mContext).getLastUpdatedTime(ServerSyncTimes.GET_ALL_INVITATION);
+        String lastTime = new ServerSyncTimes(mContext).getLastUpdatedTime(ServerSyncTimes.GET_ALL_INVITATION);
         request.setStartTime(lastTime);
         request.setLimit(LIMIT);
         request.setToken(token);

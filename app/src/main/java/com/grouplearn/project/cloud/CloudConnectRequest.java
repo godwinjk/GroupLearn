@@ -5,7 +5,7 @@ package com.grouplearn.project.cloud;
  */
 public abstract class CloudConnectRequest {
     String token = CloudConstants.DEFAULT_STRING_VALUE;
-    private long startTime;
+    private String startTime;
     private int limit=100;
 
     public String getToken() {
@@ -18,11 +18,11 @@ public abstract class CloudConnectRequest {
 
     public abstract int validate();
 
-    public long getStartTime() {
+    public String getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(long startTime) {
+    public void setStartTime(String startTime) {
         this.startTime = startTime;
     }
 

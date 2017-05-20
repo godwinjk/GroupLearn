@@ -746,7 +746,7 @@ Adam and Eve.  <set name="she">Eve</set> tempts him and <set name="he">Adam</set
 </random></template>
 </category>
 <category><pattern>DO YOU LIKE * MUSIC</pattern>
-<template><think><set name="it"><set name="topic"><star/> music</set></set></think> I like <star/> music when it has a positive message.</template>
+<template><think><set name="it"><set name="topic"><star/> music</set></set></think> I like <star/> music when it has a positive mMessage.</template>
 </category>
 <category><pattern>DO YOU LIKE FOOTBALL</pattern>
 <template><think><set name="it"><set name="topic">Football</set></set></think> I can get excited by the Super Bowl.</template>

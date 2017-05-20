@@ -38,12 +38,12 @@ public class ChatDbHelper extends DataBaseHelper {
             BigDecimal lastUpdatedTime = new BigDecimal(model.getTimeStamp());
             updatedTime = updatedTime.max(lastUpdatedTime);
         }
-        new ServerSyncTimes(mContext).updateLastServerSyncTimeForAPICall(ServerSyncTimes.MESSAGE_GET, updatedTime.longValue());
+        new ServerSyncTimes(mContext).updateLastServerSyncTimeForAPICall(ServerSyncTimes.MESSAGE_GET, updatedTime.toPlainString());
     }
 
     public long updateMessageInDb(GLMessage model) {
         String where = TableMessage.CHAT_ID + "=" + model.getMessageId();
-        ContentValues cv = new ContentValues();
+        ContentValues cv = getContentValues(model);
         cv.put(TableMessage.USER_NAME, model.getSenderName());
         return contentResolver.update(TableMessage.CONTENT_URI, cv, where, null);
     }
