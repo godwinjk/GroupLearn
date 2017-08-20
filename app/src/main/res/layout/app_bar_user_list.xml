@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gray_back"
     tools:context="com.grouplearn.project.app.uiManagement.user.UserListActivity">
 
     <include layout="@layout/layout_toolbar" />

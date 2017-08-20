@@ -25,6 +25,7 @@ import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.adapter.holder.ContactItemHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.bean.GLContact;
+import com.grouplearn.project.utilities.AppUtility;
 
 import java.util.ArrayList;
 
@@ -87,21 +88,19 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             holder.tvStatus = (TextView) convertView.findViewById(R.id.tv_contact_status);
             holder.ivIcon = (ImageView) convertView.findViewById(R.id.iv_contact_image);
             holder.llContactItem = (LinearLayout) convertView.findViewById(R.id.ll_contact_item);
+            holder.view = convertView.findViewById(R.id.view);
             convertView.setTag(holder);
         } else
             holder = (ContactItemHolder) convertView.getTag();
 
         final GLContact model = (GLContact) getItem(position);
 
-        if (type == 0 && model.getStatus() == 1) {
+        if (type == 0) {
             holder.tvInvite.setVisibility(View.INVISIBLE);
             holder.tvStatus.setVisibility(View.VISIBLE);
-        } else if (type == 1 && model.getStatus() == 1) {
+        } else if (type == 1) {
             holder.tvInvite.setVisibility(View.VISIBLE);
             holder.tvStatus.setVisibility(View.VISIBLE);
-        } else if (type == 0 && model.getStatus() == 0) {
-            holder.tvStatus.setVisibility(View.INVISIBLE);
-            holder.tvInvite.setVisibility(View.VISIBLE);
         }
 
         holder.tvContactName.setText(model.getContactName());
@@ -112,7 +111,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             @Override
             public void onClick(View v) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, model,1, v);
+                    onRecyclerItemClickListener.onItemClicked(position, model, 1, v);
                 }
             }
         });
@@ -138,7 +137,7 @@ public class ContactListAdapter extends BaseAdapter implements Filterable {
             holder.ivIcon.setPadding(dpAsPixels, dpAsPixels, dpAsPixels, dpAsPixels);
             holder.ivIcon.setImageResource(R.drawable.contact_white);
         }
-
+        holder.view.setBackgroundColor(AppUtility.getRandomColor(holder.view.getContext(), position));
         return convertView;
     }
 

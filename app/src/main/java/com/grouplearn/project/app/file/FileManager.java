@@ -2,6 +2,7 @@ package com.grouplearn.project.app.file;
 
 import android.graphics.Bitmap;
 import android.os.Environment;
+import android.webkit.MimeTypeMap;
 
 import com.grouplearn.project.bean.GLMessage;
 import com.grouplearn.project.utilities.Log;
@@ -118,23 +119,55 @@ public class FileManager {
         return file;
     }
 
+    public static String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+        return type;
+    }
+
+    public static String getFileNameFromUri(String url) {
+        String[] arr = url.split("/");
+        String filname = "temp";
+        if (arr.length > 0) {
+            filname = arr[arr.length - 1];
+        }
+        return filname;
+    }
+
     public void saveBitmap(String name, Bitmap resource) {
         FileOutputStream out = null;
-        try {
-            File file = new File(IMAGE_FOLDER_PATH, getFileName(name));
-            out = new FileOutputStream(file);
-            resource.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-            // PNG is a lossless format, the compression factor (100) is ignored
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+        File file = new File(IMAGE_FOLDER_PATH, getFileName(name));
+        if (!file.exists()) {
             try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
+                out = new FileOutputStream(file);
+                resource.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                // PNG is a lossless format, the compression factor (100) is ignored
+            } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    if (out != null) {
+                        out.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+    }
+
+    public static float getFileSizeInMb(File file) {
+        float fileLength = 0;
+        if (file != null && file.exists()) {
+            fileLength = (float) file.length() / (1024f * 1024f);
+        }
+        return fileLength;
+    }
+
+    public static boolean isAllowedSize(File file) {
+        return (getFileSizeInMb(file) > 0 && getFileSizeInMb(file) <= 20);
     }
 }

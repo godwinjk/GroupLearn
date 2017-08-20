@@ -14,6 +14,93 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="270dp"
+            android:layout_gravity="center">
+
+
+            <ImageView
+                android:id="@+id/img_user_back"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/grouplearn_icon_256" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent_black99" />
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/left_back_arrow" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="85dp"
+                    android:layout_height="85dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/user_selector">
+
+                    <com.grouplearn.project.utilities.views.RoundedImageView
+                        android:id="@+id/img_user_round"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_centerInParent="true"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/user_admin"
+                        android:transitionName="transition_group_icon" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/tv_main_display_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:text="Brandon"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_main_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:text="bran@godwin.com"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tv_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/edit_back"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="5dp"
+                    android:text="Edit"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+        </RelativeLayout>
+
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -31,7 +118,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
-                    android:backgroundTint="@color/colorPrimary"
+                    android:background="@drawable/round_btn_selector"
                     android:text="Connect"
                     android:textAllCaps="false"
                     android:textColor="@color/white" />
@@ -40,9 +127,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="10dp"
-                    android:text="Display Name"
-                    android:textColor="@color/colorPrimaryTextDark"
-                    android:textStyle="bold" />
+                    android:text="Display Name" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -55,17 +140,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="20dp"
                         android:layout_weight="2"
-                        android:text="Godwin Joseph" />
+                        android:text="Godwin Joseph"
+                        android:textStyle="bold" />
 
-                    <ImageView
-                        android:id="@+id/iv_name_edit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="right"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:padding="5dp"
-                        android:src="@drawable/edit" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -88,9 +165,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="10dp"
-                    android:text="Status"
-                    android:textColor="@color/colorPrimaryTextDark"
-                    android:textStyle="bold" />
+                    android:text="Status" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -106,15 +181,6 @@
                         android:text="Its Working fine , This is also working"
                         android:textStyle="bold" />
 
-                    <ImageView
-                        android:id="@+id/iv_status_edit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="right"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:padding="5dp"
-                        android:src="@drawable/edit" />
                 </LinearLayout>
             </LinearLayout>
         </android.support.v7.widget.CardView>
@@ -136,9 +202,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="10dp"
-                    android:text="Visibility"
-                    android:textColor="@color/colorPrimaryTextDark"
-                    android:textStyle="bold" />
+                    android:text="Visibility" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -151,14 +215,15 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
                         android:padding="5dp"
-                        android:text="Visible to any one" />
+                        android:text="Visible to any one"
+                        android:textStyle="bold" />
 
                     <CheckBox
                         android:id="@+id/cb_visibility"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
-                        android:buttonTint="@color/colorPrimaryTextDark"
+                        android:buttonTint="@color/colorPrimary"
                         android:clickable="true" />
                 </LinearLayout>
             </LinearLayout>
@@ -185,9 +250,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
                         android:layout_weight="2"
-                        android:text="Interests"
-                        android:textColor="@color/colorPrimaryTextDark"
-                        android:textStyle="bold" />
+                        android:text="Interests" />
 
                     <ImageView
                         android:id="@+id/iv_add_interest"
@@ -229,9 +292,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
                         android:layout_weight="2"
-                        android:text="Skills"
-                        android:textColor="@color/colorPrimaryTextDark"
-                        android:textStyle="bold" />
+                        android:text="Skills" />
 
                     <ImageView
                         android:id="@+id/iv_add_skills"

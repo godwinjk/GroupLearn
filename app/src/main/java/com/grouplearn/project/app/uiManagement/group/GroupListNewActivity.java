@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.grouplearn.project.R;
@@ -48,7 +49,7 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_groups);
-        setupToolbar("GroupLearn", true);
+        mToolbar = setupToolbar("GroupLearn", true);
 
         mContext = this;
         initializeWidgets();
@@ -72,6 +73,9 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
+        mDrawerToggle.setDrawerIndicatorEnabled(false);
+        mToolbar.setNavigationIcon(R.drawable.nav_icon);
+
         mNavigationView.setNavigationItemSelectedListener(this);
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
@@ -89,11 +93,20 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
         mSectionPagerAdapter = new GroupSectionPagerAdapter(getSupportFragmentManager());
         vpGroups.setAdapter(mSectionPagerAdapter);
         vpGroups.setOffscreenPageLimit(3);
+        createNavigationView();
     }
 
     @Override
     public void registerListeners() {
-
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mDrawerLayout.isDrawerOpen(GravityCompat.START))
+                    mDrawerLayout.closeDrawer(GravityCompat.START);
+                else
+                    mDrawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
     }
 
     @Override
@@ -105,7 +118,6 @@ public class GroupListNewActivity extends BaseActivity implements NavigationView
     @Override
     protected void onResume() {
         super.onResume();
-        createNavigationView();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

@@ -22,6 +22,7 @@ import android.view.animation.Animation;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.ScaleAnimation;
 
+import com.grouplearn.project.R;
 import com.grouplearn.project.app.MyApplication;
 
 import java.io.File;
@@ -42,6 +43,24 @@ public final class AppUtility extends Activity {
 
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
     private static String TAG = "Utils";
+
+    public static int getRandomColor(Context context, int position) {
+        position = Math.abs(position);
+        int[] colorSchema = new int[]{R.color.pale_rose, R.color.blue, R.color.green, R.color.purple, R.color.majenta, R.color.light_green, R.color.yellow, R.color.pale_red};
+        return context.getResources().getColor((colorSchema[position % colorSchema.length]));
+    }
+
+    public static int getHour(long timeStamp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeStamp);
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
+    public static int getMin(long timeStamp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeStamp);
+        return calendar.get(Calendar.MINUTE);
+    }
 
     public static String bytesToHex(byte[] bytes) {
         if (bytes != null && bytes.length > 0) {
@@ -273,6 +292,7 @@ public final class AppUtility extends Activity {
         LocationManager lm = (LocationManager) MyApplication.getAppContext().getSystemService(Context.LOCATION_SERVICE);
         return lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
+
     public static String getFilePath(Context context, Uri uri) throws URISyntaxException {
         String selection = null;
         String[] selectionArgs = null;

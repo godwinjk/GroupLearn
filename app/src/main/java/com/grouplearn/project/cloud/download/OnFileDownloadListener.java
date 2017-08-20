@@ -14,5 +14,7 @@ public interface OnFileDownloadListener {
 
     void onDownloadInProgress(GLMessage message, int progress);
 
+    void onDownloadInStarted(GLMessage message);
+
     void onDownloadFailed(GLMessage message, AppError error);
 }

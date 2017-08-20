@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -21,7 +23,6 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     TextView tvNotificationSettings;
     TextView tvChatSettings;
     TextView tvAbout;
-    TextView tvSignOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +42,6 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         tvNotificationSettings = (TextView) findViewById(R.id.tv_notification_settings);
         tvChatSettings = (TextView) findViewById(R.id.tv_chat_settings);
         tvAbout = (TextView) findViewById(R.id.tv_about);
-        tvSignOut = (TextView) findViewById(R.id.tv_logout);
     }
 
     @Override
@@ -50,7 +50,6 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         tvNotificationSettings.setOnClickListener(this);
         tvChatSettings.setOnClickListener(this);
         tvAbout.setOnClickListener(this);
-        tvSignOut.setOnClickListener(this);
     }
 
     @Override
@@ -68,33 +67,47 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             case R.id.tv_about:
                 startActivity(new Intent(mContext, AboutActivity.class));
                 break;
-            case R.id.tv_logout:
-                new SignOutInteractor(mContext).doSignOut(new SignOutListener() {
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.logout_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_logout)
+            doSignout();
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void doSignout() {
+        new SignOutInteractor(mContext).doSignOut(new SignOutListener() {
+            @Override
+            public void onSignOutSuccessful() {
+                runOnUiThread(new Runnable() {
                     @Override
-                    public void onSignOutSuccessful() {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Intent intent = new Intent(mContext, SplashScreenActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                DisplayInfo.showToast(mContext, "Sign out successfully.");
-                                startActivity(intent);
-                                finish();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onSignOutFailed() {
-
-                    }
-
-                    @Override
-                    public void onSignOutCanceled() {
-
+                    public void run() {
+                        Intent intent = new Intent(mContext, SplashScreenActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        DisplayInfo.showToast(mContext, "Sign out successfully.");
+                        startActivity(intent);
+                        finish();
                     }
                 });
-                break;
-        }
+            }
+
+            @Override
+            public void onSignOutFailed() {
+
+            }
+
+            @Override
+            public void onSignOutCanceled() {
+
+            }
+        });
     }
 }

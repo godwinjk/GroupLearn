@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gray_back"
     tools:context="com.grouplearn.project.app.uiManagement.group.GroupListFragment">
 
     <include layout="@layout/content_group_list" />

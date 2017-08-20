@@ -1,18 +1,12 @@
 package com.grouplearn.project.app.uiManagement.contact;
 
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
-import android.telephony.SmsManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,13 +17,13 @@ import android.widget.TextView;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.BaseFragment;
 import com.grouplearn.project.app.uiManagement.adapter.ContactListAdapter;
+import com.grouplearn.project.app.uiManagement.cloudHelper.CloudContactManager;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ContactDbHelper;
 import com.grouplearn.project.app.uiManagement.group.GroupListNewActivity;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.app.uiManagement.user.UserProfileActivity;
 import com.grouplearn.project.bean.GLContact;
-import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
@@ -73,7 +67,6 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
         registerListeners();
 
         getContactFromDb();
-
     }
 
     private void getContactFromDb() {
@@ -81,8 +74,13 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
         if (contactModels != null && contactModels.size() > 0) {
             updateDataInList(sortUserList(contactModels));
         }
+        getContactsFromCloud();
     }
 
+    private void getContactsFromCloud() {
+        CloudContactManager manager = new CloudContactManager(mContext);
+        manager.getAllContact(this);
+    }
 
     @Override
     protected void initializeWidgets(View v) {
@@ -101,7 +99,7 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
 
         mAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
                                                     @Override
-                                                    public void onItemClicked(int position, Object model,int action, View v) {
+                                                    public void onItemClicked(int position, Object model, int action, View v) {
                                                         GLContact contactModel = (GLContact) model;
                                                         if (v instanceof LinearLayout) {
                                                             openUserDetailsWindow(v, contactModel);
@@ -109,7 +107,7 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
                                                     }
 
                                                     @Override
-                                                    public void onItemLongClicked(int position, Object model,int action, View v) {
+                                                    public void onItemLongClicked(int position, Object model, int action, View v) {
 
                                                     }
                                                 }
@@ -125,25 +123,6 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
         startActivity(intent, options.toBundle());
     }
 
-    private void openSystemContactWindow(String contactId) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contactId));
-        intent.setData(uri);
-        startActivity(intent);
-    }
-
-    private void sendSms(String phoneNumber) {
-        if (checkPermissionForSms()) {
-            try {
-                SmsManager smsManager = SmsManager.getDefault();
-                smsManager.sendTextMessage(phoneNumber, null, "Install GroupLearn App to learn new things in new way https://goo.gl/2GRMMs", null, null);
-                DisplayInfo.showToast(mContext, "Invitation sent successfully.");
-            } catch (Exception ex) {
-                Log.e(TAG, "FAILED TO SEND MESSAGE, FAILED TO SEND MESSAGE");
-                ex.printStackTrace();
-            }
-        }
-    }
 
     private ArrayList<GLContact> sortUserList(final ArrayList<GLContact> models) {
         Collections.sort(models, new Comparator<GLContact>() {
@@ -194,16 +173,6 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
         Log.e(TAG, error.getErrorMessage());
     }
 
-    private boolean checkPermissionForSms() {
-        if (AppUtility.checkPermission(getActivity(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.SEND_SMS
-                    },
-                    MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
-            return false;
-        } else
-            return true;
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -214,5 +183,7 @@ public class ContactListFragment extends BaseFragment implements ContactViewInte
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+        if (getActivity() != null && isVisibleToUser)
+            getContactFromDb();
     }
 }

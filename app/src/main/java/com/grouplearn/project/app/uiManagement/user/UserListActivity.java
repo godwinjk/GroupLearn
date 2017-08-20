@@ -9,8 +9,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -70,7 +70,8 @@ public class UserListActivity extends BaseActivity
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-
+        mDrawerToggle.setDrawerIndicatorEnabled(false);
+        toolbar.setNavigationIcon(R.drawable.nav_icon);
         mNavigationView.setNavigationItemSelectedListener(this);
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
@@ -79,7 +80,7 @@ public class UserListActivity extends BaseActivity
         mNavigationView = mNavController.createNavigationMenu();
 
         rvUsers = (RecyclerView) findViewById(R.id.rv_users);
-        rvUsers.setLayoutManager(new StaggeredGridLayoutManager(2, 1));
+        rvUsers.setLayoutManager(new GridLayoutManager(mContext, 4));
         rvUsers.addItemDecoration(new SpaceItemDecoration(10));
         mAdapter = new UserListAdapter();
         rvUsers.setAdapter(mAdapter);
@@ -89,6 +90,15 @@ public class UserListActivity extends BaseActivity
 
     @Override
     public void registerListeners() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mDrawerLayout.isDrawerOpen(GravityCompat.START))
+                    mDrawerLayout.closeDrawer(GravityCompat.START);
+                else
+                    mDrawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
         srlMain.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -97,7 +107,7 @@ public class UserListActivity extends BaseActivity
         });
         mAdapter.setOnItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model,int action, View v) {
+            public void onItemClicked(int position, Object model, int action, View v) {
                 GLContact contact = (GLContact) model;
                 Intent intent = new Intent(mContext, UserProfileActivity.class);
                 intent.putExtra("user", contact);
@@ -105,7 +115,7 @@ public class UserListActivity extends BaseActivity
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, int action,View v) {
+            public void onItemLongClicked(int position, Object model, int action, View v) {
 
             }
         });

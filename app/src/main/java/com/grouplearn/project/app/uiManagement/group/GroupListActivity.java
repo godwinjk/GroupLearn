@@ -21,6 +21,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.grouplearn.project.R;
+import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
+import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
 import com.grouplearn.project.app.uiManagement.SplashScreenActivity;
 import com.grouplearn.project.app.uiManagement.adapter.GroupListAdapter;
@@ -28,19 +30,22 @@ import com.grouplearn.project.app.uiManagement.cloudHelper.CloudGroupManagement;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.databaseHelper.GroupDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.GroupListInteractor;
-import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
 import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.CloudOperationCallback;
 import com.grouplearn.project.app.uiManagement.interfaces.GroupViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
 import com.grouplearn.project.app.uiManagement.search.SearchAllActivity;
 import com.grouplearn.project.bean.GLGroup;
+import com.grouplearn.project.bean.GLMessage;
 import com.grouplearn.project.utilities.AppUtility;
+import com.grouplearn.project.utilities.ChatUtilities;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class GroupListActivity extends BaseActivity implements View.OnClickListener, GroupViewInterface {
     private static final String TAG = "GroupListActivity";
@@ -53,6 +58,8 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
 
     Toolbar mToolbar;
     private boolean mVisible = true;
+    ArrayList<GLMessage> messages;
+    ChatDbHelper helper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,13 +68,18 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
         mToolbar = setupToolbar(R.string.title_group_learn, true);
         mToolbar.setSubtitle("My Groups");
         mContext = this;
-
+        setMode();
+        helper = new ChatDbHelper(mContext);
         initializeWidgets();
         registerListeners();
 
         mFab.setVisibility(View.GONE);
         revealHide(0);
 //        makeGodwinBot();
+    }
+
+    private void setMode() {
+        messages = getIntent().getParcelableArrayListExtra("messages");
     }
 
     @Override
@@ -125,10 +137,12 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
         super.onResume();
         registerForContextMenu(lvGroupListView);
         GroupListInteractor interactor = GroupListInteractor.getInstance(mContext);
-        interactor.getMyGroupsFromDatabase(this);
-//        interactor.getSubscribedGroups(this);
 
-        MessageInteractor.getInstance().getAllMessages();
+        if (messages != null)
+            interactor.getSubscribedGroups(this);
+        else
+            interactor.getMyGroupsFromDatabase(this);
+
     }
 
     @Override
@@ -136,8 +150,6 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
         super.onPause();
         unregisterForContextMenu(lvGroupListView);
         revealHide(200);
-
-        MessageInteractor.getInstance().stopTimer();
     }
 
 
@@ -161,10 +173,10 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent chatIntent = new Intent(mContext, GroupChatActivity.class);
                 long groupUniqueId = ((GLGroup) mGroupListAdapter.getItem(position)).getGroupUniqueId();
-
+                sendItems(groupUniqueId);
                 chatIntent.putExtra("groupCloudId", groupUniqueId);
                 startActivity(chatIntent);
-//                }
+                finish();
             }
         });
 
@@ -186,6 +198,38 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
                 int lastItem = firstVisibleItem + visibleItemCount;
             }
         });
+    }
+
+    private void sendItems(long groupId) {
+        if (messages != null) {
+
+            for (GLMessage message : messages) {
+                message.setSentStatus(ChatUtilities.NOT_SENT);
+                message.setReceiverId(groupId);
+
+                AppSharedPreference mPref = new AppSharedPreference(mContext);
+                long senderId = mPref.getLongPrefValue(PreferenceConstants.USER_ID);
+                String senderName = mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME);
+
+                message.setSenderId(senderId);
+                message.setSenderName(senderName);
+                message.setTimeStamp(new BigDecimal(System.currentTimeMillis()).toPlainString());
+                message.setCreatedTime(System.currentTimeMillis());
+                message.setUpdatedTime(System.currentTimeMillis());
+                message.setTempId(getRandomTempId());
+
+                helper.addMessageToDb(message);
+            }
+        }
+    }
+
+    private long getRandomTempId() {
+        Random r = new Random();
+        long id = r.nextLong();
+        if (helper.isTempIdExist(id) > 0) {
+            return getRandomTempId();
+        } else
+            return id;
     }
 
     @Override
@@ -446,10 +490,5 @@ public class GroupListActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    private void makeGodwinBot() {
-        GroupDbHelper mDbHelper = new GroupDbHelper(mContext);
-        mDbHelper.getGodwinBot();
-
-    }
 
 }

@@ -8,7 +8,6 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
-import com.grouplearn.project.app.uiManagement.databaseHelper.ChatDbHelper;
 import com.grouplearn.project.app.uiManagement.interactor.MessageInteractor;
 import com.grouplearn.project.app.uiManagement.notification.NotificationManager;
 import com.grouplearn.project.bean.GLMessage;
@@ -44,7 +43,6 @@ public class FcmMessagingService extends FirebaseMessagingService {
 
     private String processNotification(String body) {
 
-        ChatDbHelper mDbHelper = new ChatDbHelper(this);
         GLMessage model = new GLMessage();
         StringBuilder message = new StringBuilder();
         try {
@@ -73,8 +71,15 @@ public class FcmMessagingService extends FirebaseMessagingService {
                             model.setTimeStamp(object.optString("timestamp"));
                             message = new StringBuilder();
 
-                            message.append(model.getSenderName() + " : ");
-                            message.append(model.getMessageBody() + "\n");
+                            message.append(model.getSenderName()).append(" : ");
+                            if (Math.abs(model.getMessageType()) == GLMessage.IMAGE) {
+                                message.append("Image ");
+                            } else if (Math.abs(model.getMessageType()) == GLMessage.VIDEO) {
+                                message.append("Video ");
+                            } else if (Math.abs(model.getMessageType()) == GLMessage.DOCUMENT) {
+                                message.append("Document ");
+                            }
+                            message.append(model.getMessageBody()).append("\n");
                         }
                         Intent intent = new Intent("chatRefresh");
                         sendBroadcast(intent);
@@ -85,9 +90,15 @@ public class FcmMessagingService extends FirebaseMessagingService {
                 } else if (notificationType == 1) {
                     NotificationManager.getInstance().showNotification(notificationType, "You have a new group request");
                 } else if (notificationType == 2) {
-                    NotificationManager.getInstance().showNotification(notificationType, "You have added to new group");
+                    NotificationManager.getInstance().showNotification(notificationType, "You have been added to new group");
                 } else if (notificationType == 5) {
                     NotificationManager.getInstance().showNotification(notificationType, "You have a new invitation");
+                } else if (notificationType == 6) {
+                    NotificationManager.getInstance().showNotification(notificationType, "You have been added to new group");
+                } else if (notificationType == 7) {
+                    NotificationManager.getInstance().showNotification(notificationType, "You have a new contact request");
+                } else if (notificationType == 8) {
+                    NotificationManager.getInstance().showNotification(notificationType, "You have new contacts");
                 }
             }
         } catch (JSONException e) {

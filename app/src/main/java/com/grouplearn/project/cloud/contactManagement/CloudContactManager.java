@@ -174,7 +174,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
         };
 
         CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
-        httpMethod.setRequestType(CloudHttpMethod.POST_METHOD);
+        httpMethod.setRequestType(CloudHttpMethod.PUT_METHOD);
         httpMethod.setUrl(mBaseurl + "contact-request/1");
 
         HashMap<String, String> hashMap = new HashMap<>();
@@ -187,6 +187,8 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
             try {
                 object.put("userId", contact.getContactUserId());
                 object.put("action", contact.getAction());
+                object.put("userDisplayName", contact.getContactName());
+                object.put("userEmail", contact.getContactMailId());
                 entity.put(object);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -279,7 +281,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
         };
         CloudHttpMethod httpMethod = new CloudHttpMethod(mContext, listener);
         httpMethod.setRequestType(CloudHttpMethod.GET_METHOD);
-        httpMethod.setUrl(mBaseurl + "contact/1?start" + cloudRequest.getStartTime() + "&limit=" + cloudRequest.getLimit());
+        httpMethod.setUrl(mBaseurl + "contact-request/1?start=" + cloudRequest.getStartTime() + "&limit=" + cloudRequest.getLimit());
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("token", cloudRequest.getToken());
@@ -325,6 +327,7 @@ public class CloudContactManager extends BaseManager implements CloudContactMana
                                 contact.setIconUrl(modelObject.optString("userIconUrl"));
                                 contact.setContactMailId(modelObject.optString("userEmail"));
                                 contact.setContactName(modelObject.optString("userDisplayName"));
+                                contact.setTimeStamp(modelObject.optString("timestamp"));
 //fetching interests;
                                 String url = modelObject.optString("userIconUrl");
                                 if (!TextUtils.isEmpty(url)) {

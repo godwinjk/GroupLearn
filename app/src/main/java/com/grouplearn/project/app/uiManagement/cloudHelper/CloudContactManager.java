@@ -7,6 +7,7 @@ import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.SplashScreenActivity;
 import com.grouplearn.project.app.uiManagement.databaseHelper.ContactDbHelper;
+import com.grouplearn.project.app.uiManagement.databaseHelper.ServerSyncTimes;
 import com.grouplearn.project.app.uiManagement.interactor.SignOutInteractor;
 import com.grouplearn.project.app.uiManagement.interfaces.ContactViewInterface;
 import com.grouplearn.project.app.uiManagement.interfaces.SignOutListener;
@@ -20,8 +21,11 @@ import com.grouplearn.project.cloud.contactManagement.accept.CloudContactAcceptR
 import com.grouplearn.project.cloud.contactManagement.get.CloudContactGetRequest;
 import com.grouplearn.project.cloud.contactManagement.get.CloudContactGetResponse;
 import com.grouplearn.project.cloud.contactManagement.getRequest.CloudGetContactRequest;
+import com.grouplearn.project.cloud.contactManagement.getRequest.CloudGetContactResponse;
 import com.grouplearn.project.cloud.contactManagement.request.CloudContactRequest;
 import com.grouplearn.project.utilities.errorManagement.AppError;
+
+import java.math.BigDecimal;
 
 /**
  * Created by Godwin on 07-06-2016 21:09 for Group Learn application 11:47 for GroupLearn.
@@ -29,6 +33,7 @@ import com.grouplearn.project.utilities.errorManagement.AppError;
  * @author : Godwin Joseph Kurinjikattu
  */
 public class CloudContactManager {
+    private static final int LIMIT = 100;
     Context mContext;
 
     public CloudContactManager(Context mContext) {
@@ -39,17 +44,28 @@ public class CloudContactManager {
         CloudContactGetRequest request = new CloudContactGetRequest();
         String token = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN);
         request.setToken(token);
+        request.setLimit(LIMIT);
+        String serverSyncTime = new ServerSyncTimes(mContext).getLastUpdatedTime(ServerSyncTimes.CONTACT_GET);
+        request.setStartTime(serverSyncTime);
+
         CloudResponseCallback callback = new CloudResponseCallback() {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 CloudContactGetResponse response = (CloudContactGetResponse) cloudResponse;
+                BigDecimal updatedTime = new BigDecimal("0");
+
                 ContactDbHelper helper = new ContactDbHelper(mContext);
                 int contactCount = response.getContactCount();
                 if (contactCount > 0 && response.getContacts() != null) {
-                    for (int i = 0; i < response.getContacts().size(); i++)
+                    for (int i = 0; i < response.getContacts().size(); i++) {
                         helper.addContact(response.getContacts().get(i));
+                        BigDecimal lastUpdatedTime = new BigDecimal(response.getContacts().get(i).getTimeStamp());
+                        updatedTime = updatedTime.max(lastUpdatedTime);
+                    }
                 }
                 contactViewInterface.onGetAllContactsFromCloud(helper.getContacts());
+                new ServerSyncTimes(mContext).updateLastServerSyncTimeForAPICall(ServerSyncTimes.CONTACT_GET, updatedTime.toPlainString());
+
             }
 
             @Override
@@ -130,13 +146,24 @@ public class CloudContactManager {
         CloudGetContactRequest request = new CloudGetContactRequest();
         String token = new AppSharedPreference(mContext).getStringPrefValue(PreferenceConstants.USER_TOKEN);
         request.setToken(token);
+        request.setLimit(LIMIT);
+        String serverSyncTime = new ServerSyncTimes(mContext).getLastUpdatedTime(ServerSyncTimes.CONTACT_REQUEST_GET);
+        request.setStartTime(serverSyncTime);
+
         CloudResponseCallback callback = new CloudResponseCallback() {
             @Override
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
-                CloudContactGetResponse response = (CloudContactGetResponse) cloudResponse;
+                CloudGetContactResponse response = (CloudGetContactResponse) cloudResponse;
+                BigDecimal updatedTime = new BigDecimal("0");
                 int contactCount = response.getContactCount();
                 if (contactCount > 0 && response.getContacts() != null) {
                     contactViewInterface.onGetAllContactsFromCloud(response.getContacts());
+                    /*for (GLContact model : response.getContacts()) {
+                        BigDecimal lastUpdatedTime = new BigDecimal(model.getTimeStamp());
+                        updatedTime = updatedTime.max(lastUpdatedTime);
+                    }*/
+                    new ServerSyncTimes(mContext).updateLastServerSyncTimeForAPICall(ServerSyncTimes.CONTACT_REQUEST_GET, updatedTime.toPlainString());
+
                 } else {
                     contactViewInterface.onGetContactsFailed(new AppError(response.getResponseStatus(), response.getResponseMessage()));
                 }

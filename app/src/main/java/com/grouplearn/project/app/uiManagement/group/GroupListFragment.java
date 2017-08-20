@@ -241,6 +241,7 @@ public class GroupListFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
+        getMessages();
         getActivity().registerReceiver(chatReceiver, new IntentFilter("chat"));
         getActivity().registerReceiver(chatReceiver, new IntentFilter("chatRefresh"));
     }
@@ -498,8 +499,8 @@ public class GroupListFragment extends BaseFragment implements View.OnClickListe
     }
 
     private void getMessages() {
-        MessageInteractor.getInstance().getAllMessages();
         getGroupsFromDb();
+        MessageInteractor.getInstance().getAllMessages();
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
@@ -69,6 +70,7 @@ public class MyCourseFragment extends BaseFragment {
     private GLCourse course;
     private LinearLayout llLoading;
     private GroupListNewActivity mContext;
+    private SwipeRefreshLayout srlMain;
 
     public MyCourseFragment() {
         // Required empty public constructor
@@ -100,7 +102,7 @@ public class MyCourseFragment extends BaseFragment {
     @Override
     protected void initializeWidgets(View v) {
         mRecyclerAdapter = new CourseSearchRecyclerAdapter(getActivity(), false);
-
+        srlMain = (SwipeRefreshLayout) v.findViewById(R.id.srl_main);
         tvNoItems = (TextView) v.findViewById(R.id.tv_no_items);
 
         tvContactDetails = (TextView) v.findViewById(R.id.tv_contact);
@@ -137,6 +139,12 @@ public class MyCourseFragment extends BaseFragment {
                 mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
+        srlMain.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getCourses();
+            }
+        });
         tvCourseDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -151,7 +159,7 @@ public class MyCourseFragment extends BaseFragment {
         });
         mRecyclerAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener() {
             @Override
-            public void onItemClicked(int position, Object model,int action, View v) {
+            public void onItemClicked(int position, Object model, int action, View v) {
                 course = (GLCourse) model;
                 if (v instanceof LinearLayout) {
                     setup(course);
@@ -159,7 +167,7 @@ public class MyCourseFragment extends BaseFragment {
             }
 
             @Override
-            public void onItemLongClicked(int position, Object model, int action,View v) {
+            public void onItemLongClicked(int position, Object model, int action, View v) {
 
             }
         });
@@ -353,6 +361,7 @@ public class MyCourseFragment extends BaseFragment {
                     return;
                 updateData(courses);
                 getRandomCourses();
+                srlMain.setRefreshing(false);
             }
 
             @Override
@@ -362,6 +371,7 @@ public class MyCourseFragment extends BaseFragment {
                     public void run() {
                         if (getActivity() == null)
                             return;
+                        srlMain.setRefreshing(false);
                     }
                 });
             }

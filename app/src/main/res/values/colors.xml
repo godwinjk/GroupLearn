@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#01a4e8</color>
-    <color name="colorPrimaryDark">#0292ce</color>
-    <color name="colorAccent">#01a4e8</color>
+    <color name="colorPrimary">#f4f4f4</color>
+    <color name="colorPrimaryDark">#393939</color>
+    <color name="colorAccent">#00d9db</color>
     <color name="white">#FFFFFF</color>
-    <color name="sky_blue">#3498db</color>
+    <color name="transparent_white">#c16c6b6b</color>
+
     <color name="orange_transparent">#10FC9A44</color>
 
     <color name="transparent_blue">#303498db</color>
+    <color name="transparent_blue_back">#3078c0ef</color>
 
     <color name="black_overlay">#66000000</color>
     <color name="transparent_black">#40000000</color>
+    <color name="transparent_black99">#99000000</color>
     <color name="light_grey">#DBDBDB</color>>
     <color name="grey_light">#ccccb3</color>>
     <color name="grey_back">#f4f4f4</color>>
@@ -27,7 +30,7 @@
     <color name="black">#090202</color>
     <color name="transparent_orange">#60ED6C3D</color>
     <color name="red">#FF0000</color>
-    <color name="light_ash1">#e5e5e5</color>
+    <color name="light_ash1">#eeeeee</color>
 
     <color name="pale_rose">#E04583</color>
     <color name="blue">#2A79E0</color>
@@ -41,27 +44,28 @@
     <color name="transparent_red">#60FF0000</color>
 
     <color name="select">#403498db</color>
-    <color name="colorPrimaryTextDark">#0281b6</color>
+    <color name="colorPrimaryTextDark">#009293</color>
     <color name="ivery">#fcfce0</color>
+    <color name="gray_back">#f1eff4</color>
 
-    <color name="a1">#FF7079</color>
-    <color name="a2">#FF9979</color>
-    <color name="a3">#FF701C</color>
-    <color name="a4">#A17EBC</color>
-    <color name="a5">#BC7AAB</color>
-    <color name="a6">#B9BC7A</color>
-    <color name="a7">#998FBC</color>
-    <color name="a8">#C6A2D6</color>
-    <color name="a9">#A2A6D1</color>
-    <color name="a10">#843333</color>
-    <color name="a11">#EA5B5B</color>
-    <color name="a12">#8AC4EA</color>
-    <color name="a13">#EA8AE4</color>
+    <color name="a1">#de313c</color>
+    <color name="a2">#e26138</color>
+    <color name="a3">#d15a15</color>
+    <color name="a4">#802ebf</color>
+    <color name="a5">#ba2d96</color>
+    <color name="a6">#8b8f26</color>
+    <color name="a7">#351a94</color>
+    <color name="a8">#4f0271</color>
+    <color name="a9">#7d88f9</color>
+    <color name="a10">#892222</color>
+    <color name="a11">#f25151</color>
+    <color name="a12">#5fbffd</color>
+    <color name="a13">#c24ebb</color>
     <color name="a14">#EA8A98</color>
     <color name="a15">#EA5B8A</color>
-    <color name="a16">#9FEA8A</color>
-    <color name="a17">#628774</color>
-    <color name="a18">#628774</color>
-    <color name="a19">#7587A0</color>
-    <color name="a20">#1F406D</color>
+    <color name="a16">#6eed4a</color>
+    <color name="a17">#257e50</color>
+    <color name="a18">#1b814d</color>
+    <color name="a19">#2d6abe</color>
+    <color name="a20">#081526</color>
 </resources>

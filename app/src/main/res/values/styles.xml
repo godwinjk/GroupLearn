@@ -26,12 +26,17 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
-
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:actionModeBackground">@color/colorPrimary</item>
         <item name="android:textColorPrimary">@android:color/black</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
+        <item name="windowActionModeOverlay">true</item>
         <item name="windowActionBar">false</item>
+        <item name="actionModeBackground">@color/colorPrimary</item>
         <item name="windowNoTitle">true</item>
     </style>
 
@@ -44,7 +49,8 @@
     <style name="AppTheme1.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="ToolbarStyle" parent="@style/ThemeOverlay.AppCompat.ActionBar">
-        <item name="colorAccent">@color/white</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/colorAccent</item>
     </style>
-
 </resources>

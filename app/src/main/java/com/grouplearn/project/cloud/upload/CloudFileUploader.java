@@ -11,10 +11,6 @@ import com.grouplearn.project.utilities.ChatUtilities;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.errorManagement.AppError;
 import com.grouplearn.project.utilities.errorManagement.ErrorHandler;
-import com.koushikdutta.async.http.AsyncHttpClient;
-import com.koushikdutta.async.http.AsyncHttpPost;
-import com.koushikdutta.async.http.AsyncHttpResponse;
-import com.koushikdutta.async.http.body.MultipartFormDataBody;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +35,7 @@ import static com.grouplearn.project.cloud.BaseManager.RESPONSE;
  * @author : Godwin Joseph Kurinjikattu
  */
 
-public class CloudFileUploader extends AsyncTask<String, Void, String> {
+public class CloudFileUploader extends AsyncTask<String, Integer, String> {
     private static final String TAG = CloudFileUploader.class.getName();
     private OnFileUploadListener onFileUploadListener;
     private Context mContext;
@@ -102,12 +98,17 @@ public class CloudFileUploader extends AsyncTask<String, Void, String> {
             buffer = new byte[bufferSize];
 
             bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
+            int progress = 0;
+            long totalSize = mFile.length();
             while (bytesRead > 0) {
                 dos.write(buffer, 0, bufferSize);
                 bytesAvailable = fileInputStream.available();
                 bufferSize = Math.min(bytesAvailable, maxBufferSize);
                 bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+                progress += bytesRead; // Here progress is total uploaded bytes
+
+                publishProgress((int) ((progress * 100) / totalSize)); // sending progress percent to publishProgress
             }
 
             dos.writeBytes(lineEnd);
@@ -161,6 +162,14 @@ public class CloudFileUploader extends AsyncTask<String, Void, String> {
         Log.v(TAG, s);
     }
 
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+        if (onFileUploadListener != null) {
+            onFileUploadListener.onUploadInProgress(mMessage, values[0]);
+        }
+    }
+
     public void setOnFileUploadListener(OnFileUploadListener onFileUploadListener) {
         this.onFileUploadListener = onFileUploadListener;
     }
@@ -201,31 +210,5 @@ public class CloudFileUploader extends AsyncTask<String, Void, String> {
                 onFileUploadListener.onUploadFailed(mMessage, new AppError(ErrorHandler.EMPTY_RESPONSE_FROM_CLOUD, ErrorHandler.ErrorMessage.EMPTY_RESPONSE_FROM_CLOUD));
             }
         }
-    }
-
-    public void upload() {
-
-        AppSharedPreference mPref = new AppSharedPreference(mContext);
-        String token = mPref.getStringPrefValue(PreferenceConstants.USER_TOKEN);
-
-        AsyncHttpPost post = new AsyncHttpPost(CloudConstants.getFileUploadBaseUrl());
-        MultipartFormDataBody body = new MultipartFormDataBody();
-        body.addFilePart("fileToUpload", mFile);
-        post.setHeader("token", token);
-        post.setHeader("groupId", "" + mMessage.getReceiverId());
-        post.setHeader("message", "" + mMessage.getMessageBody());
-        post.setHeader("messageType", "" + mMessage.getMessageType());
-        post.setHeader("senderName", "" + mMessage.getSenderName());
-        post.setBody(body);
-        AsyncHttpClient.getDefaultInstance().executeString(post, new AsyncHttpClient.StringCallback() {
-            @Override
-            public void onCompleted(Exception ex, AsyncHttpResponse source, String result) {
-                if (ex != null) {
-                    ex.printStackTrace();
-                    return;
-                }
-                System.out.println("Server says: " + result);
-            }
-        });
     }
 }

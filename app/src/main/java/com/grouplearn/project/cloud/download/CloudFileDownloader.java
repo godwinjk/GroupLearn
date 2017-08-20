@@ -19,6 +19,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static com.grouplearn.project.app.file.FileManager.getFileNameFromUri;
+
 /**
  * Created by Godwin on 11-05-2017 16:35 for GroupLearn.
  *
@@ -29,7 +31,6 @@ public class CloudFileDownloader extends AsyncTask<Void, String, Void> {
     private static final String TAG = CloudFileUploader.class.getName();
     private OnFileDownloadListener onFileDownloadListener;
     private Context mContext;
-    private File mFile;
     private GLMessage mMessage;
 
     public CloudFileDownloader(Context mContext, GLMessage mMessage, OnFileDownloadListener onFileDownloadListener) {
@@ -42,6 +43,9 @@ public class CloudFileDownloader extends AsyncTask<Void, String, Void> {
     protected Void doInBackground(Void... params) {
         int count;
         try {
+            if (onFileDownloadListener != null) {
+                onFileDownloadListener.onDownloadInStarted(mMessage);
+            }
             String f_url = mMessage.getCloudFilePath();
             URL url = new URL(f_url);
             HttpURLConnection conection = (HttpURLConnection) url.openConnection();
@@ -56,7 +60,7 @@ public class CloudFileDownloader extends AsyncTask<Void, String, Void> {
             // Output stream to write file
             FileManager manager = new FileManager();
             File directory = manager.getDirectory(mMessage.getMessageType());
-            File file = new File(directory, getName(f_url));
+            File file = new File(directory, getFileNameFromUri(f_url));
             OutputStream output = new FileOutputStream(file);
 
             byte data[] = new byte[1024];
@@ -68,6 +72,12 @@ public class CloudFileDownloader extends AsyncTask<Void, String, Void> {
                 // publishing the progress....
                 // After this onProgressUpdate will be called
                 publishProgress("" + (int) ((total * 100) / lenghtOfFile));
+
+                String builder = String.valueOf( count / (1024f * 1024f)) +
+                        "/" +
+                        (float) total / (1024f * 1024f);
+
+                mMessage.setDownloadSize(builder);
 
                 // writing data to file
                 output.write(data, 0, count);
@@ -90,14 +100,7 @@ public class CloudFileDownloader extends AsyncTask<Void, String, Void> {
         return null;
     }
 
-    private String getName(String url) {
-        String[] arr = url.split("/");
-        String filname = "temp";
-        if (arr.length > 0) {
-            filname = arr[arr.length - 1];
-        }
-        return filname;
-    }
+
 
     @Override
     protected void onPostExecute(Void aVoid) {
@@ -117,7 +120,9 @@ public class CloudFileDownloader extends AsyncTask<Void, String, Void> {
     protected void onProgressUpdate(String... progress) {
         // setting progress percentage
         if (onFileDownloadListener != null) {
+
             int progr = Integer.parseInt(progress[0]);
+            Log.d(TAG, "Progress : " + progr);
             onFileDownloadListener.onDownloadInProgress(mMessage, progr);
         }
     }

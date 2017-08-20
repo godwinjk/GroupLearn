@@ -18,6 +18,8 @@ public class ServerSyncTimes {
     public static final int MESSAGE_GET = 3000;
     public static final int GET_ALL_INVITATION = 3001;
     public static final int GET_ALL_REQUESTS = 3002;
+    public static final int CONTACT_GET = 3003;
+    public static final int CONTACT_REQUEST_GET = 3004;
 
     ContentResolver mContentResolver;
     Context mContext;

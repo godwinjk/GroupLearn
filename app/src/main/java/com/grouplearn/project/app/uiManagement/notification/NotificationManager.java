@@ -17,6 +17,7 @@ import com.grouplearn.project.app.MyApplication;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
+import com.grouplearn.project.app.uiManagement.contact.ContactRequestActivity;
 import com.grouplearn.project.app.uiManagement.group.GroupListActivity;
 import com.grouplearn.project.app.uiManagement.group.GroupListNewActivity;
 import com.grouplearn.project.app.uiManagement.group.InvitationActivity;
@@ -75,6 +76,8 @@ public class NotificationManager {
         } else if (notificationType == TYPE_NEW_GROUP_INVITATION) {
             resId = R.drawable.invitation_white_32;
             groupIntentIntent = new Intent(mContext, InvitationActivity.class);
+        } else if (notificationType == 7) {
+            groupIntentIntent = new Intent(mContext, ContactRequestActivity.class);
         }
         groupIntentIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         groupIntentIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -1,24 +1,17 @@
 package com.grouplearn.project.app.uiManagement;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
-import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.grouplearn.project.R;
@@ -38,7 +31,6 @@ import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.GeneralAlert;
 import com.grouplearn.project.utilities.Helper;
 import com.grouplearn.project.utilities.Log;
-import com.grouplearn.project.utilities.views.AppAlertDialog;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -49,7 +41,6 @@ public class SplashScreenActivity extends BaseActivity {
     private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 10;
     private Context mContext;
     AppSharedPreference mPref;
-    TextView tvTitle, tvDot1, tvDot2, tvDot3;
     CoordinatorLayout splashCoordinate;
 
     @Override
@@ -126,15 +117,8 @@ public class SplashScreenActivity extends BaseActivity {
 
     @Override
     public void initializeWidgets() {
-        tvTitle = (TextView) findViewById(R.id.tv_title);
         splashCoordinate = (CoordinatorLayout) findViewById(R.id.splash_coordinate);
-
-        tvDot1 = (TextView) findViewById(R.id.tv_dot_1);
-        tvDot2 = (TextView) findViewById(R.id.tv_dot_2);
-        tvDot3 = (TextView) findViewById(R.id.tv_dot_3);
-
         mPref = new AppSharedPreference(mContext);
-
     }
 
     private void doInitialTask() {
@@ -156,42 +140,8 @@ public class SplashScreenActivity extends BaseActivity {
 
     @Override
     public void registerListeners() {
-        tvTitle.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                showCustomUrlDialog();
-                return false;
-            }
-        });
     }
 
-    private void showCustomUrlDialog() {
-        AppAlertDialog alertDialog = AppAlertDialog.getAlertDialog(mContext);
-        alertDialog.setTitle(getString(R.string.title_custom_url));
-        View v = LayoutInflater.from(mContext).inflate(R.layout.layout_dialog_custom_url, null);
-        final TextInputLayout etCustomUrl = (TextInputLayout) v.findViewById(R.id.et_url);
-        alertDialog.setView(v);
-        alertDialog.setCancelable(false);
-        alertDialog.setNegativeButton(getString(R.string.btn_title_cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        }).setPositiveButton(getString(R.string.btn_title_Okay), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String url = etCustomUrl.getEditText().getText().toString();
-                if (!TextUtils.isEmpty(url)) {
-                    mPref.setStringPrefValue(PreferenceConstants.CUSTOM_URL, url);
-                    doInitialTask();
-                } else {
-                    etCustomUrl.setError("Please Enter a valid ip");
-                }
-            }
-        });
-        AlertDialog dialog = alertDialog.create();
-        alertDialog.show();
-    }
 
     Timer mTimer;
 
@@ -252,21 +202,5 @@ public class SplashScreenActivity extends BaseActivity {
             }
         });
 
-    }
-
-    private void startSplashAnimation() {
-        startScaleAnimation(tvDot1);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startScaleAnimation(tvDot2);
-            }
-        }, 300);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startScaleAnimation(tvDot3);
-            }
-        }, 600);
     }
 }

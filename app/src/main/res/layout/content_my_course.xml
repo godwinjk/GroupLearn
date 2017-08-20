@@ -5,13 +5,14 @@
     android:id="@+id/content_my_course"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gray_back"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.grouplearn.project.app.uiManagement.course.MyCourseActivity"
     tools:showIn="@layout/activity_my_course">
 
     <android.support.v4.widget.SwipeRefreshLayout
-        android:layout_width="match_parent"
         android:id="@+id/srl_main"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
@@ -25,7 +26,7 @@
         android:id="@+id/ll_loading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rv_search_list"
+        android:layout_below="@id/srl_main"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="20dp"

@@ -39,7 +39,7 @@ public class InterestDbHelper extends DataBaseHelper {
         ArrayList<GLInterest> interests = new ArrayList<>();
         String where = TableInterests.INTEREST_USER_ID + "=" + userId;
         if (type != GLInterest.BOTH)
-            where += " " + TableInterests.INTEREST_TYPE + "=" + type;
+            where += " AND " + TableInterests.INTEREST_TYPE + "=" + type;
         Cursor cursor = mContentResolver.query(TableInterests.CONTENT_URI, null, where, null, null);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -74,7 +74,7 @@ public class InterestDbHelper extends DataBaseHelper {
     public void deleteAllInterests(long userId, int type) {
         String where = TableInterests.INTEREST_USER_ID + "=" + userId;
         if (type != GLInterest.BOTH)
-            where += " " + TableInterests.INTEREST_TYPE + "=" + type;
+            where += " AND " + TableInterests.INTEREST_TYPE + "=" + type;
         mContentResolver.delete(TableInterests.CONTENT_URI, where, null);
     }
 }

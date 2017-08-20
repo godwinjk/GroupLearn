@@ -2,6 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/gray_back"
     android:layout_height="match_parent"
     tools:context="com.grouplearn.project.app.uiManagement.course.MyCourseFragment">
 
@@ -24,7 +25,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
-                android:background="@color/transparent_blue"
                 android:orientation="vertical">
 
                 <LinearLayout

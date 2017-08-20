@@ -2,7 +2,10 @@ package com.grouplearn.project.app.uiManagement.controllers;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.renderscript.Allocation;
@@ -14,7 +17,6 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -22,6 +24,8 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
+
+import static android.graphics.Bitmap.createBitmap;
 
 /**
  * Created by Godwin Joseph on 01-06-2016 11:08 for Group Learn application.
@@ -69,7 +73,7 @@ public class NavigationMenuController {
         TextView mDisplayName = (TextView) headerView.findViewById(R.id.tv_display_name);
         TextView mUserName = (TextView) headerView.findViewById(R.id.tv_user_name);
         final ImageView ivProfile = (ImageView) headerView.findViewById(R.id.iv_profile);
-        final LinearLayout llNavheader = (LinearLayout) headerView.findViewById(R.id.ll_nav_header);
+
 
         mDisplayName.setText(mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME));
         mUserName.setText(mPref.getStringPrefValue(PreferenceConstants.USER_NAME));
@@ -89,8 +93,9 @@ public class NavigationMenuController {
 
                     bitmap = getResizedBitmap(bitmap, width);
                     bitmap = blurRenderScript(mContext, bitmap, 3);
+                    bitmap = getBlackOverLayeredBitmap(bitmap);
                     Drawable d = new BitmapDrawable(mContext.getResources(), bitmap);
-                    llNavheader.setBackground(d);
+
                 }
             });
         }
@@ -124,21 +129,21 @@ public class NavigationMenuController {
         matrix.postScale(scaleWidth / width, scaleHeight / height);
         // recreate the new Bitmap
 
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
+        Bitmap resizedBitmap = createBitmap(bm, 0, 0, width, height, matrix, true);
 
         bm.recycle();
 
         return resizedBitmap;
     }
 
-    public static Bitmap blurRenderScript(Context context, Bitmap smallBitmap, int radius) {
+    public Bitmap blurRenderScript(Context context, Bitmap smallBitmap, int radius) {
         try {
             smallBitmap = RGB565toARGB888(smallBitmap);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        Bitmap bitmap = Bitmap.createBitmap(
+        Bitmap bitmap = createBitmap(
                 smallBitmap.getWidth(), smallBitmap.getHeight(),
                 Bitmap.Config.ARGB_8888);
 
@@ -159,7 +164,21 @@ public class NavigationMenuController {
 
     }
 
-    private static Bitmap RGB565toARGB888(Bitmap img) throws Exception {
+    private Bitmap getBlackOverLayeredBitmap(Bitmap bitmap) {
+
+        Bitmap colorOverlay = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+        Bitmap colorOverlayb = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+        Canvas canvas = new Canvas(colorOverlayb);
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setAlpha(100);
+        canvas.drawBitmap(bitmap, new Matrix(), paint);
+//        canvas.drawBitmap(colorOverlay, 0, 0, paint);
+
+        return colorOverlayb;
+    }
+
+    private Bitmap RGB565toARGB888(Bitmap img) throws Exception {
         int numPixels = img.getWidth() * img.getHeight();
         int[] pixels = new int[numPixels];
 
@@ -167,7 +186,7 @@ public class NavigationMenuController {
         img.getPixels(pixels, 0, img.getWidth(), 0, 0, img.getWidth(), img.getHeight());
 
         //Create a Bitmap of the appropriate format.
-        Bitmap result = Bitmap.createBitmap(img.getWidth(), img.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap result = createBitmap(img.getWidth(), img.getHeight(), Bitmap.Config.ARGB_8888);
 
         //Set RGB pixels.
         result.setPixels(pixels, 0, result.getWidth(), 0, 0, result.getWidth(), result.getHeight());

@@ -21,7 +21,8 @@ import com.grouplearn.project.cloud.userManagement.status.CloudStatusRequest;
 import com.grouplearn.project.utilities.views.DisplayInfo;
 
 
-public class StatusActivity extends BaseActivity implements View.OnClickListener {
+public class
+StatusActivity extends BaseActivity implements View.OnClickListener {
     EditText etStatus;
     TextView tvRemainingChars, tvLater, tvUpdate;
     AppSharedPreference mPref;

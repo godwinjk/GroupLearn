@@ -16,12 +16,15 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -67,6 +70,7 @@ import io.github.rockerhieu.emojicon.EmojiconGridFragment;
 import io.github.rockerhieu.emojicon.EmojiconsFragment;
 import io.github.rockerhieu.emojicon.emoji.Emojicon;
 
+import static android.os.Build.VERSION_CODES.M;
 import static com.grouplearn.project.utilities.AppUtility.getFilePath;
 
 
@@ -74,7 +78,7 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
         EmojiconsFragment.OnEmojiconBackspaceClickedListener,
         View.OnClickListener,
         OnFileUploadListener,
-        OnFileDownloadListener {
+        OnFileDownloadListener, ActionMode.Callback {
 
     private static final String TAG = "GroupChatActivity";
     private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 101;
@@ -97,7 +101,7 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
 
     private ChatDbHelper mDbHelper;
     private AppSharedPreference mPref;
-
+    ActionMode mActionMode;
     private long myUserId;
 
     @Override
@@ -119,16 +123,16 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
         initializeWidgets();
         registerListeners();
         setEmojiconFragment(false);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        NotificationManager.getInstance().cancelNotification();
         updateChatList();
 
         MessageInteractor.getInstance().getAllMessages(groupUniqueId);
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+//
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("chat");
         intentFilter.addAction("chatRefresh");
@@ -141,8 +145,20 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        NotificationManager.getInstance().cancelNotification();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
         unregisterReceiver(chatReceiver);
     }
 
@@ -258,32 +274,52 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
                 return false;
             }
         });
+
         mChatRecyclerAdapter.setOnItemClickListener(new OnRecyclerItemClickListener() {
             @Override
             public void onItemClicked(int position, Object model, int action, View v) {
-                if (action == 2) {
-                    GLMessage message = (GLMessage) model;
-                    download(message);
-                } else if (action == 1) {
-                    GLMessage message = (GLMessage) model;
-                    try {
-                        String url = message.getLocalFilePath();
-                        if (!TextUtils.isEmpty(url)) {
-                            openFile(url);
-                        } else {
+                if (mActionMode == null) {
+                    if (checkPermission()) {
+                        if (action == 2) {
+                            GLMessage message = (GLMessage) model;
                             download(message);
+                        } else if (action == 1) {
+                            GLMessage message = (GLMessage) model;
+                            try {
+                                String url = message.getLocalFilePath();
+                                if (!TextUtils.isEmpty(url)) {
+                                    openFile(url);
+                                } else {
+                                    download(message);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
+                } else {
+                    selectListItem(position, (GLMessage) model);
                 }
             }
 
             @Override
             public void onItemLongClicked(int position, Object model, int action, View v) {
-
+                selectListItem(position, (GLMessage) model);
             }
         });
+    }
+
+    private void selectListItem(int position, GLMessage message) {
+        if (mActionMode == null)
+            mActionMode = startSupportActionMode(this);
+        mChatRecyclerAdapter.toggleSelection(position, message);
+        onPrepareActionMode(mActionMode, mActionMode.getMenu());
+        if (mChatRecyclerAdapter.getSelectedItems().size() <= 0) {
+            mActionMode.finish();
+            mActionMode = null;
+        } else {
+            mActionMode.setTitle(String.valueOf(mChatRecyclerAdapter.getSelectedItems().size()) + " items");
+        }
     }
 
     private void download(GLMessage message) {
@@ -293,7 +329,11 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
 
     public void openFile(String url) throws IOException {
         // Create URI
-
+        File file = new File(url);
+        if (!file.exists()) {
+            DisplayInfo.showToast(mContext, "File not exists in storage");
+            return;
+        }
         Uri uri = Uri.parse("file://" + url);
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -373,7 +413,7 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
         ArrayList<GLMessage> messageModels = mDbHelper.getMessages(groupUniqueId);
         mChatRecyclerAdapter.setMessageModels(messageModels);
         rvChatList.scrollToPosition(mChatRecyclerAdapter.getItemCount() - 1);
-        updateLastActivity();
+//        updateLastActivity();
     }
 
     private void updateLastActivity() {
@@ -432,6 +472,7 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
         model.setReadStatus(ChatUtilities.READ);
 
         mDbHelper.addMessageToDb(model);
+        MessageInteractor.getInstance().startTimer();
         updateChatList();
     }
 
@@ -494,8 +535,12 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
                     try {
                         file = new File(getFilePath(this, uri));
                         Log.d(TAG, " PAth " + file.getAbsolutePath());
-                        File outPutFile = copyToLocalFolder(file, requestCode);
-                        uploadFile(outPutFile, requestCode);
+                        if (FileManager.isAllowedSize(file)) {
+                            File outPutFile = copyToLocalFolder(file, requestCode);
+                            uploadFile(outPutFile, requestCode);
+                        } else {
+                            DisplayInfo.showToast(mContext, "Allowed size is 0 to 20 MB!");
+                        }
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
                     }
@@ -513,7 +558,7 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
     private boolean checkPermission() {
         boolean status = false;
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= M) {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
             } else status = true;
         } else status = true;
@@ -595,7 +640,7 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
     @Override
     public void onUploadFailed(GLMessage message, AppError error) {
         message.setOperationOnProgress(false);
-
+        DisplayInfo.showToast(mContext, error.getErrorMessage());
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -639,8 +684,9 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
     }
 
     @Override
-    public void onDownloadFailed(GLMessage message, AppError error) {
-        message.setOperationOnProgress(false);
+    public void onDownloadInStarted(GLMessage message) {
+        message.setProgress(-1);
+        message.setOperationOnProgress(true);
 
         runOnUiThread(new Runnable() {
             @Override
@@ -648,5 +694,99 @@ public class GroupChatActivity extends BaseActivity implements EmojiconGridFragm
                 mChatRecyclerAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+    @Override
+    public void onDownloadFailed(GLMessage message, AppError error) {
+        message.setOperationOnProgress(false);
+        DisplayInfo.showToast(mContext, error.getErrorMessage());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mChatRecyclerAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        mode.getMenuInflater().inflate(R.menu.menu_chat_action_mode, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        ArrayList<GLMessage> messages = mChatRecyclerAdapter.getSelectedItems();
+        boolean value = false;
+        for (GLMessage message : messages) {
+            if (message.getMessageType() != GLMessage.MESSAG) {
+                value = true;
+                break;
+            }
+        }
+        menu.findItem(R.id.action_paste).setVisible(!value);
+
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        if (item.getItemId() == R.id.action_paste) {
+            copyToClipboard();
+            mChatRecyclerAdapter.deSelectAll();
+            mode.finish();
+        } else if (item.getItemId() == R.id.action_send) {
+            sentMessages();
+            mode.finish();
+            mChatRecyclerAdapter.deSelectAll();
+        } else if (item.getItemId() == R.id.action_delete) {
+            deleteMessages();
+            mode.finish();
+            mChatRecyclerAdapter.deSelectAll();
+        }
+        return true;
+    }
+
+    private void sentMessages() {
+        ArrayList<GLMessage> messages = mChatRecyclerAdapter.getSelectedItems();
+        Intent intent = new Intent(mContext, GroupListActivity.class);
+        intent.putParcelableArrayListExtra("messages", messages);
+        startActivity(intent);
+    }
+
+    private void deleteMessages() {
+        ArrayList<GLMessage> messages = mChatRecyclerAdapter.getSelectedItems();
+        mDbHelper.deleteMessages(messages);
+    }
+
+    public boolean copyToClipboard() {
+        StringBuilder builder = new StringBuilder();
+
+        for (GLMessage message : mChatRecyclerAdapter.getSelectedItems()) {
+            builder.append(message.getMessageBody());
+            builder.append("\n");
+        }
+        try {
+            int sdk = android.os.Build.VERSION.SDK_INT;
+            if (sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
+                android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                clipboard.setText(builder.toString());
+            } else {
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData
+                        .newPlainText("Copied text", builder.toString());
+                clipboard.setPrimaryClip(clip);
+            }
+            DisplayInfo.showToast(mContext, "Copied to clipboard");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        mChatRecyclerAdapter.deSelectAll();
+        mActionMode.finish();
     }
 }

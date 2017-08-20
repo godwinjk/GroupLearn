@@ -5,7 +5,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -15,6 +14,7 @@ import com.grouplearn.project.R;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.bean.GLContact;
 import com.grouplearn.project.bean.GLInterest;
+import com.grouplearn.project.utilities.views.RoundedImageView;
 
 import java.util.ArrayList;
 
@@ -56,30 +56,31 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         } else {
             holder.tvContactSkills.setVisibility(View.GONE);
         }
+
+        holder.tvContactInterests.setVisibility(View.GONE);
+        holder.tvContactSkills.setVisibility(View.GONE);
+
         holder.tvCotactName.setText(text);
         if (!TextUtils.isEmpty(imageUri)) {
             Glide.with(holder.ivContactImage.getContext())
                     .load(imageUri)
-                    .asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .fitCenter().into(holder.ivContactImage);
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .centerCrop()
 //                    .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
-                    /*.into(new BitmapImageViewTarget(holder.ivContactImage) {
-                        @Override
-                        protected void setResource(Bitmap resource) {
-                            RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(holder.ivContactImage.getContext().getResources(), resource);
-                            circularBitmapDrawable.setCircular(true);
-                            holder.ivContactImage.setImageDrawable(circularBitmapDrawable);
-                        }
-                    });*/
+                    .into(holder.ivContactImage);
         } else {
-            holder.ivContactImage.setImageResource(R.drawable.user_placeholder);
+            Glide.with(holder.ivContactImage.getContext())
+                    .load(R.drawable.user_admin)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .centerCrop()
+                    .into(holder.ivContactImage);
         }
         holder.llContactItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-if (onItemClickListener!=null){
-    onItemClickListener.onItemClicked(position,contact,1,v);
-}
+                if (onItemClickListener != null) {
+                    onItemClickListener.onItemClicked(position, contact, 1, v);
+                }
             }
         });
     }
@@ -116,7 +117,7 @@ if (onItemClickListener!=null){
 
     class UserViewHolder extends RecyclerView.ViewHolder {
         TextView tvCotactName, tvContactInterests, tvContactSkills;
-        ImageView ivContactImage;
+        RoundedImageView ivContactImage;
         LinearLayout llContactItem;
 
         public UserViewHolder(View v) {
@@ -124,7 +125,7 @@ if (onItemClickListener!=null){
             tvCotactName = (TextView) v.findViewById(R.id.tv_contact_name);
             tvContactInterests = (TextView) v.findViewById(R.id.tv_contact_interests);
             tvContactSkills = (TextView) v.findViewById(R.id.tv_contact_skills);
-            ivContactImage = (ImageView) v.findViewById(R.id.iv_user_profile);
+            ivContactImage = (RoundedImageView) v.findViewById(R.id.iv_user_profile);
             llContactItem = (LinearLayout) v.findViewById(R.id.ll_contact_item);
         }
     }

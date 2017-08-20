@@ -4,10 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/login_background"
     android:fitsSystemWindows="true"
     tools:context=".app.uiManagement.user.LoginActivity">
 
-    <include layout="@layout/layout_toolbar" />
 
     <include layout="@layout/content_login" />
 

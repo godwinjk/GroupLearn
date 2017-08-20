@@ -17,6 +17,7 @@ import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.bean.GLGroup;
+import com.grouplearn.project.utilities.AppUtility;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,8 +70,9 @@ public class GroupListFrontAdapter extends RecyclerView.Adapter<GroupFrontViewHo
             holder.tvMessageCount.setVisibility(View.VISIBLE);
         }
         holder.tvMessageCount.setText("" + messageCount);
-
         final Context mContext = holder.itemView.getContext();
+        holder.view.setBackgroundColor(AppUtility.getRandomColor(mContext, position));
+
         String imageUri = mGroupModel.getIconUrl();
         if (!TextUtils.isEmpty(imageUri)) {
             Glide.with(mContext)
@@ -198,4 +200,5 @@ public class GroupListFrontAdapter extends RecyclerView.Adapter<GroupFrontViewHo
         notifyDataSetChanged();
         setGroupList(notMineList);
     }
+
 }

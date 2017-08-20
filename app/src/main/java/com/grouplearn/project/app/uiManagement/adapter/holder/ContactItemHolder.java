@@ -1,5 +1,6 @@
 package com.grouplearn.project.app.uiManagement.adapter.holder;
 
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ public class ContactItemHolder {
     public TextView tvInvite;
     public TextView tvStatus;
     public ImageView ivIcon;
+    public View view;
     public LinearLayout llContactItem;
 
 

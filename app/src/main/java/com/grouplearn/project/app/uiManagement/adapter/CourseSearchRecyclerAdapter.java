@@ -18,13 +18,15 @@ import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstan
 import com.grouplearn.project.app.uiManagement.adapter.holder.CourseSearchViewHolder;
 import com.grouplearn.project.app.uiManagement.interfaces.OnRecyclerItemClickListener;
 import com.grouplearn.project.bean.GLCourse;
+import com.grouplearn.project.utilities.AppUtility;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ListIterator;
 
 /**
- * Created by WiSilica on 04-12-2016 10:42 for GroupLearn application.
+ * Created by Godwin on 04-12-2016 10:42 for GroupLearn application 17:36 for GroupLearn.
+ * @author : Godwin Joseph Kurinjikattu
  */
 
 public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSearchViewHolder> {
@@ -63,7 +65,7 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
             @Override
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, course,1, holder.llSearchItem);
+                    onRecyclerItemClickListener.onItemClicked(position, course, 1, holder.llSearchItem);
                 }
             }
         });
@@ -71,7 +73,7 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
             @Override
             public void onClick(View view) {
                 if (onRecyclerItemClickListener != null) {
-                    onRecyclerItemClickListener.onItemClicked(position, course, 1,holder.tvView);
+                    onRecyclerItemClickListener.onItemClicked(position, course, 1, holder.tvView);
                 }
             }
         });
@@ -101,6 +103,7 @@ public class CourseSearchRecyclerAdapter extends RecyclerView.Adapter<CourseSear
             holder.tvBadge.setVisibility(View.GONE);
         }
         holder.tvView.setVisibility(View.GONE);
+        holder.view.setBackgroundColor(AppUtility.getRandomColor(holder.view.getContext(), position));
     }
 
     @Override

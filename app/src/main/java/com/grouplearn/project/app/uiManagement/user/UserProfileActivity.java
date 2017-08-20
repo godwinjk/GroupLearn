@@ -9,38 +9,30 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.grouplearn.project.R;
 import com.grouplearn.project.app.databaseManagament.AppSharedPreference;
 import com.grouplearn.project.app.databaseManagament.constants.PreferenceConstants;
 import com.grouplearn.project.app.uiManagement.BaseActivity;
-import com.grouplearn.project.app.uiManagement.StatusActivity;
 import com.grouplearn.project.app.uiManagement.adapter.InterestRecyclerAdapter;
 import com.grouplearn.project.app.uiManagement.contact.ContactListActivity;
 import com.grouplearn.project.app.uiManagement.interactor.ContactInteractor;
@@ -64,6 +56,7 @@ import com.grouplearn.project.utilities.AppUtility;
 import com.grouplearn.project.utilities.Log;
 import com.grouplearn.project.utilities.views.AppAlertDialog;
 import com.grouplearn.project.utilities.views.DisplayInfo;
+import com.grouplearn.project.utilities.views.RoundedImageView;
 import com.grouplearn.project.utilities.views.SpaceItemDecoration;
 
 import java.io.ByteArrayOutputStream;
@@ -78,20 +71,17 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     private static final String TAG = "UserProfileActivity";
     private static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 101;
 
-    private CollapsingToolbarLayout collapsingToolbarLayout;
-    private Toolbar mToolbar;
     private Context mContext;
-    private TextView tvName, tvStatus;
+    private TextView tvName, tvStatus, tvEdit, tvMainName, tvEmail;
 
     private CheckBox cbVisibility;
-    private ImageView ivProfile, ivSelect;
-
+    private ImageView ivProPicBack, ivBack;
+    private RoundedImageView rivProPic;
     private RecyclerView rvInterests, rvSkills;
 
     private InterestRecyclerAdapter mInterestRecyclerAdapter;
     private InterestRecyclerAdapter mSkillRecyclerAdapter;
     private AppSharedPreference mPref;
-    private ImageView ivNameEdit, ivStatusEdit;
     private CardView cvVisibility;
     private boolean isOtherUser;
     private GLContact mContact;
@@ -102,53 +92,32 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
-        mToolbar = setupToolbar("Profile", true);
         mContext = this;
         mPref = new AppSharedPreference(mContext);
 
-        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbarLayout.setTitle("User Info");
-        mContact = getIntent().getParcelableExtra("user");
-        long userId = mPref.getLongPrefValue(PreferenceConstants.USER_ID);
-
-
         initializeWidgets();
         registerListeners();
-        String imagePath = null;
-        if (userId == mContact.getContactUserId()) {
-            isOtherUser = false;
-            ivAddInterest.setVisibility(View.VISIBLE);
-            ivAddSkills.setVisibility(View.VISIBLE);
-            imagePath = mPref.getStringPrefValue(PreferenceConstants.DP_PATH);
-            btnConnect.setVisibility(View.GONE);
-        } else {
-            isOtherUser = true;
-            ivAddInterest.setVisibility(View.GONE);
-            ivAddSkills.setVisibility(View.GONE);
-            imagePath = mContact.getIconUrl();
-            btnConnect.setVisibility(View.VISIBLE);
-        }
-        if (imagePath != null) {
-            setProfilePic(imagePath);
-        }
+        getData();
         fetchInterests();
     }
 
     @Override
     public void initializeWidgets() {
         cbVisibility = (CheckBox) findViewById(R.id.cb_visibility);
-
+        rivProPic = (RoundedImageView) findViewById(R.id.img_user_round);
+        ivProPicBack = (ImageView) findViewById(R.id.img_user_back);
+        tvEdit = (TextView) findViewById(R.id.tv_edit);
         tvName = (TextView) findViewById(R.id.tv_display_name);
+        tvMainName = (TextView) findViewById(R.id.tv_main_display_name);
+        tvEmail = (TextView) findViewById(R.id.tv_main_email);
+        tvEdit = (TextView) findViewById(R.id.tv_edit);
+        ivBack = (ImageView) findViewById(R.id.iv_back);
 
         tvStatus = (TextView) findViewById(R.id.tv_status);
         btnConnect = (Button) findViewById(R.id.btn_connect);
 
-        ivNameEdit = (ImageView) findViewById(R.id.iv_name_edit);
-        ivProfile = (ImageView) findViewById(R.id.iv_profile);
-        ivSelect = (ImageView) findViewById(R.id.iv_select);
         ivAddInterest = (ImageView) findViewById(R.id.iv_add_interest);
         ivAddSkills = (ImageView) findViewById(R.id.iv_add_skills);
-        ivStatusEdit = (ImageView) findViewById(R.id.iv_status_edit);
         cvVisibility = (CardView) findViewById(R.id.cv_visibility);
 
         rvInterests = (RecyclerView) findViewById(R.id.rv_interests);
@@ -170,21 +139,45 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     @Override
     protected void onResume() {
         super.onResume();
-        if (!isOtherUser) {
-//            setDataToAdapter();
+
+    }
+
+    private void getData() {
+        mContact = getIntent().getParcelableExtra("user");
+        long userId = mPref.getLongPrefValue(PreferenceConstants.USER_ID);
+        String imagePath = null;
+
+        if (mContact == null || userId == mContact.getContactUserId()) {
+            isOtherUser = false;
+            ivAddInterest.setVisibility(View.VISIBLE);
+            ivAddSkills.setVisibility(View.VISIBLE);
+            imagePath = mPref.getStringPrefValue(PreferenceConstants.DP_PATH);
+            btnConnect.setVisibility(View.GONE);
+        } else {
+            isOtherUser = true;
+            ivAddInterest.setVisibility(View.GONE);
+            ivAddSkills.setVisibility(View.GONE);
+            imagePath = mContact.getIconUrl();
+            btnConnect.setVisibility(View.VISIBLE);
+        }
+        if (imagePath != null) {
+            setProfilePic(imagePath);
         }
         setUserPreference();
-
     }
 
     private void setUserDetails() {
         if (isOtherUser) {
-            collapsingToolbarLayout.setTitle(mContact.getContactName());
+            tvEmail.setText(mContact.getContactMailId());
+            tvMainName.setText(mContact.getContactName());
+
             tvName.setText(mContact.getContactName());
             tvStatus.setText(mContact.getContactStatus());
             cbVisibility.setVisibility(View.GONE);
         } else {
-            collapsingToolbarLayout.setTitle(mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME));
+            tvMainName.setText(mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME));
+            tvEmail.setText(mPref.getStringPrefValue(PreferenceConstants.USER_EMAIL_ID));
+
             tvName.setText(mPref.getStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME));
             tvStatus.setText(mPref.getStringPrefValue(PreferenceConstants.USER_STATUS));
             cbVisibility.setVisibility(View.VISIBLE);
@@ -194,7 +187,6 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
 
     @Override
     public void registerListeners() {
-        ivStatusEdit.setOnClickListener(this);
         ivAddInterest.setOnClickListener(this);
         ivAddSkills.setOnClickListener(this);
         btnConnect.setOnClickListener(this);
@@ -219,61 +211,18 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                 setPrivacy(cbVisibility.isChecked());
             }
         });
-
-        ivSelect.setOnClickListener(new View.OnClickListener() {
+        ivBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showFileChooser();
+                finish();
             }
         });
-        ivNameEdit.setOnClickListener(new View.OnClickListener() {
+        tvEdit.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                showNameAlert();
+            public void onClick(View v) {
+                startActivity(new Intent(mContext, UserEditActivity.class));
             }
         });
-    }
-
-    private void showNameAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        final EditText etName = new EditText(mContext);
-        etName.setHint("Display name");
-        etName.setPadding(20, 20, 20, 20);
-        builder.setView(etName);
-
-        builder.setMessage("Enter your new display name");
-        builder.setTitle("Display name");
-        AlertDialog dialog = builder.setPositiveButton("change", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                String name = etName.getText().toString();
-                if (TextUtils.isEmpty(name)) {
-                    DisplayInfo.showToast(mContext, "Display name is mandatory");
-                    showNameAlert();
-                } else if (name.length() < 3 || name.length() > 32) {
-                    DisplayInfo.showToast(mContext, "Display name should be in between of 3-32");
-                    showNameAlert();
-                } else {
-                    setDisplayName(name);
-                }
-                dialogInterface.dismiss();
-            }
-        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        }).create();
-        dialog.show();
-    }
-
-    private void showFileChooser() {
-        if (checkPermission()) {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), ACTIVITY_IMAGE_GET_REQUEST_CODE);
-        }
     }
 
     @Override
@@ -286,7 +235,6 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                     Bitmap bitmap = decodeUri(filePath);
                     if (bitmap != null) {
                         updateImage1(bitmap);
-//                        createDirectoryAndSaveFile(bitmap, true);
                     } else {
                         DisplayInfo.showToast(mContext, "Unable to find the file from directory. Please check the permission");
                     }
@@ -297,8 +245,6 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
             } else if (ACTIVITY_IMAGE_CROP_REQUEST_CODE == requestCode) {
                 Bundle extras = data.getExtras();
                 Bitmap thePic = extras.getParcelable("data");
-//                createDirectoryAndSaveFile(thePic, true);
-                ivProfile.setImageBitmap(thePic);
             }
         }
     }
@@ -306,9 +252,6 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.iv_status_edit:
-                startActivity(new Intent(mContext, StatusActivity.class));
-                break;
             case R.id.iv_add_interest:
                 addInterest(false);
                 break;
@@ -326,7 +269,6 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void requestContact() {
-
         ContactInteractor interactor = new ContactInteractor(mContext);
         DisplayInfo.showLoader(mContext, "Please wait");
         interactor.requestToConnect(mContact, new CloudResponseCallback() {
@@ -343,22 +285,6 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
                 DisplayInfo.showToast(mContext, "Failed to sent request");
             }
         });
-    }
-
-    private void cropImage(Uri imageUri) {
-        Intent cropIntent = new Intent("com.android.camera.action.CROP");
-        cropIntent.setDataAndType(imageUri, "image/*");
-        cropIntent.putExtra("crop", "true");
-        cropIntent.putExtra("aspectX", 1);
-        cropIntent.putExtra("aspectY", 1);
-        cropIntent.putExtra("scale", true);
-        cropIntent.putExtra("outputX", 500);
-        cropIntent.putExtra("outputY", 500);
-        cropIntent.putExtra("return-data", true);
-        cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-
-        cropIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        startActivityForResult(cropIntent, ACTIVITY_IMAGE_CROP_REQUEST_CODE);
     }
 
     private void addInterest(final boolean isSkill) {
@@ -549,6 +475,7 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 DisplayInfo.dismissLoader(mContext);
                 tvName.setText(displayName);
+                mPref.setStringPrefValue(PreferenceConstants.USER_DISPLAY_NAME, displayName);
             }
 
             @Override
@@ -567,40 +494,16 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
 
     private void setProfilePic(final String imageUri) {
 //        final Bitmap bitmap = BitmapFactory.decodeFile(imageUri);
-        Glide.with(mContext)
-                .load(imageUri)
-                .asBitmap()
-                .centerCrop()
-//                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
-                .into(new BitmapImageViewTarget(ivProfile) {
-                    @Override
-                    protected void setResource(Bitmap resource) {
-                        RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
-                        circularBitmapDrawable.setCircular(true);
-                        ivProfile.setImageDrawable(circularBitmapDrawable);
-                        Palette palette = Palette.from(resource).generate();
-
-                        Palette.Swatch swatch = palette.getDarkMutedSwatch();
-                        if (swatch != null) {
-                            int rgb = swatch.getRgb();
-                            if (collapsingToolbarLayout != null) {
-                                collapsingToolbarLayout.setStatusBarScrimColor(rgb);
-                                collapsingToolbarLayout.setContentScrimColor(rgb);
-                                collapsingToolbarLayout.setBackgroundColor(rgb);
-                                Window window = getWindow();
-                                if (window != null) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        window.setStatusBarColor(rgb);
-                                    }
-                                }
-                            }
-                            if (mToolbar != null)
-                                mToolbar.setBackgroundColor(swatch.getRgb());
-                        }
-                    }
-                });
+        int width = rivProPic.getWidth() <= 0 ? BitmapImageViewTarget.SIZE_ORIGINAL : rivProPic.getWidth();
+        int height = rivProPic.getHeight() <= 0 ? BitmapImageViewTarget.SIZE_ORIGINAL : rivProPic.getHeight();
+        Glide.with(this).load(imageUri).asBitmap().into(new SimpleTarget<Bitmap>(width, height) {
+            @Override
+            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                rivProPic.setImageBitmap(resource);
+                ivProPicBack.setImageBitmap(resource);
+            }
+        });
     }
-
 
     private Bitmap decodeUri(Uri selectedImage) throws FileNotFoundException {
         BitmapFactory.Options o = new BitmapFactory.Options();
@@ -668,19 +571,15 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
 
     private void setUserPreference() {
         if (isOtherUser) {
-            ivNameEdit.setVisibility(View.GONE);
-            ivStatusEdit.setVisibility(View.GONE);
+            tvEdit.setVisibility(View.GONE);
+            btnConnect.setVisibility(View.VISIBLE);
             cvVisibility.setVisibility(View.GONE);
-            ivSelect.setVisibility(View.GONE);
-            collapsingToolbarLayout.setTitle(mContact.getContactName());
             tvName.setText(mContact.getContactName());
             tvStatus.setText(mContact.getContactStatus());
         } else {
-            ivNameEdit.setVisibility(View.VISIBLE);
-            ivStatusEdit.setVisibility(View.VISIBLE);
+            tvEdit.setVisibility(View.VISIBLE);
             cvVisibility.setVisibility(View.VISIBLE);
-            ivProfile.setVisibility(View.VISIBLE);
-            ivSelect.setVisibility(View.VISIBLE);
+            btnConnect.setVisibility(View.GONE);
         }
         setUserDetails();
     }
@@ -727,7 +626,6 @@ public class UserProfileActivity extends BaseActivity implements View.OnClickLis
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        showFileChooser();
     }
 
     private void setDataToAdapter(ArrayList<GLInterest> interests) {

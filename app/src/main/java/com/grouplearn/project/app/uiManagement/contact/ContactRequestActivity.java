@@ -59,8 +59,15 @@ public class ContactRequestActivity extends BaseActivity implements ContactViewI
         interactor = new ContactInteractor(mContext);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchList();
+    }
+
     public void fetchList() {
         interactor.getRequests(this);
+        srlMain.setRefreshing(true);
     }
 
     @Override
@@ -95,6 +102,11 @@ public class ContactRequestActivity extends BaseActivity implements ContactViewI
     public void onGetAllContactsFromCloud(ArrayList<GLContact> contactModels) {
         srlMain.setRefreshing(false);
         mAdapter.setRequestModels(contactModels);
+        if (mAdapter.getRequestModels().size()>0){
+            tvNoItems.setVisibility(View.GONE);
+        }else {
+            tvNoItems.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -114,6 +126,7 @@ public class ContactRequestActivity extends BaseActivity implements ContactViewI
             public void onSuccess(CloudConnectRequest cloudRequest, CloudConnectResponse cloudResponse) {
                 DisplayInfo.dismissLoader(mContext);
                 mAdapter.getRequestModels().remove(contact);
+                mAdapter.notifyDataSetChanged();
             }
 
             @Override

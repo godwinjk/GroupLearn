@@ -89,7 +89,7 @@ public class MessageInteractor implements MessageConversationCallback {
     Timer mTimer;
 
 
-    private void startTimer() {
+    public void startTimer() {
         stopTimer();
         mTimer = new Timer();
         TimerTask task = new TimerTask() {
@@ -97,12 +97,12 @@ public class MessageInteractor implements MessageConversationCallback {
             public void run() {
                 boolean isLoggedIn = new AppSharedPreference(mContext).getBooleanPrefValue(PreferenceConstants.IS_LOGIN);
                 if (!isMessageSyncing && !isMessageUpdatingRunning && !isPaused && isLoggedIn) {
-//                    updateMessageToCloud();
+                    updateMessageToCloud();
 //                    getAllMessages();
                 }
             }
         };
-        mTimer.schedule(task, 2000, 5 * 1000);
+        mTimer.schedule(task, 2 * 1000, 1 * 60 * 1000);
     }
 
     public void stopTimer() {

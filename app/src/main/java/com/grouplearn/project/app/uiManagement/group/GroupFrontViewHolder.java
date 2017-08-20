@@ -22,6 +22,7 @@ public class GroupFrontViewHolder extends RecyclerView.ViewHolder {
     public EmojiconTextView tvLastMessage;
     public ImageView ivGroupIcon;
     public LinearLayout llMain;
+    public View view;
 
     public GroupFrontViewHolder(View v) {
         super(v);
@@ -32,5 +33,6 @@ public class GroupFrontViewHolder extends RecyclerView.ViewHolder {
         tvRequest = (TextView) v.findViewById(R.id.tv_group_request);
         llMain = (LinearLayout) v.findViewById(R.id.ll_group_item);
         tvBadge = (TextView) v.findViewById(R.id.tv_badge);
+        view = v.findViewById(R.id.view);
     }
 }

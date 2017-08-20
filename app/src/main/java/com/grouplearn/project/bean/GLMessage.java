@@ -39,6 +39,16 @@ public class GLMessage extends BaseModel implements Parcelable {
     private File file = null;
     private int progress = 0;
     private boolean isOperationOnProgress = false;
+    private boolean isSelected = false;
+    private String downloadSize = "";
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
 
     public int getReadStatus() {
         return readStatus;
@@ -151,6 +161,14 @@ public class GLMessage extends BaseModel implements Parcelable {
         isOperationOnProgress = operationOnProgress;
     }
 
+    public String getDownloadSize() {
+        return downloadSize;
+    }
+
+    public void setDownloadSize(String downloadSize) {
+        this.downloadSize = downloadSize;
+    }
+
     public File getFile() {
         if (file == null && localFilePath != null)
             file = new File(localFilePath);
@@ -169,8 +187,8 @@ public class GLMessage extends BaseModel implements Parcelable {
         this.cloudFilePath = cloudFilePath;
     }
 
+
     protected GLMessage(Parcel in) {
-        super(in);
         messageBody = in.readString();
         messageType = in.readInt();
         senderId = in.readLong();
@@ -181,18 +199,21 @@ public class GLMessage extends BaseModel implements Parcelable {
         messageStatus = in.readInt();
         readStatus = in.readInt();
         sentStatus = in.readInt();
+        localFilePath = in.readString();
+        cloudFilePath = in.readString();
+        downloadSize = in.readString();
+        progress = in.readInt();
+        isOperationOnProgress = in.readByte() != 0x00;
+        isSelected = in.readByte() != 0x00;
     }
 
     @Override
     public int describeContents() {
-        super.describeContents();
         return 0;
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-
         dest.writeString(messageBody);
         dest.writeInt(messageType);
         dest.writeLong(senderId);
@@ -203,6 +224,12 @@ public class GLMessage extends BaseModel implements Parcelable {
         dest.writeInt(messageStatus);
         dest.writeInt(readStatus);
         dest.writeInt(sentStatus);
+        dest.writeString(localFilePath);
+        dest.writeString(cloudFilePath);
+        dest.writeString(downloadSize);
+        dest.writeInt(progress);
+        dest.writeByte((byte) (isOperationOnProgress ? 0x01 : 0x00));
+        dest.writeByte((byte) (isSelected ? 0x01 : 0x00));
     }
 
     @SuppressWarnings("unused")

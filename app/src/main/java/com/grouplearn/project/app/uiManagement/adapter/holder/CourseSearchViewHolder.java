@@ -16,6 +16,7 @@ public class CourseSearchViewHolder extends RecyclerView.ViewHolder {
     public ImageView ivCourseIcon;
     public TextView  tvCourseName, tvDescription, tvView,tvBadge;
     public LinearLayout llSearchItem;
+    public View view;
 
     public CourseSearchViewHolder(View v) {
         super(v);
@@ -23,6 +24,7 @@ public class CourseSearchViewHolder extends RecyclerView.ViewHolder {
         tvBadge = (TextView) v.findViewById(R.id.tv_badge);
 
         llSearchItem = (LinearLayout) v.findViewById(R.id.ll_search_item);
+        view = v.findViewById(R.id.view);
 
         tvCourseName = (TextView) v.findViewById(R.id.tv_item_name);
         tvDescription = (TextView) v.findViewById(R.id.tv_details);

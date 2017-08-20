@@ -3,8 +3,8 @@
     package="com.grouplearn.project">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.SEND_SMS" />
 
     <application
         android:name=".app.MyApplication"
@@ -36,11 +36,11 @@
             android:name=".app.uiManagement.user.LoginActivity"
             android:label="@string/title_activity_login"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme1" />
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
         <activity
             android:name=".app.uiManagement.group.GroupListActivity"
             android:label="@string/title_activity_group_list"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme1" />
         <activity
             android:name=".app.uiManagement.user.SignupActivity"
             android:label="@string/title_activity_signup"
@@ -50,7 +50,7 @@
         <activity
             android:name=".app.uiManagement.group.GroupChatActivity"
             android:label="@string/title_activity_group_chat"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme1" />
         <activity
             android:name=".app.uiManagement.group.AddGroupActivity"
             android:label="@string/title_activity_add_group"
@@ -173,6 +173,10 @@
         <activity
             android:name=".app.uiManagement.contact.ContactRequestActivity"
             android:label="@string/title_activity_contact_request"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".app.uiManagement.user.UserEditActivity"
+            android:label="@string/title_activity_user_edit"
             android:theme="@style/AppTheme1"></activity>
     </application>
 

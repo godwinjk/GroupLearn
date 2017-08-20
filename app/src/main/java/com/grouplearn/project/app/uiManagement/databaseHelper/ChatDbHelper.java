@@ -32,7 +32,7 @@ public class ChatDbHelper extends DataBaseHelper {
         BigDecimal updatedTime = new BigDecimal("0");
         for (GLMessage model : messageModels) {
 
-            if (updateMessageInDb(model) <= 0) {
+            if (updateMessage(model) <= 0) {
                 addMessageToDb(model);
             }
             BigDecimal lastUpdatedTime = new BigDecimal(model.getTimeStamp());
@@ -44,7 +44,14 @@ public class ChatDbHelper extends DataBaseHelper {
     public long updateMessageInDb(GLMessage model) {
         String where = TableMessage.CHAT_ID + "=" + model.getMessageId();
         ContentValues cv = getContentValues(model);
-        cv.put(TableMessage.USER_NAME, model.getSenderName());
+
+        return contentResolver.update(TableMessage.CONTENT_URI, cv, where, null);
+    }
+
+    public long updateMessage(GLMessage model) {
+        String where = TableMessage.CHAT_ID + "=" + model.getMessageId();
+        ContentValues cv = new ContentValues();
+        cv.put(TableMessage.TIME_STAMP, model.getTimeStamp());
         return contentResolver.update(TableMessage.CONTENT_URI, cv, where, null);
     }
 
@@ -152,7 +159,13 @@ public class ChatDbHelper extends DataBaseHelper {
 
     public Object getUnSyncedMessages() {
         ArrayList<GLMessage> messageModels = new ArrayList<>();
-        String where = TableMessage.SENT_STATUS + "=" + ChatUtilities.NOT_SENT;
+        String where = TableMessage.SENT_STATUS
+                + "="
+                + ChatUtilities.NOT_SENT
+                + " AND "
+                + TableMessage.MESSAGE_TYPE
+                + "="
+                + GLMessage.MESSAG;
         Cursor cursor = contentResolver.query(TableMessage.CONTENT_URI, null, where, null, null);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -161,5 +174,16 @@ public class ChatDbHelper extends DataBaseHelper {
             } while (cursor.moveToNext());
         }
         return messageModels;
+    }
+
+    public void deleteMessages(ArrayList<GLMessage> messages) {
+        for (GLMessage message : messages) {
+            deleteMessage(message);
+        }
+    }
+
+    public void deleteMessage(GLMessage message) {
+        String where = TableMessage.CHAT_ID + "=" + message.getMessageId();
+        contentResolver.delete(TableMessage.CONTENT_URI, where, null);
     }
 }
